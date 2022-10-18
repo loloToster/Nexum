@@ -32,6 +32,7 @@ erDiagram
         int widget_id
         int tab_id
         string device_id
+        string type
         int x
         int y
         int width
