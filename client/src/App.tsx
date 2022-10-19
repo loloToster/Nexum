@@ -10,21 +10,21 @@ import Header from "./components/Header/Header"
 import Widgets from "./screens/Widgets"
 import Users from "./screens/Users"
 
-const theme = DarkTheme
+DarkTheme.mode = "exact"
 
 const Stack = createStackNavigator()
 
 function App() {
   return (
     <NavigationContainer>
-      <PaperProvider theme={theme}>
+      <PaperProvider theme={DarkTheme}>
         <Stack.Navigator
           initialRouteName="widgets"
           screenOptions={{
             header: props => <Header {...props} />
           }}>
           <Stack.Screen name="widgets" component={Widgets} />
-          <Stack.Screen name="users" options={{ headerTitle: "Users" }} component={Users} />
+          <Stack.Screen name="users" component={Users} options={{ headerTitle: "Users" }} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </PaperProvider>
