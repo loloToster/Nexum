@@ -1,0 +1,22 @@
+{
+  "name": "nexum",
+  "version": "1.0.0",
+  "description": "```mermaid\r erDiagram\r     USER ||--o{ USER_TAB : has-access-to",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loloToster/Nexum.git"
+  },
+  "author": "loloToster",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/loloToster/Nexum/issues"
+  },
+  "homepage": "https://github.com/loloToster/Nexum#readme",
+  "devDependencies": {
+    "prettier": "2.7.1"
+  }
+}

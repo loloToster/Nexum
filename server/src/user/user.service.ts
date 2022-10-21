@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common'
-import { DatabaseService } from '../database/database.service'
+import { Injectable } from "@nestjs/common"
+import { DatabaseService } from "../database/database.service"
 
 @Injectable()
 export class UserService {
-  constructor(private db: DatabaseService) { }
+  constructor(private db: DatabaseService) {}
 
   async addUser(name: string, isAdmin: boolean) {
     const newUser = await this.db.user.create({

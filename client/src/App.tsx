@@ -22,9 +22,14 @@ function App() {
           initialRouteName="widgets"
           screenOptions={{
             header: props => <Header {...props} />
-          }}>
+          }}
+        >
           <Stack.Screen name="widgets" component={Widgets} />
-          <Stack.Screen name="users" component={Users} options={{ headerTitle: "Users" }} />
+          <Stack.Screen
+            name="users"
+            component={Users}
+            options={{ headerTitle: "Users" }}
+          />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </PaperProvider>

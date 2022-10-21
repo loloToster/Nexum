@@ -8,7 +8,7 @@ erDiagram
 
     USER {
         string user_id
-        string name 
+        string name
         bool is_admin
     }
 
