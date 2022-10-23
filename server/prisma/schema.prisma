@@ -11,4 +11,11 @@ model User {
   id      String  @id @default(uuid())
   name    String
   isAdmin Boolean @map("is_admin")
+  tabs    Tab[]
+}
+
+model Tab {
+  id    Int    @id @default(autoincrement())
+  name  String
+  users User[]
 }
