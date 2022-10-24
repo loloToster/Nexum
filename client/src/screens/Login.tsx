@@ -1,45 +1,99 @@
 import { useState } from "react"
-import { View, StyleSheet, Dimensions } from "react-native"
+import { View, StyleSheet } from "react-native"
+
+import axios, { AxiosError } from "axios"
+import { useMutation } from "react-query"
+
 import {
   Theme,
   useTheme,
   Headline,
   TextInput,
   Text,
-  Button
+  Button,
+  Portal,
+  Modal,
+  ActivityIndicator
 } from "react-native-paper"
 
 import QrScanner from "../components/QrScanner/QrScanner"
 
-function Login() {
+function Login({ login }: { login: (token: string) => void }) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
   const [code, setCode] = useState("")
   const [scannerOpened, setScannerOpened] = useState(false)
+  const [userError, setUserError] = useState("")
 
-  const handleScan = ({ data }) => {
-    console.log(data)
+  const loginMutation = useMutation(
+    "login",
+    async (token: string) => {
+      try {
+        const res = await axios.post("http://localhost:3000/auth/login", {
+          token
+        })
+
+        return res.data
+      } catch (err: unknown) {
+        if (err instanceof AxiosError && err.response?.status === 404) {
+          setUserError("User with this code does not exist")
+          return null
+        } else {
+          throw err
+        }
+      }
+    },
+    {
+      onSuccess: data => {
+        if (data) login(data.id)
+      }
+    }
+  )
+
+  const handleScan = ({ data }: { data: string }) => {
+    const validationString = "nexum-"
+
+    if (!data.startsWith(validationString) || loginMutation.isLoading) return
+    const token = data.slice(validationString.length)
+    loginMutation.mutate(token)
+    setScannerOpened(false)
   }
 
   return (
     <View style={styles.container}>
+      <Portal>
+        <Modal visible={loginMutation.isLoading} dismissable={false}>
+          <ActivityIndicator size="large" />
+        </Modal>
+      </Portal>
       <QrScanner
         visible={scannerOpened}
         onDismiss={() => setScannerOpened(false)}
         onScan={handleScan}
       />
       <Headline style={{ ...styles.head, ...styles.rowItem }}>
-        {"Log in to start\nusing the app"}
+        {loginMutation.isError
+          ? "Something went wrong\nplease try again"
+          : "Log in to start\nusing the app"}
       </Headline>
       <TextInput
         style={styles.rowItem}
-        label="Insert Your Code Manually"
+        label={userError || "Insert Your Code Manually"}
         value={code}
-        onChangeText={setCode}
+        onChangeText={val => {
+          setCode(val)
+          setUserError("")
+        }}
+        error={Boolean(userError)}
       />
-      {code && (
-        <Button style={styles.rowItem} mode="contained">
+      {code.length > 3 && (
+        <Button
+          style={styles.rowItem}
+          mode="contained"
+          onPress={() => loginMutation.mutate(code)}
+          disabled={loginMutation.isLoading}
+        >
           Login
         </Button>
       )}
