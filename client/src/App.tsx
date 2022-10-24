@@ -8,8 +8,9 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { DarkTheme, Provider as PaperProvider } from "react-native-paper"
 
 import Header from "./components/Header/Header"
+
 import Login from "./screens/Login"
-import Widgets from "./screens/Widgets"
+import Main from "./screens/Main"
 import Users from "./screens/Users"
 
 DarkTheme.mode = "exact"
@@ -17,7 +18,7 @@ DarkTheme.mode = "exact"
 const Stack = createStackNavigator()
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(true)
 
   return (
     <PaperProvider theme={DarkTheme}>
@@ -29,7 +30,7 @@ function App() {
               header: props => <Header {...props} />
             }}
           >
-            <Stack.Screen name="widgets" component={Widgets} />
+            <Stack.Screen name="widgets" component={Main} />
             <Stack.Screen
               name="users"
               component={Users}
