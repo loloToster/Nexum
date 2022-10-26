@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { View, StyleSheet } from "react-native"
 
-import axios, { AxiosError } from "axios"
+import api from "../api"
+import { AxiosError } from "axios"
 import { useMutation } from "react-query"
 
 import {
@@ -30,7 +31,7 @@ function Login({ login }: { login: (token: string) => void }) {
     "login",
     async (token: string) => {
       try {
-        const res = await axios.post("http://localhost:3000/auth/login", {
+        const res = await api.post("http://localhost:3000/auth/login", {
           token
         })
 
