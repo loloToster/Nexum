@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from "@nestjs/common"
+import { Controller, Post, Body, NotFoundException } from "@nestjs/common"
 import { AuthService } from "./auth.service"
 
 @Controller("/auth")
@@ -7,6 +7,10 @@ export class AuthController {
 
   @Post("/login")
   async login(@Body("token") token: string) {
-    return this.userService.getUser(token)
+    const user = await this.userService.getUser(token)
+
+    if (!user) throw new NotFoundException("No user with this code")
+
+    return user
   }
 }
