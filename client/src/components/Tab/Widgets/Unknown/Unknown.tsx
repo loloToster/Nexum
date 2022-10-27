@@ -9,7 +9,11 @@ function Unknown({ type }: WidgetData) {
   return (
     <View style={styles.wrapper}>
       <View style={styles.container}>
-        <List.Icon style={styles.icon} icon="alert" color="#565656" />
+        <List.Icon
+          style={styles.icon}
+          icon="alert"
+          color={theme.colors.surface}
+        />
         <Text
           style={styles.text}
         >{`There is no\nwidget of "${type}" type`}</Text>
@@ -30,7 +34,7 @@ const getStyles = (theme: Theme) => {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
-      borderColor: "#565656",
+      borderColor: theme.colors.surface,
       borderWidth: 3,
       borderStyle: "dashed",
       padding: 10
@@ -39,7 +43,7 @@ const getStyles = (theme: Theme) => {
       margin: 0
     },
     text: {
-      color: "#565656",
+      color: theme.colors.surface,
       textAlign: "center",
       fontWeight: "bold"
     }

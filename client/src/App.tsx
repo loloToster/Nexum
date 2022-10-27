@@ -17,6 +17,8 @@ import Main from "./screens/Main"
 import Users from "./screens/Users"
 
 DarkTheme.mode = "exact"
+DarkTheme.colors.surface = "#565656"
+
 const queryClient = new QueryClient()
 const Stack = createStackNavigator()
 

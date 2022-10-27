@@ -102,7 +102,7 @@ const getStyles = (theme: Theme) => {
 
   return StyleSheet.create({
     user: {
-      backgroundColor: "#565656",
+      backgroundColor: theme.colors.surface,
       marginBottom: space,
       borderRadius: theme.roundness,
       padding: space
