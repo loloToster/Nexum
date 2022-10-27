@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { View, StyleSheet, Dimensions } from "react-native"
+import { View, StyleSheet, Dimensions, Platform } from "react-native"
 import {
   Theme,
   useTheme,
@@ -10,7 +10,8 @@ import {
   Chip,
   IconButton,
   Portal,
-  Modal
+  Modal,
+  Divider
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
 
@@ -55,25 +56,30 @@ function User(props: { user: UserI }) {
             <Text>Administrator privilages:</Text>
             <Switch value={isAdmin} onValueChange={() => setIsAdmin(p => !p)} />
           </View>
-          <View>
-            <Text>Available tabs:</Text>
-            <View style={styles.tabs}>
-              {user.tabs.map((tab, i) => (
-                <Chip
-                  style={styles.tab}
-                  key={i}
-                  mode="flat"
-                  closeIcon="minus-circle"
-                  onClose={() => {}}
-                >
-                  {tab}
-                </Chip>
-              ))}
-              <IconButton
-                style={{ ...styles.tab, ...styles.addTab }}
-                icon="plus"
-              />
-            </View>
+          <Divider
+            style={
+              Platform.OS === "web"
+                ? { marginVertical: 10 }
+                : { marginBottom: 10 }
+            }
+          />
+          <Text>Available tabs:</Text>
+          <View style={styles.tabs}>
+            {user.tabs.map((tab, i) => (
+              <Chip
+                style={styles.tab}
+                key={i}
+                mode="flat"
+                closeIcon="minus-circle"
+                onClose={() => {}}
+              >
+                {tab}
+              </Chip>
+            ))}
+            <IconButton
+              style={{ ...styles.tab, ...styles.addTab }}
+              icon="plus"
+            />
           </View>
           <Button
             style={styles.showQr}
@@ -113,14 +119,13 @@ const getStyles = (theme: Theme) => {
       flex: 1,
       flexDirection: "row",
       justifyContent: "space-between",
-      marginBottom: 10
+      alignItems: "center"
     },
     tabs: {
       flexDirection: "row",
       flexWrap: "wrap"
     },
     tab: {
-      alignSelf: "flex-start",
       marginVertical: 2.5,
       marginRight: 2.5,
       marginLeft: 0
