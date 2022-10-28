@@ -52,7 +52,8 @@ function App() {
             <Stack.Navigator
               initialRouteName="widgets"
               screenOptions={{
-                header: props => <Header {...props} />
+                header: props => <Header {...props} />,
+                headerMode: "float"
               }}
             >
               <Stack.Screen name="widgets" component={Main} />
