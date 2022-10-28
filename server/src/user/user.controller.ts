@@ -1,12 +1,15 @@
-import { Controller, Get, Post, Body } from "@nestjs/common"
+import { Controller, Get, Post, Body, UseGuards } from "@nestjs/common"
 import { UserService } from "./user.service"
+
+import { IsAdminGuard } from "src/guards/isadmin.guard"
 
 @Controller("/users")
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get("/")
-  getMe() {
+  @UseGuards(IsAdminGuard)
+  getAllUsers() {
     return this.userService.getUsers()
   }
 
