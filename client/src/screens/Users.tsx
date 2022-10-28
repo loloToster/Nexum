@@ -1,6 +1,8 @@
-import { useState } from "react"
 import { View, FlatList, StyleSheet } from "react-native"
-import { Theme, useTheme } from "react-native-paper"
+import { Theme, useTheme, ActivityIndicator } from "react-native-paper"
+
+import { useQuery } from "react-query"
+import api from "../api"
 
 import { UserI } from "../components/User/types"
 import User from "../components/User/User"
@@ -8,12 +10,10 @@ import User from "../components/User/User"
 function Users() {
   const theme = useTheme()
 
-  const dummyTabs = [...Array(7)].map((_, i) => "Tab " + i)
-  const [users, setUsers] = useState<UserI[]>([
-    { id: "1", name: "test 1", isAdmin: true, tabs: dummyTabs },
-    { id: "2", name: "test 2", isAdmin: false, tabs: dummyTabs },
-    { id: "3", name: "test 3", isAdmin: false, tabs: dummyTabs }
-  ])
+  const { isLoading, data } = useQuery("users", async () => {
+    const res = await api.get("http://localhost:3000/users")
+    return res.data
+  })
 
   const styles = getStyles(theme)
 
@@ -23,7 +23,13 @@ function Users() {
 
   return (
     <View style={styles.container}>
-      <FlatList data={users} renderItem={renderUser} />
+      {isLoading ? (
+        <View style={styles.loadingWrapper}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : (
+        <FlatList data={data} renderItem={renderUser} />
+      )}
     </View>
   )
 }
@@ -39,6 +45,11 @@ const getStyles = (theme: Theme) => {
       flex: 1,
       padding: space,
       paddingBottom: 0
+    },
+    loadingWrapper: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center"
     }
   })
 }

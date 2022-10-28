@@ -14,7 +14,7 @@ export class UserService {
   }
 
   async getUsers() {
-    const allUsers = await this.db.user.findMany()
+    const allUsers = await this.db.user.findMany({ include: { tabs: true } })
     return allUsers
   }
 }

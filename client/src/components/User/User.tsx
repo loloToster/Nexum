@@ -73,7 +73,7 @@ function User(props: { user: UserI }) {
                 closeIcon="minus-circle"
                 onClose={() => {}}
               >
-                {tab}
+                {tab.name}
               </Chip>
             ))}
             <IconButton
