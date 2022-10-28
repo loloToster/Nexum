@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { View, StyleSheet } from "react-native"
 
+import config from "../config"
+
 import api from "../api"
 import { AxiosError } from "axios"
 import { useMutation } from "react-query"
@@ -31,7 +33,7 @@ function Login({ login }: { login: (token: string) => void }) {
     "login",
     async (token: string) => {
       try {
-        const res = await api.post("http://localhost:3000/auth/login", {
+        const res = await api.post("/auth/login", {
           token
         })
 
@@ -53,10 +55,10 @@ function Login({ login }: { login: (token: string) => void }) {
   )
 
   const handleScan = ({ data }: { data: string }) => {
-    const validationString = "nexum-"
+    if (!data.startsWith(config.userCodePrefix) || loginMutation.isLoading)
+      return
 
-    if (!data.startsWith(validationString) || loginMutation.isLoading) return
-    const token = data.slice(validationString.length)
+    const token = data.slice(config.userCodePrefix.length)
     loginMutation.mutate(token)
     setScannerOpened(false)
   }

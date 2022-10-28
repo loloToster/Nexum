@@ -11,7 +11,7 @@ function Users() {
   const theme = useTheme()
 
   const { isLoading, data } = useQuery("users", async () => {
-    const res = await api.get("http://localhost:3000/users")
+    const res = await api.get("/users")
     return res.data
   })
 

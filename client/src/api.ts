@@ -1,7 +1,12 @@
 import axios from "axios"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { Platform } from "react-native"
 
-const apiHandler = axios.create()
+import config from "./config"
+
+const apiHandler = axios.create({
+  baseURL: config.apiBaseUrl[Platform.OS] || config.apiBaseUrl.default
+})
 
 // add saved user token to every request
 apiHandler.interceptors.request.use(async config => {

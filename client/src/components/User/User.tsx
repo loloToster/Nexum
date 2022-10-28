@@ -15,6 +15,8 @@ import {
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
 
+import config from "../../config"
+
 import { UserI } from "./types"
 
 function User(props: { user: UserI }) {
@@ -38,7 +40,7 @@ function User(props: { user: UserI }) {
           <View style={styles.qrWrapper}>
             <QRCode
               size={Dimensions.get("window").width / 1.5}
-              value={user.id}
+              value={config.userCodePrefix + user.id}
             />
           </View>
         </Modal>

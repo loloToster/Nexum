@@ -1,0 +1,6 @@
+{
+  "userCodePrefix": "nexum-",
+  "apiBaseUrl": {
+    "default": ""
+  }
+}
