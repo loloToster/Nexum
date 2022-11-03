@@ -18,12 +18,12 @@ function Main() {
         {
           name: "Tab with btns",
           widgets: [
-            { type: "btn", x: 2, y: 1, w: 2, h: 3 },
+            { type: "gauge", x: 0, y: 1, w: 4, h: 2 },
             {
               type: "btn",
-              x: 0,
+              x: 1,
               y: 0,
-              w: 1,
+              w: 2,
               h: 1
             }
           ]
