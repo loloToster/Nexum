@@ -1,16 +1,23 @@
-import { View, StyleSheet, Dimensions } from "react-native"
+import { useEffect, useState } from "react"
+import { View, StyleSheet, Dimensions, Platform } from "react-native"
 import { useTheme, Theme } from "react-native-paper"
 
-import { WidgetData } from "./Widgets/types"
-import Widget from "./Widgets/Widget"
+import { WidgetData } from "../Widget/types"
+import Widget from "../Widget/Widget"
 
 function Tab({ widgets }: { widgets: WidgetData[] }) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  // ratio of cell is 4/5
-  const cellWidth = Dimensions.get("window").width / 4
-  const cellHeight = (cellWidth / 4) * 5
+  const [cellWidth, setCellWidth] = useState(Dimensions.get("window").width / 4)
+
+  if (Platform.OS === "web")
+    useEffect(() => {
+      const resizeHandler = () =>
+        setCellWidth(Dimensions.get("window").width / 4)
+      window.addEventListener("resize", resizeHandler)
+      return () => window.removeEventListener("resize", resizeHandler)
+    }, [])
 
   return (
     <View style={styles.tab}>
@@ -18,12 +25,12 @@ function Tab({ widgets }: { widgets: WidgetData[] }) {
         <View
           key={i}
           style={{
-            backgroundColor: "teal",
             position: "absolute",
             width: cellWidth * widgetData.w,
-            height: cellHeight * widgetData.h,
+            // ratio of cell is 4/5
+            height: (cellWidth / 4) * 5 * widgetData.h,
             left: cellWidth * widgetData.x,
-            top: cellHeight * widgetData.y
+            top: (cellWidth / 4) * 5 * widgetData.y
           }}
         >
           <Widget {...widgetData} />
