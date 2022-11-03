@@ -17,4 +17,12 @@ export class UserService {
     const allUsers = await this.db.user.findMany({ include: { tabs: true } })
     return allUsers
   }
+
+  async getUserById(id: string) {
+    const allUsers = await this.db.user.findUnique({
+      where: { id },
+      include: { tabs: { include: { widgets: true } } }
+    })
+    return allUsers
+  }
 }

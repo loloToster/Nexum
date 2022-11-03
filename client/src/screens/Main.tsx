@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react"
 import { View, StyleSheet } from "react-native"
 import { ActivityIndicator, Theme, useTheme } from "react-native-paper"
+
+import { useQuery } from "react-query"
+import api from "../api"
 
 import { TabData } from "../components/Tab/types"
 import Tabs from "../components/Tabs/Tabs"
@@ -9,39 +11,17 @@ function Main() {
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const [data, setData] = useState<TabData[]>(null)
+  const { isLoading, data } = useQuery("me", async () => {
+    const res = await api.get("/users/me")
+    return res.data
+  })
 
-  // fetch widgets
-  useEffect(() => {
-    setTimeout(() => {
-      setData([
-        {
-          name: "Tab with btns",
-          widgets: [
-            { type: "gauge", x: 0, y: 1, w: 4, h: 2 },
-            {
-              type: "btn",
-              x: 1,
-              y: 0,
-              w: 2,
-              h: 1
-            }
-          ]
-        },
-        {
-          name: "Empty Tab",
-          widgets: [{ type: "x", x: 1, y: 1, w: 2, h: 1 }]
-        }
-      ])
-    }, 500)
-  }, [])
-
-  return data ? (
-    <Tabs data={data} />
-  ) : (
+  return isLoading ? (
     <View style={styles.loading}>
       <ActivityIndicator size="large" />
     </View>
+  ) : (
+    <Tabs data={data.tabs as TabData[]} />
   )
 }
 

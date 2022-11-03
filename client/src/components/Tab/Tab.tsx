@@ -26,9 +26,9 @@ function Tab({ widgets }: { widgets: WidgetData[] }) {
           key={i}
           style={{
             position: "absolute",
-            width: cellWidth * widgetData.w,
+            width: cellWidth * widgetData.width,
             // ratio of cell is 4/5
-            height: (cellWidth / 4) * 5 * widgetData.h,
+            height: (cellWidth / 4) * 5 * widgetData.height,
             left: cellWidth * widgetData.x,
             top: (cellWidth / 4) * 5 * widgetData.y
           }}
