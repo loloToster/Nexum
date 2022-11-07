@@ -10,6 +10,8 @@ import { createStackNavigator } from "@react-navigation/stack"
 
 import { DarkTheme, Provider as PaperProvider } from "react-native-paper"
 
+import { LoggedInContext } from "./contexts/loggedIn"
+
 import Header from "./components/Header/Header"
 
 import Login from "./screens/Login"
@@ -47,26 +49,28 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={DarkTheme}>
-        {loggedIn ? (
-          <NavigationContainer>
-            <Stack.Navigator
-              initialRouteName="widgets"
-              screenOptions={{
-                header: props => <Header {...props} />,
-                headerMode: "float"
-              }}
-            >
-              <Stack.Screen name="widgets" component={Main} />
-              <Stack.Screen
-                name="users"
-                component={Users}
-                options={{ headerTitle: "Users" }}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        ) : (
-          <Login login={login} />
-        )}
+        <LoggedInContext.Provider value={{ loggedIn, setLoggedIn }}>
+          {loggedIn ? (
+            <NavigationContainer>
+              <Stack.Navigator
+                initialRouteName="widgets"
+                screenOptions={{
+                  header: props => <Header {...props} />,
+                  headerMode: "float"
+                }}
+              >
+                <Stack.Screen name="widgets" component={Main} />
+                <Stack.Screen
+                  name="users"
+                  component={Users}
+                  options={{ headerTitle: "Users" }}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          ) : (
+            <Login login={login} />
+          )}
+        </LoggedInContext.Provider>
         <StatusBar style="auto" />
       </PaperProvider>
     </QueryClientProvider>

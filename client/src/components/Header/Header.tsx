@@ -1,9 +1,13 @@
-import { useCallback } from "react"
+import { useCallback, useContext } from "react"
 import { StackHeaderProps } from "@react-navigation/stack"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Appbar } from "react-native-paper"
 
+import { LoggedInContext } from "../../contexts/loggedIn"
+
 function Header({ options, back, navigation, route }: StackHeaderProps) {
+  const { setLoggedIn } = useContext(LoggedInContext)
+
   const title =
     typeof options.headerTitle == "string" ? options.headerTitle : "Nexum"
 
@@ -11,7 +15,7 @@ function Header({ options, back, navigation, route }: StackHeaderProps) {
 
   const handleLogout = useCallback(() => {
     AsyncStorage.removeItem("token", () => {
-      // TODO: go to login page
+      setLoggedIn(false)
     })
   }, [])
 
