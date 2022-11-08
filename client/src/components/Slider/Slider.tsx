@@ -1,7 +1,17 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { View, Platform, StyleSheet } from "react-native"
 
 import ReactNativeSlider from "@react-native-community/slider"
+
+function map(
+  x: number,
+  inMin: number,
+  inMax: number,
+  outMin: number,
+  outMax: number
+) {
+  return ((x - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
+}
 
 interface SliderProps {
   min?: number
@@ -35,6 +45,42 @@ function Slider({
   }>({ width: 0, height: 0 })
 
   const sliderPercentage = ((value - min) / (max - min)) * 100
+
+  // fix for web slider not responding on touchmove
+  const [inputing, setInputing] = useState(false)
+  const input = useRef<HTMLInputElement>()
+  if (Platform.OS === "web") {
+    useEffect(() => {
+      const moveHandler = (e: TouchEvent) => {
+        if (!inputing) return
+
+        const { clientY } = e.touches[0]
+        const { y, height } = input.current.getBoundingClientRect()
+        const start = y + height
+        const end = y
+
+        const prevVal = value
+        let newVal = map(clientY, start, end, min, max)
+
+        // value needs to be within min & max
+        newVal = newVal > max ? max : newVal
+        newVal = newVal < min ? min : newVal
+
+        // logic that takes step into account
+        newVal =
+          newVal - (newVal % step) + (newVal % step > step / 2 ? step : 0)
+
+        // round the number when using smaller steps to prevent floating point problems
+        newVal = step >= 0.001 ? +newVal.toFixed(3) : newVal
+
+        if (prevVal !== newVal) onChange(newVal)
+        setValue(newVal)
+      }
+
+      window.addEventListener("touchmove", moveHandler)
+      return () => window.removeEventListener("touchmove", moveHandler)
+    }, [inputing, value])
+  }
 
   return (
     <View
@@ -76,6 +122,7 @@ function Slider({
               }}
             ></style>
             <input
+              ref={input}
               className="slider-widget"
               type="range"
               min={min}
@@ -88,6 +135,8 @@ function Slider({
                 onChange(v)
                 setValue(v)
               }}
+              onTouchStart={() => setInputing(true)}
+              onTouchEnd={() => setInputing(false)}
             />
           </>
         ) : (
