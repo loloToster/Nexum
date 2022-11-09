@@ -30,13 +30,16 @@ DarkTheme.colors.surface = "#565656"
 const queryClient = new QueryClient()
 const Stack = createStackNavigator()
 
-const socket = io(config.apiBaseUrl[Platform.OS] || config.apiBaseUrl.default)
+const socket = io(config.apiBaseUrl[Platform.OS] || config.apiBaseUrl.default, {
+  autoConnect: false
+})
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
 
   useEffect(() => {
     socket.on("connect", () => console.log("connected"))
+    socket.on("disconnect", () => console.log("disconnected"))
 
     socket.emit("message", "test")
 
@@ -45,6 +48,12 @@ function App() {
       if (token) setLoggedIn(true)
     })
   }, [])
+
+  // connect socket io on login
+  useEffect(() => {
+    if (loggedIn) socket.connect()
+    else socket.disconnect()
+  }, [loggedIn])
 
   const login = useCallback(
     (token: string) =>
