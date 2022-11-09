@@ -22,12 +22,20 @@ model Tab {
 }
 
 model Widget {
-  id     Int     @id @default(autoincrement())
-  tabId  Int     @map("tab_id")
-  tab    Tab     @relation(fields: [tabId], references: [id])
-  type   String
-  x      Int
-  y      Int
-  width  Int
-  height Int
+  id       Int    @id @default(autoincrement())
+  tabId    Int    @map("tab_id")
+  tab      Tab    @relation(fields: [tabId], references: [id])
+  deviceId String @map("device_id")
+  device   Device @relation(fields: [deviceId], references: [id])
+  type     String
+  x        Int
+  y        Int
+  width    Int
+  height   Int
+}
+
+model Device {
+  id      String   @id @default(uuid())
+  name    String
+  widgets Widget[]
 }
