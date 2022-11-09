@@ -49,7 +49,7 @@ function Slider({
   // fix for web slider not responding on touchmove
   const [inputing, setInputing] = useState(false)
   const input = useRef<HTMLInputElement>()
-  if (Platform.OS === "web") {
+  if (Platform.OS === "web" && vertical) {
     useEffect(() => {
       const moveHandler = (e: TouchEvent) => {
         if (!inputing) return
