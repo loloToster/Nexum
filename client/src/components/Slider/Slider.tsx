@@ -90,11 +90,11 @@ function Slider({
       }}
     >
       <View
-        style={{
-          ...styles.nativeSliderWrapper,
-          ...(vertical ? { transform: [{ rotate: "-90deg" }] } : {}),
-          ...{ width: vertical ? nativeSize.height : nativeSize.width }
-        }}
+        style={[
+          styles.nativeSliderWrapper,
+          vertical ? { transform: [{ rotate: "-90deg" }] } : {},
+          { width: vertical ? nativeSize.height : nativeSize.width }
+        ]}
       >
         {/* i found no better way to do this  :/ */}
         {Platform.OS === "web" ? (

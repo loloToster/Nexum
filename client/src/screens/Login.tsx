@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { View, StyleSheet } from "react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import config from "../config"
 
@@ -19,15 +20,30 @@ import {
   ActivityIndicator
 } from "react-native-paper"
 
+import { useLoggedIn } from "../contexts/loggedIn"
 import QrScanner from "../components/QrScanner/QrScanner"
 
-function Login({ login }: { login: (token: string) => void }) {
+function Login() {
   const theme = useTheme()
   const styles = getStyles(theme)
+
+  const { setLoggedIn } = useLoggedIn()
 
   const [code, setCode] = useState("")
   const [scannerOpened, setScannerOpened] = useState(false)
   const [userError, setUserError] = useState("")
+
+  const login = useCallback(
+    (token: string) =>
+      new Promise<void>((res, rej) => {
+        AsyncStorage.setItem("token", token, err => {
+          if (err) return rej(err)
+          setLoggedIn(true)
+          res()
+        })
+      }),
+    []
+  )
 
   const loginMutation = useMutation(
     "login",
@@ -75,7 +91,7 @@ function Login({ login }: { login: (token: string) => void }) {
         onDismiss={() => setScannerOpened(false)}
         onScan={handleScan}
       />
-      <Headline style={{ ...styles.head, ...styles.rowItem }}>
+      <Headline style={[styles.head, styles.rowItem]}>
         {loginMutation.isError
           ? "Something went wrong\nplease try again"
           : "Log in to start\nusing the app"}
@@ -100,7 +116,7 @@ function Login({ login }: { login: (token: string) => void }) {
           Login
         </Button>
       )}
-      <Text style={{ ...styles.or, ...styles.rowItem }}>OR</Text>
+      <Text style={[styles.or, styles.rowItem]}>OR</Text>
       <Button
         style={styles.rowItem}
         mode="contained"

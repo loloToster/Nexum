@@ -78,10 +78,7 @@ function User(props: { user: UserI }) {
                 {tab.name}
               </Chip>
             ))}
-            <IconButton
-              style={{ ...styles.tab, ...styles.addTab }}
-              icon="plus"
-            />
+            <IconButton style={[styles.tab, styles.addTab]} icon="plus" />
           </View>
           <Button
             style={styles.showQr}

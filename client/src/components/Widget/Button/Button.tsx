@@ -40,10 +40,10 @@ function Button(props: WidgetData) {
       onPressOut={pressOutHandler}
     >
       <View
-        style={{
-          ...styles.container,
-          backgroundColor: active ? color : "transparent"
-        }}
+        style={[
+          styles.container,
+          { backgroundColor: active ? color : "transparent" }
+        ]}
       >
         <Text style={styles.text}>{text}</Text>
       </View>

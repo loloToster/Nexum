@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Platform } from "react-native"
 import { registerRootComponent } from "expo"
 import { StatusBar } from "expo-status-bar"
@@ -41,8 +41,6 @@ function App() {
     socket.on("connect", () => console.log("connected"))
     socket.on("disconnect", () => console.log("disconnected"))
 
-    socket.emit("message", "test")
-
     AsyncStorage.getItem("token", (err, token) => {
       if (err) return
       if (token) setLoggedIn(true)
@@ -54,18 +52,6 @@ function App() {
     if (loggedIn) socket.connect()
     else socket.disconnect()
   }, [loggedIn])
-
-  const login = useCallback(
-    (token: string) =>
-      new Promise<void>((res, rej) => {
-        AsyncStorage.setItem("token", token, err => {
-          if (err) return rej(err)
-          setLoggedIn(true)
-          res()
-        })
-      }),
-    []
-  )
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -91,7 +77,7 @@ function App() {
               </NavigationContainer>
             </SocketContext.Provider>
           ) : (
-            <Login login={login} />
+            <Login />
           )}
         </LoggedInContext.Provider>
         <StatusBar style="auto" />
