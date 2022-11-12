@@ -4,7 +4,7 @@ import { Text, useTheme, Theme } from "react-native-paper"
 
 import { AnimatedCircularProgress } from "react-native-circular-progress"
 
-import { WidgetData } from "../types"
+import { WidgetProps } from "../types"
 
 function map(
   x: number,
@@ -16,7 +16,7 @@ function map(
   return ((x - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
 }
 
-function Gauge(props: WidgetData) {
+function Gauge(props: WidgetProps) {
   const color = "crimson"
   const beforeValue = ""
   const afterValue = "°C"
@@ -24,11 +24,17 @@ function Gauge(props: WidgetData) {
   const minValue = 9
   const maxValue = 32
 
+  const [value, setValue] = useState(minValue)
+  const { setOnChangeHandler } = props
+
+  setOnChangeHandler(val => {
+    setValue(val as number)
+  })
+
   const theme = useTheme()
   const styles = getStyles(theme, color)
 
   const [size, setSize] = useState(0)
-  const [value, setValue] = useState(20.55465)
 
   return (
     <View
@@ -40,7 +46,7 @@ function Gauge(props: WidgetData) {
       <AnimatedCircularProgress
         size={size}
         width={20}
-        fill={map(value, minValue, maxValue, 0, 100)}
+        fill={map((value as number) || 0, minValue, maxValue, 0, 100)}
         tintColor={color}
         backgroundColor={"#090909"}
         arcSweepAngle={270}
@@ -49,7 +55,9 @@ function Gauge(props: WidgetData) {
       >
         {() => (
           <Text style={styles.text}>
-            {`${beforeValue}${+value.toFixed(numberRound)}${afterValue}`}
+            {`${beforeValue}${+((value as number) || 0).toFixed(
+              numberRound
+            )}${afterValue}`}
           </Text>
         )}
       </AnimatedCircularProgress>

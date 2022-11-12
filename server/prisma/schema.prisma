@@ -23,6 +23,7 @@ model Tab {
 
 model Widget {
   id       Int    @id @default(autoincrement())
+  customId String @map("custom_id")
   tabId    Int    @map("tab_id")
   tab      Tab    @relation(fields: [tabId], references: [id])
   deviceId String @map("device_id")
@@ -32,6 +33,8 @@ model Widget {
   y        Int
   width    Int
   height   Int
+
+  @@unique([x, y, tabId]) // no widgets can have the same coordinates on the same tab
 }
 
 model Device {

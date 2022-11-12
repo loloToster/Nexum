@@ -8,9 +8,9 @@ import {
 } from "react-native"
 import { Text, useTheme, Theme } from "react-native-paper"
 
-import { WidgetData } from "../types"
+import { WidgetProps } from "../types"
 
-function Button(props: WidgetData) {
+function Button(props: WidgetProps) {
   const color = "teal"
   const text = "Button"
   const isSwitch = false
@@ -18,7 +18,12 @@ function Button(props: WidgetData) {
   const theme = useTheme()
   const styles = getStyles(theme, color)
 
-  const [active, setActive] = useState(false)
+  const [value, setValue] = useState(false)
+  const { setOnChangeHandler, updateValue } = props
+
+  setOnChangeHandler(val => {
+    setValue(val as boolean)
+  })
 
   type PressFunc = ((event: GestureResponderEvent) => void) | undefined
 
@@ -27,10 +32,21 @@ function Button(props: WidgetData) {
     pressOutHandler: PressFunc
 
   if (isSwitch) {
-    pressHandler = () => setActive(prev => !prev)
+    pressHandler = () =>
+      setValue(prev => {
+        const newVal = !prev
+        updateValue(newVal)
+        return newVal
+      })
   } else {
-    pressInHandler = () => setActive(true)
-    pressOutHandler = () => setActive(false)
+    pressInHandler = () => {
+      updateValue(true)
+      setValue(true)
+    }
+    pressOutHandler = () => {
+      updateValue(false)
+      setValue(false)
+    }
   }
 
   return (
@@ -42,7 +58,7 @@ function Button(props: WidgetData) {
       <View
         style={[
           styles.container,
-          { backgroundColor: active ? color : "transparent" }
+          { backgroundColor: value ? color : "transparent" }
         ]}
       >
         <Text style={styles.text}>{text}</Text>

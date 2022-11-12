@@ -13,6 +13,10 @@ function map(
   return ((x - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
 }
 
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2)
+}
+
 interface SliderProps {
   min?: number
   max?: number
@@ -39,16 +43,25 @@ function Slider({
   const styles = getStyles()
 
   const [value, setValue] = useState(initialValue)
+  const [inputing, setInputing] = useState(false)
   const [nativeSize, setNativeSize] = useState<{
     width: number
     height: number
   }>({ width: 0, height: 0 })
 
   const sliderPercentage = ((value - min) / (max - min)) * 100
+  // round the number when using smaller steps to prevent floating point problems
+  const roundValue = (val: number) => (step >= 0.001 ? +val.toFixed(3) : val)
+
+  // fix for web slider not updating when initial value is changed
+  if (Platform.OS === "web")
+    useEffect(() => {
+      setValue(initialValue)
+    }, [initialValue])
 
   // fix for web slider not responding on touchmove
-  const [inputing, setInputing] = useState(false)
   const input = useRef<HTMLInputElement>()
+  const inputId = uid()
   if (Platform.OS === "web" && vertical) {
     useEffect(() => {
       const moveHandler = (e: TouchEvent) => {
@@ -70,8 +83,7 @@ function Slider({
         newVal =
           newVal - (newVal % step) + (newVal % step > step / 2 ? step : 0)
 
-        // round the number when using smaller steps to prevent floating point problems
-        newVal = step >= 0.001 ? +newVal.toFixed(3) : newVal
+        newVal = roundValue(newVal)
 
         if (prevVal !== newVal) onChange(newVal)
         setValue(newVal)
@@ -102,7 +114,7 @@ function Slider({
             <style
               dangerouslySetInnerHTML={{
                 __html: `
-                .slider-widget {
+                .slider-widget-${inputId} {
                   -webkit-appearance: none;
                   outline: none;
                   height: 5px;
@@ -110,7 +122,7 @@ function Slider({
                   border-radius: 100vh;
                 }
 
-                .slider-widget::-webkit-slider-thumb {
+                .slider-widget-${inputId}::-webkit-slider-thumb {
                   -webkit-appearance: none;
                   appearance: none;
                   width: 15px;
@@ -123,7 +135,7 @@ function Slider({
             ></style>
             <input
               ref={input}
-              className="slider-widget"
+              className={`slider-widget-${inputId}`}
               type="range"
               min={min}
               max={max}
@@ -148,10 +160,13 @@ function Slider({
             minimumTrackTintColor={minColor}
             maximumTrackTintColor={maxColor}
             thumbTintColor={thumbColor}
-            onValueChange={n => {
-              onChange(n)
-              setValue(n)
+            onValueChange={val => {
+              val = roundValue(val)
+              if (inputing) onChange(val)
+              setValue(val)
             }}
+            onSlidingStart={() => setInputing(true)}
+            onSlidingComplete={() => setInputing(false)}
           />
         )}
       </View>

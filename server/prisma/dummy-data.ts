@@ -41,6 +41,7 @@ async function main() {
       name: "tab 1",
       widgets: [
         {
+          customId: "button",
           x: 0,
           y: 0,
           width: 1,
@@ -49,6 +50,7 @@ async function main() {
           deviceId: createdDevices[0].id
         },
         {
+          customId: "slider",
           x: 1,
           y: 0,
           width: 3,
@@ -57,6 +59,7 @@ async function main() {
           deviceId: createdDevices[0].id
         },
         {
+          customId: "temp-gauge",
           x: 0,
           y: 2,
           width: 4,
@@ -70,6 +73,7 @@ async function main() {
       name: "tab 2",
       widgets: [
         {
+          customId: "idk",
           x: 1,
           y: 1,
           width: 2,
