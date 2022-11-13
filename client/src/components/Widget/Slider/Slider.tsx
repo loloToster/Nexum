@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { View, StyleSheet } from "react-native"
 import Slider from "../../Slider/Slider"
 
@@ -8,24 +7,20 @@ function SliderWidget(props: WidgetProps) {
   const color = "teal"
   const isVertical = true
 
-  const [value, setValue] = useState(0)
   const styles = getStyles()
 
-  const { setOnChangeHandler, updateValue } = props
-
-  setOnChangeHandler(val => {
-    setValue(val as number)
-  })
+  const { useWidgetValue } = props
+  const [value, setValue] = useWidgetValue(0)
 
   return (
     <View style={styles.container}>
       <Slider
-        initialValue={(value as number) || 0}
+        initialValue={value}
         minColor={color}
         thumbColor={color}
         maxColor="#040404"
         vertical={isVertical}
-        onChange={updateValue}
+        onChange={v => setValue(v, true)}
       />
     </View>
   )

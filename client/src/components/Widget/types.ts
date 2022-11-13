@@ -7,10 +7,17 @@ export interface WidgetData {
   height: number
 }
 
-export type WidgetValue = string | number | boolean
-export type WidgetFunc = (val: WidgetValue) => void
+export type SetWidgetValueAction<T> = {
+  (newVal: React.SetStateAction<T>): void
+  // onlyServer option is used to prevent infinite loop
+  (newVal: React.SetStateAction<T>, onlyServer?: false): void
+  (newVal: T, onlyServer?: true): void
+}
+
+export type WidgetValueHook = <T = string | number | boolean>(
+  initialValue: T
+) => [T, SetWidgetValueAction<T>]
 
 export interface WidgetProps extends WidgetData {
-  updateValue: WidgetFunc
-  setOnChangeHandler: (func: WidgetFunc) => void
+  useWidgetValue: WidgetValueHook
 }

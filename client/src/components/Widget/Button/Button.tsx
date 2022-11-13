@@ -1,4 +1,3 @@
-import { useState } from "react"
 import {
   View,
   TouchableWithoutFeedback,
@@ -13,17 +12,13 @@ import { WidgetProps } from "../types"
 function Button(props: WidgetProps) {
   const color = "teal"
   const text = "Button"
-  const isSwitch = false
+  const isSwitch = true
 
   const theme = useTheme()
   const styles = getStyles(theme, color)
 
-  const [value, setValue] = useState(false)
-  const { setOnChangeHandler, updateValue } = props
-
-  setOnChangeHandler(val => {
-    setValue(val as boolean)
-  })
+  const { useWidgetValue } = props
+  const [value, setValue] = useWidgetValue(false)
 
   type PressFunc = ((event: GestureResponderEvent) => void) | undefined
 
@@ -32,21 +27,10 @@ function Button(props: WidgetProps) {
     pressOutHandler: PressFunc
 
   if (isSwitch) {
-    pressHandler = () =>
-      setValue(prev => {
-        const newVal = !prev
-        updateValue(newVal)
-        return newVal
-      })
+    pressHandler = () => setValue(prev => !prev)
   } else {
-    pressInHandler = () => {
-      updateValue(true)
-      setValue(true)
-    }
-    pressOutHandler = () => {
-      updateValue(false)
-      setValue(false)
-    }
+    pressInHandler = () => setValue(true)
+    pressOutHandler = () => setValue(false)
   }
 
   return (

@@ -24,12 +24,8 @@ function Gauge(props: WidgetProps) {
   const minValue = 9
   const maxValue = 32
 
-  const [value, setValue] = useState(minValue)
-  const { setOnChangeHandler } = props
-
-  setOnChangeHandler(val => {
-    setValue(val as number)
-  })
+  const { useWidgetValue } = props
+  const [value] = useWidgetValue(minValue)
 
   const theme = useTheme()
   const styles = getStyles(theme, color)
@@ -46,7 +42,7 @@ function Gauge(props: WidgetProps) {
       <AnimatedCircularProgress
         size={size}
         width={20}
-        fill={map((value as number) || 0, minValue, maxValue, 0, 100)}
+        fill={map(value, minValue, maxValue, 0, 100)}
         tintColor={color}
         backgroundColor={"#090909"}
         arcSweepAngle={270}
@@ -55,9 +51,7 @@ function Gauge(props: WidgetProps) {
       >
         {() => (
           <Text style={styles.text}>
-            {`${beforeValue}${+((value as number) || 0).toFixed(
-              numberRound
-            )}${afterValue}`}
+            {`${beforeValue}${+value.toFixed(numberRound)}${afterValue}`}
           </Text>
         )}
       </AnimatedCircularProgress>
