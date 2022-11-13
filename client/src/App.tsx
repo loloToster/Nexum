@@ -31,7 +31,11 @@ const queryClient = new QueryClient()
 const Stack = createStackNavigator()
 
 const socket = io(config.apiBaseUrl[Platform.OS] || config.apiBaseUrl.default, {
-  autoConnect: false
+  autoConnect: false,
+  auth: async cb => {
+    const token = await AsyncStorage.getItem("token")
+    cb({ as: "user", token })
+  }
 })
 
 function App() {
