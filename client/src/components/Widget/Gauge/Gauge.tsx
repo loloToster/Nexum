@@ -1,20 +1,11 @@
 import { useState } from "react"
 import { View, StyleSheet, ColorValue } from "react-native"
 import { Text, useTheme, Theme } from "react-native-paper"
-
 import { AnimatedCircularProgress } from "react-native-circular-progress"
 
-import { WidgetProps } from "../types"
+import { map } from "../../../utils"
 
-function map(
-  x: number,
-  inMin: number,
-  inMax: number,
-  outMin: number,
-  outMax: number
-) {
-  return ((x - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
-}
+import { WidgetProps } from "../types"
 
 function Gauge(props: WidgetProps) {
   const { color, text, min, max, step } = props.properties
