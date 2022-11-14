@@ -1,10 +1,11 @@
-import { PrismaClient, User, Widget } from "@prisma/client"
+import { PrismaClient, User, Widget, WidgetProperties } from "@prisma/client"
 
 async function main() {
   const prisma = new PrismaClient({ log: ["info", "warn", "error"] })
 
   // clear all tables
   await prisma.user.deleteMany()
+  await prisma.widgetProperties.deleteMany()
   await prisma.widget.deleteMany()
   await prisma.tab.deleteMany()
   await prisma.device.deleteMany()
@@ -33,9 +34,13 @@ async function main() {
 
   const createdDevices = await prisma.device.findMany()
 
+  interface W extends Omit<Widget, "id" | "tabId"> {
+    properties?: Partial<WidgetProperties>
+  }
+
   const tabs: Array<{
     name: string
-    widgets: Omit<Widget, "id" | "tabId">[]
+    widgets: W[]
   }> = [
     {
       name: "tab 1",
@@ -47,7 +52,8 @@ async function main() {
           width: 1,
           height: 1,
           type: "btn",
-          deviceId: createdDevices[0].id
+          deviceId: createdDevices[0].id,
+          properties: { isSwitch: true, text: "Button" }
         },
         {
           customId: "slider",
@@ -56,7 +62,14 @@ async function main() {
           width: 3,
           height: 2,
           type: "sldr",
-          deviceId: createdDevices[0].id
+          deviceId: createdDevices[0].id,
+          properties: {
+            color: "lime",
+            step: 1,
+            min: 0,
+            max: 10,
+            isVertical: true
+          }
         },
         {
           customId: "temp-gauge",
@@ -65,7 +78,11 @@ async function main() {
           width: 4,
           height: 3,
           type: "gauge",
-          deviceId: createdDevices[1].id
+          deviceId: createdDevices[1].id,
+          properties: {
+            color: "crimson",
+            text: "/val/°C"
+          }
         }
       ]
     },
@@ -90,7 +107,11 @@ async function main() {
       data: {
         name: tab.name,
         widgets: {
-          create: tab.widgets
+          create: tab.widgets.map(w => {
+            const newW: any = { ...w }
+            if (newW.properties) newW.properties = { create: newW.properties }
+            return newW
+          })
         }
       }
     })

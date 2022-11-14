@@ -33,8 +33,24 @@ model Widget {
   y        Int
   width    Int
   height   Int
+  properties WidgetProperties?
 
   @@unique([x, y, tabId]) // no widgets can have the same coordinates on the same tab
+}
+
+model WidgetProperties {
+  id         Int    @id @default(autoincrement())
+  widgetId   Int    @map("widget_id")
+  widget     Widget @relation(fields: [widgetId], references: [id])
+  color      String?
+  text       String?
+  isSwitch   Boolean?
+  isVertical Boolean?
+  step       Int?
+  min        Int?
+  max        Int?
+
+  @@unique([widgetId])
 }
 
 model Device {
