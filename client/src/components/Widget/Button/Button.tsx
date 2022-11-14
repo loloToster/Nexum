@@ -10,9 +10,7 @@ import { Text, useTheme, Theme } from "react-native-paper"
 import { WidgetProps } from "../types"
 
 function Button(props: WidgetProps) {
-  const color = "teal"
-  const text = "Button"
-  const isSwitch = true
+  const { color, text, isSwitch } = props.properties
 
   const theme = useTheme()
   const styles = getStyles(theme, color)

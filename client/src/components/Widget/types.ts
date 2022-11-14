@@ -1,3 +1,13 @@
+export interface WidgetProperties {
+  color: string
+  text: string
+  isSwitch: boolean
+  isVertical: boolean
+  min: number
+  max: number
+  step: number
+}
+
 export interface WidgetData {
   type: string
   customId: string
@@ -5,6 +15,7 @@ export interface WidgetData {
   y: number
   width: number
   height: number
+  properties?: Partial<WidgetProperties>
 }
 
 export type SetWidgetValueAction<T> = {
@@ -18,6 +29,7 @@ export type WidgetValueHook = <T = string | number | boolean>(
   initialValue: T
 ) => [T, SetWidgetValueAction<T>]
 
-export interface WidgetProps extends WidgetData {
+export interface WidgetProps extends Omit<WidgetData, "properties"> {
+  properties: WidgetProperties
   useWidgetValue: WidgetValueHook
 }

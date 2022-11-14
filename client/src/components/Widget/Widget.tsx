@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
+import { useTheme } from "react-native-paper"
 
 import {
-  SetWidgetValueAction,
+  WidgetProperties,
   WidgetData,
   WidgetProps,
+  SetWidgetValueAction,
   WidgetValueHook
 } from "./types"
 
@@ -24,6 +26,7 @@ const map: Record<string, (props?: WidgetProps) => JSX.Element> = {
 }
 
 function Widget(props: WidgetData) {
+  const theme = useTheme()
   const ChoosenWidget = map[props.type] || Unknown
 
   const useWidgetValue: WidgetValueHook = initialValue => {
@@ -71,8 +74,26 @@ function Widget(props: WidgetData) {
     return [widgetValue, setValue]
   }
 
+  const defaultProperties: WidgetProperties = {
+    color: theme.colors.accent,
+    text: "Text",
+    isSwitch: true,
+    isVertical: false,
+    min: 0,
+    max: 10,
+    step: 1
+  }
+
+  // asign default properties to undefined or null fields
+  const newProperties = props.properties || {}
+  Object.keys(defaultProperties).forEach(p => {
+    const val = newProperties[p]
+    if (val === null || val === undefined)
+      newProperties[p] = defaultProperties[p]
+  })
+
   const choosenWidgetProps: WidgetProps = {
-    ...props,
+    ...{ ...props, properties: newProperties as WidgetProperties },
     useWidgetValue
   }
 

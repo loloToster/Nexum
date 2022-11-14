@@ -4,8 +4,7 @@ import Slider from "../../Slider/Slider"
 import { WidgetProps } from "../types"
 
 function SliderWidget(props: WidgetProps) {
-  const color = "teal"
-  const isVertical = true
+  const { color, isVertical } = props.properties
 
   const styles = getStyles()
 
