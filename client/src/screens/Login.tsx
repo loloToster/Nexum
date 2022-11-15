@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react"
-import { View, StyleSheet } from "react-native"
+import { View, StyleSheet, Platform } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import config from "../config"
@@ -79,11 +79,13 @@ function Login() {
           <ActivityIndicator size="large" />
         </Modal>
       </Portal>
-      <QrScanner
-        visible={scannerOpened}
-        onDismiss={() => setScannerOpened(false)}
-        onScan={handleScan}
-      />
+      {Platform.OS !== "web" && (
+        <QrScanner
+          visible={scannerOpened}
+          onDismiss={() => setScannerOpened(false)}
+          onScan={handleScan}
+        />
+      )}
       <Headline style={[styles.head, styles.rowItem]}>
         {loginMutation.isError
           ? "Something went wrong\nplease try again"
@@ -91,7 +93,11 @@ function Login() {
       </Headline>
       <TextInput
         style={styles.rowItem}
-        label={userError || "Insert Your Code Manually"}
+        label={
+          userError || Platform.OS === "web"
+            ? "Insert your code"
+            : "Insert your code manually"
+        }
         value={code}
         onChangeText={val => {
           setCode(val)
@@ -99,25 +105,29 @@ function Login() {
         }}
         error={Boolean(userError)}
       />
-      {code.length > 3 && (
+      {(code.length > 3 || Platform.OS === "web") && (
         <Button
           style={styles.rowItem}
           mode="contained"
           onPress={() => loginMutation.mutate(code)}
-          disabled={loginMutation.isLoading}
+          disabled={loginMutation.isLoading || code.length <= 3}
         >
           Login
         </Button>
       )}
-      <Text style={[styles.or, styles.rowItem]}>OR</Text>
-      <Button
-        style={styles.rowItem}
-        mode="contained"
-        icon="qrcode"
-        onPress={() => setScannerOpened(true)}
-      >
-        Scan the QR Code
-      </Button>
+      {Platform.OS !== "web" && (
+        <>
+          <Text style={[styles.or, styles.rowItem]}>OR</Text>
+          <Button
+            style={styles.rowItem}
+            mode="contained"
+            icon="qrcode"
+            onPress={() => setScannerOpened(true)}
+          >
+            Scan the QR Code
+          </Button>
+        </>
+      )}
     </View>
   )
 }
