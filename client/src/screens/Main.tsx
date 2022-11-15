@@ -6,12 +6,13 @@ import api from "../api"
 
 import { TabData } from "../components/Tab/types"
 import Tabs from "../components/Tabs/Tabs"
+import Error from "../components/Error/Error"
 
 function Main() {
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const { isLoading, data } = useQuery("me", async () => {
+  const { isLoading, isError, data } = useQuery("me", async () => {
     const res = await api.get("/users/me")
     return res.data
   })
@@ -20,6 +21,8 @@ function Main() {
     <View style={styles.loading}>
       <ActivityIndicator size="large" />
     </View>
+  ) : isError ? (
+    <Error text="Could not load widgets" />
   ) : (
     <Tabs data={data.tabs as TabData[]} />
   )

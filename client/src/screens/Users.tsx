@@ -6,11 +6,12 @@ import api from "../api"
 
 import { UserI } from "../components/User/types"
 import User from "../components/User/User"
+import Error from "../components/Error/Error"
 
 function Users() {
   const theme = useTheme()
 
-  const { isLoading, data } = useQuery("users", async () => {
+  const { isLoading, isError, data } = useQuery("users", async () => {
     const res = await api.get("/users")
     return res.data
   })
@@ -27,6 +28,8 @@ function Users() {
         <View style={styles.loadingWrapper}>
           <ActivityIndicator size="large" />
         </View>
+      ) : isError ? (
+        <Error text="Could not get users" />
       ) : (
         <FlatList data={data} renderItem={renderUser} />
       )}
