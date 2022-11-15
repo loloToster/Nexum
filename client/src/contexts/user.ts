@@ -5,10 +5,15 @@ export type User = {
   isAdmin: boolean
 } | null
 
-export const UserContext = createContext<{
+export interface UserContextI {
   user: User
   setUser: (user: User) => void
-}>({ user: null, setUser: () => {} })
+}
+
+export const UserContext = createContext<UserContextI>({
+  user: null,
+  setUser: () => null
+})
 
 export const useUser = () => {
   return useContext(UserContext)

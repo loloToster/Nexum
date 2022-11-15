@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { View, Platform, StyleSheet } from "react-native"
 import ReactNativeSlider from "@react-native-community/slider"
 
@@ -25,7 +25,7 @@ function Slider({
   maxColor = "gray",
   thumbColor = "teal",
   vertical = false,
-  onChange = () => {}
+  onChange = () => null
 }: SliderProps) {
   const styles = getStyles()
 

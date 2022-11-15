@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Platform } from "react-native"
 import { registerRootComponent } from "expo"
 import { StatusBar } from "expo-status-bar"

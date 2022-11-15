@@ -1,5 +1,5 @@
 import devConfig from "./config.dev.json"
-import prodConfig from "./config.dev.json"
+import prodConfig from "./config.prod.json"
 
 interface Config {
   userCodePrefix: string

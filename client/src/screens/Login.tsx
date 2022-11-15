@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import React, { useCallback, useState } from "react"
 import { View, StyleSheet, Platform } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 

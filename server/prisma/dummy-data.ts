@@ -107,11 +107,10 @@ async function main() {
       data: {
         name: tab.name,
         widgets: {
-          create: tab.widgets.map(w => {
-            const newW: any = { ...w }
-            if (newW.properties) newW.properties = { create: newW.properties }
-            return newW
-          })
+          create: tab.widgets.map(w => ({
+            ...w,
+            properties: w.properties ? { create: w.properties } : undefined
+          }))
         }
       }
     })

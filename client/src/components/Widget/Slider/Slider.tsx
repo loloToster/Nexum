@@ -1,3 +1,4 @@
+import React from "react"
 import { View, StyleSheet } from "react-native"
 import Slider from "../../Slider/Slider"
 

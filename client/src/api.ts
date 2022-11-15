@@ -14,9 +14,11 @@ apiHandler.interceptors.request.use(async config => {
   try {
     const user: User = JSON.parse(await AsyncStorage.getItem("user"))
     if (user) config.headers.Authorization = `Bearer ${user.id}`
-  } finally {
-    return config
+  } catch (e) {
+    console.error(e)
   }
+
+  return config
 })
 
 export default apiHandler

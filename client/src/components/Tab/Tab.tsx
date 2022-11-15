@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { View, StyleSheet, Dimensions, Platform } from "react-native"
 import { useTheme, Theme } from "react-native-paper"
 

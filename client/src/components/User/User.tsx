@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { View, StyleSheet, Dimensions, Platform } from "react-native"
 import {
   Theme,
@@ -73,7 +73,6 @@ function User(props: { user: UserI }) {
                 key={i}
                 mode="flat"
                 closeIcon="minus-circle"
-                onClose={() => {}}
               >
                 {tab.name}
               </Chip>

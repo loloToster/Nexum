@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { View, StyleSheet, ColorValue } from "react-native"
 import { Text, useTheme, Theme } from "react-native-paper"
 import { AnimatedCircularProgress } from "react-native-circular-progress"

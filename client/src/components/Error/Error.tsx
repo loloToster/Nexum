@@ -1,3 +1,4 @@
+import React from "react"
 import { View, StyleSheet } from "react-native"
 import { Text, useTheme, Theme, Avatar } from "react-native-paper"
 

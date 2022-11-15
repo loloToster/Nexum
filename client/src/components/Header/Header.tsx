@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import React, { useCallback } from "react"
 import { StackHeaderProps } from "@react-navigation/stack"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Appbar } from "react-native-paper"
@@ -27,7 +27,11 @@ function Header({ options, back, navigation, route }: StackHeaderProps) {
       <Appbar.Content title={title} />
       {user?.isAdmin && (
         <>
-          <Appbar.Action color="black" icon="raspberry-pi" onPress={() => {}} />
+          <Appbar.Action
+            color="black"
+            icon="raspberry-pi"
+            onPress={() => null}
+          />
           <Appbar.Action
             color="black"
             icon="account-multiple"

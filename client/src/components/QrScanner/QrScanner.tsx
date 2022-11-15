@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { StyleSheet, Dimensions, View, Image } from "react-native"
 
 import {
@@ -25,7 +25,7 @@ function QrScanner(
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const [permission, requestPermission] = Camera.useCameraPermissions()
+  const requestPermission = Camera.useCameraPermissions()[1]
   const [flashlightOn, setFlashlightOn] = useState(false)
 
   // ask for permission when modal is opened

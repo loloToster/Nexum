@@ -1,3 +1,4 @@
+import React from "react"
 import {
   Tabs as PaperTabs,
   TabScreen as PaperTabScreen
