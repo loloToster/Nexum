@@ -3,31 +3,38 @@ import { StackHeaderProps } from "@react-navigation/stack"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Appbar } from "react-native-paper"
 
-import { useLoggedIn } from "../../contexts/loggedIn"
+import { useUser } from "../../contexts/user"
 
 function Header({ options, back, navigation, route }: StackHeaderProps) {
-  const { setLoggedIn } = useLoggedIn()
+  const { user, setUser } = useUser()
 
   const title =
     typeof options.headerTitle == "string" ? options.headerTitle : "Nexum"
 
   const headerStyle = route.name === "widgets" ? { elevation: 0 } : {}
 
-  const handleLogout = useCallback(() => {
-    AsyncStorage.removeItem("token", () => {
-      setLoggedIn(false)
-    })
+  const handleLogout = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem("user")
+    } finally {
+      setUser(null)
+    }
   }, [])
 
   return (
     <Appbar.Header style={headerStyle}>
       {back ? <Appbar.BackAction onPress={navigation.goBack} /> : null}
       <Appbar.Content title={title} />
-      <Appbar.Action icon="raspberry-pi" onPress={() => {}} />
-      <Appbar.Action
-        icon="account-multiple"
-        onPress={() => navigation.navigate("users")}
-      />
+      {user?.isAdmin && (
+        <>
+          <Appbar.Action color="black" icon="raspberry-pi" onPress={() => {}} />
+          <Appbar.Action
+            color="black"
+            icon="account-multiple"
+            onPress={() => navigation.navigate("users")}
+          />
+        </>
+      )}
       <Appbar.Action icon="logout" onPress={handleLogout} />
     </Appbar.Header>
   )

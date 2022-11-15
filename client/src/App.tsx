@@ -15,7 +15,7 @@ import { DarkTheme, Provider as PaperProvider } from "react-native-paper"
 
 import config from "./config"
 
-import { LoggedInContext } from "./contexts/loggedIn"
+import { UserContext, User } from "./contexts/user"
 import { SocketContext } from "./contexts/socket"
 
 import Header from "./components/Header/Header"
@@ -33,35 +33,35 @@ const Stack = createStackNavigator()
 const socket = io(config.apiBaseUrl[Platform.OS] || config.apiBaseUrl.default, {
   autoConnect: false,
   auth: async cb => {
-    const token = await AsyncStorage.getItem("token")
-    cb({ as: "user", token })
+    const user = JSON.parse(await AsyncStorage.getItem("user"))
+    cb({ as: "user", token: user.id })
   }
 })
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false)
+  const [user, setUser] = useState<User>(null)
 
   useEffect(() => {
     socket.on("connect", () => console.log("connected"))
     socket.on("disconnect", () => console.log("disconnected"))
 
-    AsyncStorage.getItem("token", (err, token) => {
+    AsyncStorage.getItem("user", (err, user) => {
       if (err) return
-      if (token) setLoggedIn(true)
+      if (user) setUser(JSON.parse(user))
     })
   }, [])
 
   // connect socket io on login
   useEffect(() => {
-    if (loggedIn) socket.connect()
+    if (user) socket.connect()
     else socket.disconnect()
-  }, [loggedIn])
+  }, [user])
 
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={DarkTheme}>
-        <LoggedInContext.Provider value={{ loggedIn, setLoggedIn }}>
-          {loggedIn ? (
+        <UserContext.Provider value={{ user, setUser }}>
+          {user ? (
             <SocketContext.Provider value={{ socket }}>
               <NavigationContainer>
                 <Stack.Navigator
@@ -83,7 +83,7 @@ function App() {
           ) : (
             <Login />
           )}
-        </LoggedInContext.Provider>
+        </UserContext.Provider>
         <StatusBar style="auto" />
       </PaperProvider>
     </QueryClientProvider>

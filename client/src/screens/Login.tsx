@@ -20,30 +20,23 @@ import {
   ActivityIndicator
 } from "react-native-paper"
 
-import { useLoggedIn } from "../contexts/loggedIn"
+import { useUser, User } from "../contexts/user"
 import QrScanner from "../components/QrScanner/QrScanner"
 
 function Login() {
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const { setLoggedIn } = useLoggedIn()
+  const { setUser } = useUser()
 
   const [code, setCode] = useState("")
   const [scannerOpened, setScannerOpened] = useState(false)
   const [userError, setUserError] = useState("")
 
-  const login = useCallback(
-    (token: string) =>
-      new Promise<void>((res, rej) => {
-        AsyncStorage.setItem("token", token, err => {
-          if (err) return rej(err)
-          setLoggedIn(true)
-          res()
-        })
-      }),
-    []
-  )
+  const login = useCallback(async (user: User) => {
+    await AsyncStorage.setItem("user", JSON.stringify(user))
+    setUser(user)
+  }, [])
 
   const loginMutation = useMutation(
     "login",
@@ -65,7 +58,7 @@ function Login() {
     },
     {
       onSuccess: data => {
-        if (data) login(data.id)
+        if (data) login(data)
       }
     }
   )
