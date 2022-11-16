@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { View, Platform, StyleSheet } from "react-native"
 import ReactNativeSlider from "@react-native-community/slider"
 
-import { map, uid } from "../../utils"
+import { map, uid } from "src/utils"
 
 interface SliderProps {
   min?: number

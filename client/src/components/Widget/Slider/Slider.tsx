@@ -1,8 +1,8 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
-import Slider from "../../Slider/Slider"
+import Slider from "src/components/Slider/Slider"
 
-import { WidgetProps } from "../types"
+import { WidgetProps } from "src/components/Widget/types"
 
 function SliderWidget(props: WidgetProps) {
   const { color, isVertical } = props.properties

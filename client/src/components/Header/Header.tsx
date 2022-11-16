@@ -3,7 +3,7 @@ import { StackHeaderProps } from "@react-navigation/stack"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Appbar } from "react-native-paper"
 
-import { useUser } from "../../contexts/user"
+import { useUser } from "src/contexts/user"
 
 function Header({ options, back, navigation, route }: StackHeaderProps) {
   const { user, setUser } = useUser()

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { useTheme } from "react-native-paper"
 
+import { useSocket, ValueUpdateFunc } from "src/contexts/socket"
+
 import {
   WidgetProperties,
   WidgetData,
@@ -8,8 +10,6 @@ import {
   SetWidgetValueAction,
   WidgetValueHook
 } from "./types"
-
-import { useSocket, ValueUpdateFunc } from "../../contexts/socket"
 
 // special component returned if provided type does not match any component in map
 import Unknown from "./Unknown/Unknown"

@@ -3,9 +3,9 @@ import { View, StyleSheet, ColorValue } from "react-native"
 import { Text, useTheme, Theme } from "react-native-paper"
 import { AnimatedCircularProgress } from "react-native-circular-progress"
 
-import { map } from "../../../utils"
+import { map } from "src/utils"
 
-import { WidgetProps } from "../types"
+import { WidgetProps } from "src/components/Widget/types"
 
 function Gauge(props: WidgetProps) {
   const { color, text, min, max, step } = props.properties

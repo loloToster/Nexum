@@ -1,13 +1,13 @@
 import React from "react"
 import { View, FlatList, StyleSheet } from "react-native"
 import { Theme, useTheme, ActivityIndicator } from "react-native-paper"
-
 import { useQuery } from "react-query"
-import api from "../api"
 
-import { UserI } from "../components/User/types"
-import User from "../components/User/User"
-import Error from "../components/Error/Error"
+import api from "src/api"
+
+import { UserI } from "src/components/User/types"
+import User from "src/components/User/User"
+import Error from "src/components/Error/Error"
 
 function Users() {
   const theme = useTheme()

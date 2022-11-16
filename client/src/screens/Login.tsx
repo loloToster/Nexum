@@ -1,10 +1,6 @@
 import React, { useCallback, useState } from "react"
 import { View, StyleSheet, Platform } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-
-import config from "../config"
-
-import api from "../api"
 import { AxiosError } from "axios"
 import { useMutation } from "react-query"
 
@@ -20,8 +16,11 @@ import {
   ActivityIndicator
 } from "react-native-paper"
 
-import { useUser, User } from "../contexts/user"
-import QrScanner from "../components/QrScanner/QrScanner"
+import config from "src/config"
+import api from "src/api"
+
+import { useUser, User } from "src/contexts/user"
+import QrScanner from "src/components/QrScanner/QrScanner"
 
 function Login() {
   const theme = useTheme()

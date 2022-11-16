@@ -7,7 +7,7 @@ import {
 } from "@nestjs/websockets"
 import { Server, Socket } from "socket.io"
 
-import { DatabaseService } from "../database/database.service"
+import { DatabaseService } from "src/database/database.service"
 
 @WebSocketGateway({ cors: true })
 export class EventsGateway {

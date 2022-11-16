@@ -15,7 +15,7 @@ import {
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
 
-import config from "../../config"
+import config from "src/config"
 
 import { UserI } from "./types"
 

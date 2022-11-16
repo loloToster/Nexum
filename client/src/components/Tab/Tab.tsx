@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react"
 import { View, StyleSheet, Dimensions, Platform } from "react-native"
 import { useTheme, Theme } from "react-native-paper"
 
-import { WidgetData } from "../Widget/types"
-import Widget from "../Widget/Widget"
+import { WidgetData } from "src/components/Widget/types"
+import Widget from "src/components/Widget/Widget"
 
 function Tab({ widgets }: { widgets: WidgetData[] }) {
   const theme = useTheme()

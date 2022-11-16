@@ -4,8 +4,8 @@ import {
   TabScreen as PaperTabScreen
 } from "react-native-paper-tabs"
 
-import Tab from "../Tab/Tab"
-import { TabData } from "../Tab/types"
+import Tab from "src/components/Tab/Tab"
+import { TabData } from "src/components/Tab/types"
 
 function Tabs({ data }: { data: TabData[] }) {
   return (

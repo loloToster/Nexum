@@ -8,7 +8,7 @@ import {
 } from "react-native"
 import { Text, useTheme, Theme } from "react-native-paper"
 
-import { WidgetProps } from "../types"
+import { WidgetProps } from "src/components/Widget/types"
 
 function Button(props: WidgetProps) {
   const { color, text, isSwitch } = props.properties

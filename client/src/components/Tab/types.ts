@@ -1,4 +1,4 @@
-import { WidgetData } from "../Widget/types"
+import { WidgetData } from "src/components/Widget/types"
 
 export interface TabData {
   name: string

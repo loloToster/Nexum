@@ -1,13 +1,13 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
 import { ActivityIndicator, Theme, useTheme } from "react-native-paper"
-
 import { useQuery } from "react-query"
-import api from "../api"
 
-import { TabData } from "../components/Tab/types"
-import Tabs from "../components/Tabs/Tabs"
-import Error from "../components/Error/Error"
+import api from "src/api"
+
+import { TabData } from "src/components/Tab/types"
+import Tabs from "src/components/Tabs/Tabs"
+import Error from "src/components/Error/Error"
 
 function Main() {
   const theme = useTheme()
