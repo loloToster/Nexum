@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from "@nestjs/common"
+import { Controller, Get, Post, Body, UseGuards, Query } from "@nestjs/common"
 import { UserService } from "./user.service"
 
 import { User as UserI } from "@prisma/client"
@@ -13,8 +13,8 @@ export class UserController {
 
   @Get("/")
   @UseGuards(IsAdminGuard)
-  getAllUsers() {
-    return this.userService.getUsers()
+  getAllUsers(@Query("q") query?: string) {
+    return this.userService.getUsers(query)
   }
 
   @Get("/me")
