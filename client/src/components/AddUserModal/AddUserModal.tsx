@@ -56,7 +56,6 @@ export default AddUserModal
 const getStyles = (theme: Theme) => {
   return StyleSheet.create({
     modal: {
-      flex: 1,
       alignItems: "center",
       justifyContent: "center"
     },
@@ -67,15 +66,14 @@ const getStyles = (theme: Theme) => {
       backgroundColor: theme.colors.background
     },
     row: {
-      minHeight: 30,
-      marginBottom: 15
+      marginBottom: 15,
+      minHeight: 40
     },
-    // TODO: fix android version
     administratorRow: {
-      flex: 1,
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between"
+      justifyContent: "space-between",
+      paddingHorizontal: 5
     }
   })
 }
