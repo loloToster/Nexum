@@ -1,13 +1,16 @@
 import { Injectable } from "@nestjs/common"
+import { User } from "@prisma/client"
 import { DatabaseService } from "src/database/database.service"
 
 @Injectable()
 export class UserService {
   constructor(private db: DatabaseService) {}
 
-  async addUser(name: string, isAdmin: boolean) {
+  async createUser({ id, name, isAdmin = false }: Partial<User>) {
+    if (!id) id = undefined
+
     const newUser = await this.db.user.create({
-      data: { name, isAdmin }
+      data: { id, name, isAdmin }
     })
 
     return newUser

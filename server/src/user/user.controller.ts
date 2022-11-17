@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, UseGuards, Query } from "@nestjs/common"
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Query,
+  ConflictException,
+  BadRequestException
+} from "@nestjs/common"
 import { UserService } from "./user.service"
 
 import { User as UserI } from "@prisma/client"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime"
 
 import { IsAdminGuard } from "src/guards/isadmin.guard"
 import { LoggedInGuard } from "src/guards/loggedin.guard"
@@ -25,7 +35,25 @@ export class UserController {
 
   @Post("/")
   @UseGuards(IsAdminGuard)
-  createUser(@Body("name") name: string) {
-    return this.userService.addUser(name, false)
+  async createUser(
+    @Body("name") name: string,
+    @Body("isAdmin") isAdmin: boolean | undefined,
+    @Body("id") id: string | undefined
+  ) {
+    if (!name) throw new BadRequestException("Name cannot be empty")
+
+    try {
+      return await this.userService.createUser({ name, isAdmin, id })
+    } catch (err: unknown) {
+      if (
+        err instanceof PrismaClientKnownRequestError &&
+        err.code === "P2002" &&
+        err.meta?.target[0] === "id"
+      ) {
+        throw new ConflictException({ conflictOn: "id" })
+      } else {
+        throw err
+      }
+    }
   }
 }
