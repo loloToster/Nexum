@@ -10,11 +10,13 @@ import {
 import { useQuery } from "react-query"
 
 import api from "src/api"
-
 import { UserI } from "src/components/User/types"
+
+import useDebounce from "src/hooks/useDebounce"
+
 import User from "src/components/User/User"
 import Error from "src/components/Error/Error"
-import useDebounce from "src/hooks/useDebounce"
+import AddUserModal from "src/components/AddUserModal/AddUserModal"
 
 function Users() {
   const theme = useTheme()
@@ -34,12 +36,18 @@ function Users() {
     }
   )
 
+  const [addUserModalActive, setAddUserModalActive] = useState(false)
+
   const renderUser = ({ item: user }: { item: UserI }) => {
     return <User user={user} />
   }
 
   return (
     <View style={styles.container}>
+      <AddUserModal
+        visible={addUserModalActive}
+        onDismiss={() => setAddUserModalActive(false)}
+      />
       <Searchbar
         ref={searchBar}
         style={styles.search}
@@ -60,7 +68,7 @@ function Users() {
       <FAB
         style={styles.fab}
         icon="account-plus"
-        onPress={() => console.log("add user")}
+        onPress={() => setAddUserModalActive(true)}
       />
     </View>
   )
