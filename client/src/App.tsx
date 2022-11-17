@@ -63,7 +63,7 @@ function App() {
         <UserContext.Provider value={{ user, setUser }}>
           {user ? (
             <SocketContext.Provider value={{ socket }}>
-              <NavigationContainer>
+              <NavigationContainer linking={{ prefixes: [] }}>
                 <Stack.Navigator
                   initialRouteName="widgets"
                   screenOptions={{
