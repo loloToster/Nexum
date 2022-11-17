@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { View, StyleSheet, Dimensions, Platform } from "react-native"
+import React, { useRef, useState } from "react"
+import { View, StyleSheet, Dimensions, TextInput } from "react-native"
 import {
   Theme,
   useTheme,
@@ -11,7 +11,8 @@ import {
   IconButton,
   Portal,
   Modal,
-  Divider
+  Divider,
+  Colors
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
 
@@ -23,11 +24,15 @@ function User(props: { user: UserI }) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const { user } = props
+  const { user: initialUser } = props
+
+  const [user, setUser] = useState(initialUser)
 
   const [active, setActive] = useState(false)
   const [qrActive, setQrActive] = useState(false)
   const [isAdmin, setIsAdmin] = useState(user.isAdmin)
+
+  const nameInput = useRef<TextInput>()
 
   return (
     <Surface style={styles.user}>
@@ -55,17 +60,42 @@ function User(props: { user: UserI }) {
       {active && (
         <View style={styles.metadata}>
           <View style={styles.row}>
+            <Text numberOfLines={1}>ID: {user.id}</Text>
+            <IconButton
+              icon="qrcode"
+              size={20}
+              onPress={() => setQrActive(true)}
+            />
+          </View>
+          <Divider />
+          <View style={styles.row}>
+            <View
+              style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+            >
+              <Text style={{ marginRight: 5 }}>Name:</Text>
+              <TextInput
+                style={{
+                  borderWidth: 0,
+                  color: "white"
+                }}
+                ref={nameInput}
+                value={user.name}
+                onChangeText={t => setUser(p => ({ ...p, name: t }))}
+              />
+            </View>
+            <IconButton
+              icon="pencil"
+              size={20}
+              onPress={() => nameInput.current.focus()}
+            />
+          </View>
+          <Divider />
+          <View style={styles.row}>
             <Text>Administrator privilages:</Text>
             <Switch value={isAdmin} onValueChange={() => setIsAdmin(p => !p)} />
           </View>
-          <Divider
-            style={
-              Platform.OS === "web"
-                ? { marginVertical: 10 }
-                : { marginBottom: 10 }
-            }
-          />
-          <Text>Available tabs:</Text>
+          <Divider />
+          <Text style={{ marginTop: 10 }}>Available tabs:</Text>
           <View style={styles.tabs}>
             {user.tabs.map((tab, i) => (
               <Chip
@@ -80,12 +110,13 @@ function User(props: { user: UserI }) {
             <IconButton style={[styles.tab, styles.addTab]} icon="plus" />
           </View>
           <Button
-            style={styles.showQr}
-            icon="qrcode"
-            onPress={() => setQrActive(true)}
+            style={styles.delete}
+            icon="delete"
+            color={Colors.red500}
             mode="contained"
+            onPress={() => console.log("delete")}
           >
-            Show QR code
+            Delete
           </Button>
         </View>
       )}
@@ -117,7 +148,8 @@ const getStyles = (theme: Theme) => {
       flex: 1,
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "center"
+      alignItems: "center",
+      minHeight: 50
     },
     tabs: {
       flexDirection: "row",
@@ -134,7 +166,7 @@ const getStyles = (theme: Theme) => {
       borderRadius: 16,
       backgroundColor: "#383838"
     },
-    showQr: {
+    delete: {
       marginTop: space
     },
     qrModal: {
