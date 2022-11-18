@@ -1,13 +1,13 @@
 import {
   Controller,
+  UseGuards,
   Get,
   Post,
+  Delete,
   Body,
-  UseGuards,
   Query,
   ConflictException,
-  BadRequestException,
-  Delete
+  NotFoundException
 } from "@nestjs/common"
 import { UserService } from "./user.service"
 
@@ -17,6 +17,9 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime"
 import { IsAdminGuard } from "src/guards/isadmin.guard"
 import { LoggedInGuard } from "src/guards/loggedin.guard"
 import { User } from "src/decorators/user.decorator"
+
+import CreateUserDto from "src/dtos/createUser.dto"
+import RemoveUserDto from "src/dtos/removeUser.dto"
 
 @Controller("/users")
 export class UserController {
@@ -36,15 +39,9 @@ export class UserController {
 
   @Post("/")
   @UseGuards(IsAdminGuard)
-  async createUser(
-    @Body("name") name: string,
-    @Body("isAdmin") isAdmin: boolean | undefined,
-    @Body("id") id: string | undefined
-  ) {
-    if (!name) throw new BadRequestException("Name cannot be empty")
-
+  async createUser(@Body() newUser: CreateUserDto) {
     try {
-      return await this.userService.createUser({ name, isAdmin, id })
+      return await this.userService.createUser(newUser)
     } catch (err: unknown) {
       if (
         err instanceof PrismaClientKnownRequestError &&
@@ -60,7 +57,18 @@ export class UserController {
 
   @Delete("/")
   @UseGuards(IsAdminGuard)
-  async removeUser(@Body("id") id: string) {
-    return this.userService.removeUser(id)
+  async removeUser(@Body() { id }: RemoveUserDto) {
+    try {
+      return await this.userService.removeUser(id)
+    } catch (err: unknown) {
+      if (
+        err instanceof PrismaClientKnownRequestError &&
+        err.code === "P2025"
+      ) {
+        throw new NotFoundException("No user with this id")
+      } else {
+        throw err
+      }
+    }
   }
 }
