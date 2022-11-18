@@ -1,9 +1,6 @@
 import React, { useRef, useState } from "react"
 import { View, StyleSheet, Dimensions, TextInput } from "react-native"
 import {
-  Theme,
-  useTheme,
-  Surface,
   Button,
   Switch,
   Text,
@@ -21,18 +18,18 @@ import QRCode from "react-native-qrcode-svg"
 import config from "src/config"
 import useObjectState from "src/hooks/useObjectState"
 
+import ListItem from "src/components/ListItem/ListItem"
+
 import { UserI } from "./types"
 
 function User(props: {
   user: UserI
   deleteUser: (id: string) => void | Promise<void>
 }) {
-  const theme = useTheme()
-  const styles = getStyles(theme)
+  const styles = getStyles()
 
   const { user: initialUser, deleteUser } = props
 
-  const [active, setActive] = useState(false)
   const [user, setUser] = useObjectState(initialUser)
   const [qrActive, setQrActive] = useState(false)
   const [deleteActive, setDeleteActive] = useState(false)
@@ -51,7 +48,7 @@ function User(props: {
   }
 
   return (
-    <Surface style={styles.user}>
+    <ListItem name={user.name}>
       <Portal>
         <Modal
           style={styles.qrModal}
@@ -77,105 +74,67 @@ function User(props: {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      <Button
-        contentStyle={styles.header}
-        icon={active ? "chevron-down" : "chevron-left"}
-        onPress={() => setActive(p => !p)}
-      >
-        <Text>{user.name}</Text>
-      </Button>
-      {active && (
-        <View style={styles.metadata}>
-          <View style={styles.row}>
-            <Text numberOfLines={1}>ID: {user.id}</Text>
-            <IconButton
-              icon="qrcode"
-              size={20}
-              onPress={() => setQrActive(true)}
-            />
-          </View>
-          <Divider />
-          <View style={styles.row}>
-            <View
-              style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
-            >
-              <Text style={{ marginRight: 5 }}>Name:</Text>
-              <TextInput
-                style={{
-                  borderWidth: 0,
-                  color: "white"
-                }}
-                ref={nameInput}
-                value={user.name}
-                onChangeText={t => setUser("name", t)}
-              />
-            </View>
-            <IconButton
-              icon="pencil"
-              size={20}
-              onPress={() => nameInput.current.focus()}
-            />
-          </View>
-          <Divider />
-          <View style={styles.row}>
-            <Text>Administrator privilages:</Text>
-            <Switch
-              value={user.isAdmin}
-              onValueChange={v => setUser("isAdmin", v)}
-            />
-          </View>
-          <Divider />
-          <Text style={{ marginTop: 10 }}>Available tabs:</Text>
-          <View style={styles.tabs}>
-            {user.tabs.map((tab, i) => (
-              <Chip
-                style={styles.tab}
-                key={i}
-                mode="flat"
-                closeIcon="minus-circle"
-              >
-                {tab.name}
-              </Chip>
-            ))}
-            <IconButton style={[styles.tab, styles.addTab]} icon="plus" />
-          </View>
-          <Button
-            style={styles.delete}
-            icon="delete"
-            color={Colors.red500}
-            mode="contained"
-            onPress={() => setDeleteActive(true)}
-            loading={deleteLoading}
-            disabled={deleteLoading}
-          >
-            {deleteLoading ? "Deleting" : "Delete"}
-          </Button>
+      <View style={styles.row}>
+        <Text numberOfLines={1}>ID: {user.id}</Text>
+        <IconButton icon="qrcode" size={20} onPress={() => setQrActive(true)} />
+      </View>
+      <Divider />
+      <View style={styles.row}>
+        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+          <Text style={{ marginRight: 5 }}>Name:</Text>
+          <TextInput
+            style={{
+              borderWidth: 0,
+              color: "white"
+            }}
+            ref={nameInput}
+            value={user.name}
+            onChangeText={t => setUser("name", t)}
+          />
         </View>
-      )}
-    </Surface>
+        <IconButton
+          icon="pencil"
+          size={20}
+          onPress={() => nameInput.current.focus()}
+        />
+      </View>
+      <Divider />
+      <View style={styles.row}>
+        <Text>Administrator privilages:</Text>
+        <Switch
+          value={user.isAdmin}
+          onValueChange={v => setUser("isAdmin", v)}
+        />
+      </View>
+      <Divider />
+      <Text style={{ marginTop: 10 }}>Available tabs:</Text>
+      <View style={styles.tabs}>
+        {user.tabs.map((tab, i) => (
+          <Chip style={styles.tab} key={i} mode="flat" closeIcon="minus-circle">
+            {tab.name}
+          </Chip>
+        ))}
+        <IconButton style={[styles.tab, styles.addTab]} icon="plus" />
+      </View>
+      <Button
+        style={styles.delete}
+        icon="delete"
+        color={Colors.red500}
+        mode="contained"
+        onPress={() => setDeleteActive(true)}
+        loading={deleteLoading}
+        disabled={deleteLoading}
+      >
+        {deleteLoading ? "Deleting" : "Delete"}
+      </Button>
+    </ListItem>
   )
 }
 
 export default User
 
-const getStyles = (theme: Theme) => {
-  const space = 10
-
+const getStyles = () => {
   return StyleSheet.create({
-    user: {
-      backgroundColor: theme.colors.surface,
-      marginBottom: space,
-      borderRadius: theme.roundness,
-      padding: space
-    },
-    header: {
-      flexDirection: "row-reverse",
-      justifyContent: "space-between"
-    },
-    metadata: {
-      marginTop: space,
-      marginHorizontal: 16
-    },
     row: {
       flex: 1,
       flexDirection: "row",
@@ -199,7 +158,7 @@ const getStyles = (theme: Theme) => {
       backgroundColor: "#383838"
     },
     delete: {
-      marginTop: space
+      marginVertical: 10
     },
     qrModal: {
       flex: 1,
