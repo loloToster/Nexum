@@ -6,11 +6,12 @@ import { DatabaseModule } from "./database/database.module"
 
 import { EventsGateway } from "./gateways/events.gateway"
 
-import { UserModule } from "./user/user.module"
 import { AuthModule } from "./auth/auth.module"
+import { DeviceModule } from "./device/device.module"
+import { UserModule } from "./user/user.module"
 
 @Module({
-  imports: [AuthModule, UserModule, DatabaseModule, EventsGateway]
+  imports: [AuthModule, DeviceModule, UserModule, DatabaseModule, EventsGateway]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
