@@ -6,7 +6,8 @@ import {
   UseGuards,
   Query,
   ConflictException,
-  BadRequestException
+  BadRequestException,
+  Delete
 } from "@nestjs/common"
 import { UserService } from "./user.service"
 
@@ -55,5 +56,11 @@ export class UserController {
         throw err
       }
     }
+  }
+
+  @Delete("/")
+  @UseGuards(IsAdminGuard)
+  async removeUser(@Body("id") id: string) {
+    return this.userService.removeUser(id)
   }
 }

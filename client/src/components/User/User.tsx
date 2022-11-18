@@ -12,27 +12,43 @@ import {
   Portal,
   Modal,
   Divider,
-  Colors
+  Colors,
+  Dialog,
+  Paragraph
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
 
 import config from "src/config"
+import useObjectState from "src/hooks/useObjectState"
 
 import { UserI } from "./types"
 
-function User(props: { user: UserI }) {
+function User(props: {
+  user: UserI
+  deleteUser: (id: string) => void | Promise<void>
+}) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const { user: initialUser } = props
-
-  const [user, setUser] = useState(initialUser)
+  const { user: initialUser, deleteUser } = props
 
   const [active, setActive] = useState(false)
+  const [user, setUser] = useObjectState(initialUser)
   const [qrActive, setQrActive] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(user.isAdmin)
+  const [deleteActive, setDeleteActive] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const nameInput = useRef<TextInput>()
+
+  const handleDelete = async () => {
+    setDeleteLoading(true)
+    setDeleteActive(false)
+    try {
+      await deleteUser(user.id)
+    } catch {
+      setDeleteLoading(false)
+    }
+  }
 
   return (
     <Surface style={styles.user}>
@@ -49,6 +65,17 @@ function User(props: { user: UserI }) {
             />
           </View>
         </Modal>
+      </Portal>
+      <Portal>
+        <Dialog visible={deleteActive}>
+          <Dialog.Content>
+            <Paragraph>Are you sure you want to delete this user?</Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setDeleteActive(false)}>Cancel</Button>
+            <Button onPress={handleDelete}>Yes</Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
       <Button
         contentStyle={styles.header}
@@ -80,7 +107,7 @@ function User(props: { user: UserI }) {
                 }}
                 ref={nameInput}
                 value={user.name}
-                onChangeText={t => setUser(p => ({ ...p, name: t }))}
+                onChangeText={t => setUser("name", t)}
               />
             </View>
             <IconButton
@@ -92,7 +119,10 @@ function User(props: { user: UserI }) {
           <Divider />
           <View style={styles.row}>
             <Text>Administrator privilages:</Text>
-            <Switch value={isAdmin} onValueChange={() => setIsAdmin(p => !p)} />
+            <Switch
+              value={user.isAdmin}
+              onValueChange={v => setUser("isAdmin", v)}
+            />
           </View>
           <Divider />
           <Text style={{ marginTop: 10 }}>Available tabs:</Text>
@@ -114,9 +144,11 @@ function User(props: { user: UserI }) {
             icon="delete"
             color={Colors.red500}
             mode="contained"
-            onPress={() => console.log("delete")}
+            onPress={() => setDeleteActive(true)}
+            loading={deleteLoading}
+            disabled={deleteLoading}
           >
-            Delete
+            {deleteLoading ? "Deleting" : "Delete"}
           </Button>
         </View>
       )}

@@ -7,7 +7,7 @@ import {
   Searchbar,
   FAB
 } from "react-native-paper"
-import { useQuery } from "react-query"
+import { useMutation, useQuery } from "react-query"
 
 import api from "src/api"
 import { UserI } from "src/components/User/types"
@@ -25,21 +25,38 @@ function Users() {
   const searchBar = useRef<TextInput>()
   const [searchValue, setSearchValue] = useState("")
   const debouncedSearchValue = useDebounce(searchValue)
+  const [addUserModalActive, setAddUserModalActive] = useState(false)
 
-  const { isLoading, isError, data } = useQuery(
-    ["users", debouncedSearchValue],
-    async ({ queryKey }) => {
-      const query = encodeURIComponent(queryKey[1] || "")
-      const params = query ? `?q=${query}` : query
-      const res = await api.get("/users" + params)
-      return res.data
+  const {
+    isLoading,
+    isError,
+    data,
+    refetch: refetchUsers
+  } = useQuery(["users", debouncedSearchValue], async ({ queryKey }) => {
+    const query = encodeURIComponent(queryKey[1] || "")
+    const params = query ? `?q=${query}` : query
+    const res = await api.get("/users" + params)
+    return res.data
+  })
+
+  const deleteMutation = useMutation(
+    "delete-user",
+    async (id: string) => {
+      await api.delete("users", { data: { id } })
+    },
+    {
+      onSuccess: () => {
+        refetchUsers()
+      }
     }
   )
 
-  const [addUserModalActive, setAddUserModalActive] = useState(false)
+  const deleteUser = (id: string) => {
+    deleteMutation.mutate(id)
+  }
 
   const renderUser = ({ item: user }: { item: UserI }) => {
-    return <User user={user} />
+    return <User user={user} deleteUser={deleteUser} />
   }
 
   return (
@@ -47,6 +64,7 @@ function Users() {
       <AddUserModal
         visible={addUserModalActive}
         onDismiss={() => setAddUserModalActive(false)}
+        onAdd={() => refetchUsers()}
       />
       <Searchbar
         ref={searchBar}

@@ -43,7 +43,9 @@ function ErrorText({ error }: { error: string }) {
   )
 }
 
-function AddUserModal(props: Omit<ModalProps, "children" | "theme">) {
+function AddUserModal(
+  props: { onAdd: () => void } & Omit<ModalProps, "children" | "theme">
+) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
@@ -102,6 +104,7 @@ function AddUserModal(props: Omit<ModalProps, "children" | "theme">) {
       onSuccess: (res: AxiosResponse | null) => {
         if (!res) return
         setUserData({ ...emptyUserData })
+        props.onAdd()
         handleDismiss()
       }
     }

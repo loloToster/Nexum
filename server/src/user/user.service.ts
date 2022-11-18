@@ -16,6 +16,10 @@ export class UserService {
     return newUser
   }
 
+  async removeUser(id: string) {
+    return await this.db.user.delete({ where: { id } })
+  }
+
   async getUsers(searchQuery?: string) {
     if (searchQuery) searchQuery = decodeURIComponent(searchQuery)
 
