@@ -19,7 +19,7 @@ import { LoggedInGuard } from "src/guards/loggedin.guard"
 import { User } from "src/decorators/user.decorator"
 
 import CreateUserDto from "src/dtos/createUser.dto"
-import RemoveUserDto from "src/dtos/removeUser.dto"
+import RemoveByIdDto from "src/dtos/removeById.dto"
 
 @Controller("/users")
 export class UserController {
@@ -57,7 +57,7 @@ export class UserController {
 
   @Delete("/")
   @UseGuards(IsAdminGuard)
-  async removeUser(@Body() { id }: RemoveUserDto) {
+  async removeUser(@Body() { id }: RemoveByIdDto) {
     try {
       return await this.userService.removeUser(id)
     } catch (err: unknown) {
