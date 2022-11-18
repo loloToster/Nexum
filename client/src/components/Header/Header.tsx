@@ -1,9 +1,13 @@
 import React, { useCallback } from "react"
+import { Image } from "react-native"
 import { StackHeaderProps } from "@react-navigation/stack"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Appbar } from "react-native-paper"
 
 import { useUser } from "src/contexts/user"
+
+// @ts-ignore
+import microcontrollerIcon from "assets/microcontroller.png"
 
 function Header({ options, back, navigation, route }: StackHeaderProps) {
   const { user, setUser } = useUser()
@@ -29,7 +33,13 @@ function Header({ options, back, navigation, route }: StackHeaderProps) {
         <>
           <Appbar.Action
             color="black"
-            icon="raspberry-pi"
+            icon={({ size }) => (
+              <Image
+                source={microcontrollerIcon}
+                style={{ width: size, height: size }}
+              />
+            )}
+            animated={false}
             onPress={() => null}
           />
           <Appbar.Action

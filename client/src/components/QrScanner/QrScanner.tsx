@@ -15,7 +15,7 @@ import {
 import { Camera, BarCodeScanningResult, FlashMode } from "expo-camera"
 
 // @ts-ignore
-import qrFrame from "./qr-frame.png"
+import qrFrame from "assets/qr-frame.png"
 
 function QrScanner(
   props: Omit<ModalProps, "children" | "theme"> & {
