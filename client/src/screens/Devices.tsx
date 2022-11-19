@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { StyleSheet } from "react-native"
+import { StyleSheet, Image } from "react-native"
 import { FAB } from "react-native-paper"
 import { useMutation, useQuery } from "react-query"
 
@@ -11,6 +11,9 @@ import useDebounce from "src/hooks/useDebounce"
 import SearchableList from "src/components/SearchableList/SearchableList"
 import Device from "src/components/Device/Device"
 import AddDeviceModal from "src/components/AddDeviceModal/AddDeviceModal"
+
+// @ts-ignore
+import microcontrollerPlusIcon from "assets/microcontroller-plus.png"
 
 function Devices() {
   const styles = getStyles()
@@ -68,7 +71,12 @@ function Devices() {
       ></SearchableList>
       <FAB
         style={styles.fab}
-        icon="plus"
+        icon={({ size }) => (
+          <Image
+            source={microcontrollerPlusIcon}
+            style={{ width: size, height: size, opacity: 0.7 }}
+          />
+        )}
         onPress={() => setAddDeviceModalActive(true)}
       />
     </>
