@@ -18,8 +18,6 @@ import QRCode from "react-native-qrcode-svg"
 import config from "src/config"
 import useObjectState from "src/hooks/useObjectState"
 
-import ListItem from "src/components/ListItem/ListItem"
-
 import { UserI } from "./types"
 
 function User(props: {
@@ -48,7 +46,7 @@ function User(props: {
   }
 
   return (
-    <ListItem name={user.name}>
+    <View style={styles.container}>
       <Portal>
         <Modal
           style={styles.qrModal}
@@ -127,7 +125,7 @@ function User(props: {
       >
         {deleteLoading ? "Deleting" : "Delete"}
       </Button>
-    </ListItem>
+    </View>
   )
 }
 
@@ -135,6 +133,9 @@ export default User
 
 const getStyles = () => {
   return StyleSheet.create({
+    container: {
+      paddingHorizontal: 15
+    },
     row: {
       flex: 1,
       flexDirection: "row",
