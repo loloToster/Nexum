@@ -40,7 +40,7 @@ function Header({ options, back, navigation, route }: StackHeaderProps) {
               />
             )}
             animated={false}
-            onPress={() => null}
+            onPress={() => navigation.navigate("devices")}
           />
           <Appbar.Action
             color="black"

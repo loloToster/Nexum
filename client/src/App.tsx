@@ -22,6 +22,7 @@ import Header from "./components/Header/Header"
 
 import Login from "./screens/Login"
 import Main from "./screens/Main"
+import Devices from "./screens/Devices"
 import Users from "./screens/Users"
 
 DarkTheme.mode = "exact"
@@ -72,6 +73,11 @@ function App() {
                   }}
                 >
                   <Stack.Screen name="widgets" component={Main} />
+                  <Stack.Screen
+                    name="devices"
+                    component={Devices}
+                    options={{ headerTitle: "Devices" }}
+                  />
                   <Stack.Screen
                     name="users"
                     component={Users}
