@@ -43,4 +43,12 @@ export class DeviceService {
 
     return devices
   }
+
+  async getDeviceById(id: string) {
+    const user = await this.db.device.findUnique({
+      where: { id }
+    })
+
+    return user
+  }
 }

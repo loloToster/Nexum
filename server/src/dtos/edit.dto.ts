@@ -3,10 +3,6 @@ import { IsNotEmpty, IsString, NotEquals } from "class-validator"
 export default class EditDto {
   @IsNotEmpty()
   @IsString()
-  id: string
-
-  @IsNotEmpty()
-  @IsString()
   key: string
 
   @NotEquals(null)

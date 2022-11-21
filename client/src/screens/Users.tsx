@@ -34,7 +34,7 @@ function Users() {
   const deleteMutation = useMutation(
     "delete-user",
     async (id: string) => {
-      await api.delete("users", { data: { id } })
+      await api.delete("/users/" + id)
     },
     {
       onSuccess: () => {

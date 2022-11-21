@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Query,
+  Param,
   ConflictException,
   NotFoundException
 } from "@nestjs/common"
@@ -19,29 +20,17 @@ import { LoggedInGuard } from "src/guards/loggedin.guard"
 import { User } from "src/decorators/user.decorator"
 
 import CreateUserDto from "src/dtos/createUser.dto"
-import RemoveByIdDto from "src/dtos/removeById.dto"
 
 @Controller("/users")
+@UseGuards(LoggedInGuard)
 export class UserController {
   constructor(private userService: UserService) {}
-
-  @Get("/")
-  @UseGuards(IsAdminGuard)
-  getAllUsers(@Query("q") query?: string) {
-    return this.userService.getUsers(query)
-  }
-
-  @Get("/me")
-  @UseGuards(LoggedInGuard)
-  getMe(@User() user: UserI) {
-    return this.userService.getUserById(user.id)
-  }
 
   @Post("/")
   @UseGuards(IsAdminGuard)
   async createUser(@Body() newUser: CreateUserDto) {
     try {
-      return await this.userService.createUser(newUser)
+      return this.userService.createUser(newUser)
     } catch (err: unknown) {
       if (
         err instanceof PrismaClientKnownRequestError &&
@@ -55,9 +44,26 @@ export class UserController {
     }
   }
 
-  @Delete("/")
+  @Get("/")
   @UseGuards(IsAdminGuard)
-  async removeUser(@Body() { id }: RemoveByIdDto) {
+  getAllUsers(@Query("q") query?: string) {
+    return this.userService.getUsers(query)
+  }
+
+  @Get("/me")
+  getMe(@User() user: UserI) {
+    return this.userService.getUserById(user.id)
+  }
+
+  @Get("/:id")
+  @UseGuards(IsAdminGuard)
+  getUser(@Param("id") id: string) {
+    return this.userService.getUserById(id)
+  }
+
+  @Delete("/:id")
+  @UseGuards(IsAdminGuard)
+  async removeUser(@Param("id") id: string) {
     try {
       return await this.userService.removeUser(id)
     } catch (err: unknown) {

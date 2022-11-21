@@ -7,6 +7,7 @@ import {
   Delete,
   Body,
   Query,
+  Param,
   ConflictException,
   NotFoundException
 } from "@nestjs/common"
@@ -18,20 +19,13 @@ import { IsAdminGuard } from "src/guards/isadmin.guard"
 
 import CreateDeviceDto from "src/dtos/createDevice.dto"
 import EditDto from "src/dtos/edit.dto"
-import RemoveByIdDto from "src/dtos/removeById.dto"
 
 @Controller("/devices")
+@UseGuards(IsAdminGuard)
 export class DeviceController {
   constructor(private deviceService: DeviceService) {}
 
-  @Get("/")
-  @UseGuards(IsAdminGuard)
-  getAllDevices(@Query("q") query?: string) {
-    return this.deviceService.getDevices(query)
-  }
-
   @Post("/")
-  @UseGuards(IsAdminGuard)
   async createDevice(@Body() newDevice: CreateDeviceDto) {
     try {
       return await this.deviceService.createDevice(newDevice)
@@ -48,15 +42,23 @@ export class DeviceController {
     }
   }
 
-  @Patch("/")
-  @UseGuards(IsAdminGuard)
-  async editDevice(@Body() { id, key, value }: EditDto) {
-    return await this.deviceService.editDevice(id, key, value)
+  @Get("/")
+  getAllDevices(@Query("q") query?: string) {
+    return this.deviceService.getDevices(query)
   }
 
-  @Delete("/")
-  @UseGuards(IsAdminGuard)
-  async removeDevice(@Body() { id }: RemoveByIdDto) {
+  @Get("/:id")
+  getDevice(@Param("id") id: string) {
+    return this.deviceService.getDeviceById(id)
+  }
+
+  @Patch("/:id")
+  async editDevice(@Param("id") id: string, @Body() { key, value }: EditDto) {
+    return this.deviceService.editDevice(id, key, value)
+  }
+
+  @Delete("/:id")
+  async removeDevice(@Param("id") id: string) {
     try {
       return await this.deviceService.removeDevice(id)
     } catch (err: unknown) {

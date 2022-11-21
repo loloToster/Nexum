@@ -37,7 +37,7 @@ function Devices() {
   const deleteMutation = useMutation(
     "delete-device",
     async (id: string) => {
-      await api.delete("devices", { data: { id } })
+      await api.delete("/devices/" + id)
     },
     {
       onSuccess: () => {
