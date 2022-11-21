@@ -16,6 +16,13 @@ export class UserService {
     return newUser
   }
 
+  async editUser(id: string, key: string, value: User[keyof User]) {
+    return await this.db.user.update({
+      where: { id },
+      data: { [key]: value }
+    })
+  }
+
   async removeUser(id: string) {
     return await this.db.user.delete({ where: { id } })
   }

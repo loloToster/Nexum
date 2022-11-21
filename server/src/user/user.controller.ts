@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Delete,
+  Patch,
   Body,
   Query,
   Param,
@@ -20,6 +21,7 @@ import { LoggedInGuard } from "src/guards/loggedin.guard"
 import { User } from "src/decorators/user.decorator"
 
 import CreateUserDto from "src/dtos/createUser.dto"
+import EditDto from "src/dtos/edit.dto"
 
 @Controller("/users")
 @UseGuards(LoggedInGuard)
@@ -59,6 +61,11 @@ export class UserController {
   @UseGuards(IsAdminGuard)
   getUser(@Param("id") id: string) {
     return this.userService.getUserById(id)
+  }
+
+  @Patch("/:id")
+  async editDevice(@Param("id") id: string, @Body() { key, value }: EditDto) {
+    return this.userService.editUser(id, key, value)
   }
 
   @Delete("/:id")
