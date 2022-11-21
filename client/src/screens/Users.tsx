@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { StyleSheet } from "react-native"
 import { FAB } from "react-native-paper"
-import { useMutation, useQuery } from "react-query"
+import { useQuery } from "react-query"
 
 import api from "src/api"
 import { UserI } from "src/components/User/types"
@@ -31,24 +31,8 @@ function Users() {
     return res.data
   })
 
-  const deleteMutation = useMutation(
-    "delete-user",
-    async (id: string) => {
-      await api.delete("/users/" + id)
-    },
-    {
-      onSuccess: () => {
-        refetchUsers()
-      }
-    }
-  )
-
-  const deleteUser = (id: string) => {
-    deleteMutation.mutate(id)
-  }
-
   const renderUser = (user: UserI) => {
-    return <User user={user} deleteUser={deleteUser} />
+    return <User user={user} deleteUser={() => refetchUsers()} />
   }
 
   return (

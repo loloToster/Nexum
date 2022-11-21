@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react"
 import { View, StyleSheet, Dimensions, TextInput } from "react-native"
+import { useMutation } from "react-query"
 import {
   Button,
   Switch,
@@ -15,15 +16,17 @@ import {
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
 
+import api from "src/api"
+
 import config from "src/config"
+
+import useDebounce from "src/hooks/useDebounce"
+import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 import useObjectState from "src/hooks/useObjectState"
 
 import { UserI } from "./types"
 
-function User(props: {
-  user: UserI
-  deleteUser: (id: string) => void | Promise<void>
-}) {
+function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
   const styles = getStyles()
 
   const { user: initialUser, deleteUser } = props
@@ -31,19 +34,49 @@ function User(props: {
   const [user, setUser] = useObjectState(initialUser)
   const [qrActive, setQrActive] = useState(false)
   const [deleteActive, setDeleteActive] = useState(false)
-  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const nameInput = useRef<TextInput>()
 
-  const handleDelete = async () => {
-    setDeleteLoading(true)
-    setDeleteActive(false)
-    try {
-      await deleteUser(user.id)
-    } catch {
-      setDeleteLoading(false)
+  const deleteMutation = useMutation(
+    "delete-user",
+    async (id: string) => {
+      await api.delete("/users/" + id)
+      return id
+    },
+    {
+      onSuccess: (id: string) => {
+        deleteUser(id)
+      }
     }
+  )
+
+  const handleDelete = async () => {
+    setDeleteActive(false)
+    deleteMutation.mutate(user.id)
   }
+
+  interface EditMutationParams {
+    id: string
+    key: keyof UserI
+    value: UserI[keyof UserI]
+  }
+
+  const editMutation = useMutation(
+    "edit-user",
+    async ({ id, key, value }: EditMutationParams) => {
+      await api.patch("/users/" + id, { key, value })
+    }
+  )
+
+  // attach edit listeners
+  const editableFields: (keyof UserI)[] = ["name", "isAdmin"]
+  editableFields.forEach(field => {
+    const debouncedState = useDebounce(user[field])
+
+    useAfterMountEffect(() => {
+      editMutation.mutate({ id: user.id, key: field, value: debouncedState })
+    }, [debouncedState])
+  })
 
   return (
     <View style={styles.container}>
@@ -120,10 +153,10 @@ function User(props: {
         color={Colors.red500}
         mode="contained"
         onPress={() => setDeleteActive(true)}
-        loading={deleteLoading}
-        disabled={deleteLoading}
+        loading={deleteMutation.isLoading}
+        disabled={deleteMutation.isLoading}
       >
-        {deleteLoading ? "Deleting" : "Delete"}
+        {deleteMutation.isLoading ? "Deleting" : "Delete"}
       </Button>
     </View>
   )
