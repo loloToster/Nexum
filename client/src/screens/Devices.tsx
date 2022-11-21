@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { StyleSheet, Image } from "react-native"
 import { FAB } from "react-native-paper"
-import { useMutation, useQuery } from "react-query"
+import { useQuery } from "react-query"
 
 import api from "src/api"
 import { DeviceI } from "src/components/Device/types"
@@ -34,24 +34,8 @@ function Devices() {
     return res.data
   })
 
-  const deleteMutation = useMutation(
-    "delete-device",
-    async (id: string) => {
-      await api.delete("/devices/" + id)
-    },
-    {
-      onSuccess: () => {
-        refetchDevices()
-      }
-    }
-  )
-
-  const deleteDevice = (id: string) => {
-    deleteMutation.mutate(id)
-  }
-
   const renderDevice = (device: DeviceI) => {
-    return <Device device={device} deleteDevice={deleteDevice} />
+    return <Device device={device} deleteDevice={() => refetchDevices()} />
   }
 
   return (

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react"
 import { View, StyleSheet, TextInput } from "react-native"
+import { useMutation } from "react-query"
 import {
   Button,
   Text,
@@ -11,13 +12,17 @@ import {
   Paragraph
 } from "react-native-paper"
 
+import api from "src/api"
+
+import useDebounce from "src/hooks/useDebounce"
+import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 import useObjectState from "src/hooks/useObjectState"
 
 import { DeviceI } from "./types"
 
 function Device(props: {
   device: DeviceI
-  deleteDevice: (id: string) => void | Promise<void>
+  deleteDevice: (id: string) => unknown
 }) {
   const styles = getStyles()
 
@@ -25,18 +30,44 @@ function Device(props: {
 
   const [device, setDevice] = useObjectState(initialDevice)
   const [deleteActive, setDeleteActive] = useState(false)
-  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const nameInput = useRef<TextInput>()
 
-  const handleDelete = async () => {
-    setDeleteLoading(true)
-    setDeleteActive(false)
-    try {
-      await deleteDevice(device.id)
-    } catch {
-      setDeleteLoading(false)
+  interface EditMutationParams {
+    id: string
+    key: keyof DeviceI
+    value: DeviceI[keyof DeviceI]
+  }
+
+  const editMutation = useMutation(
+    "edit-device",
+    async ({ id, key, value }: EditMutationParams) => {
+      await api.patch("/devices/" + id, { key, value })
     }
+  )
+
+  const debouncedName = useDebounce(device.name)
+
+  useAfterMountEffect(() => {
+    editMutation.mutate({ id: device.id, key: "name", value: debouncedName })
+  }, [debouncedName])
+
+  const deleteMutation = useMutation(
+    "delete-device",
+    async (id: string) => {
+      await api.delete("/devices/" + id)
+      return id
+    },
+    {
+      onSuccess: (id: string) => {
+        deleteDevice(id)
+      }
+    }
+  )
+
+  const handleDelete = async () => {
+    setDeleteActive(false)
+    deleteMutation.mutate(device.id)
   }
 
   return (
@@ -81,10 +112,10 @@ function Device(props: {
         color={Colors.red500}
         mode="contained"
         onPress={() => setDeleteActive(true)}
-        loading={deleteLoading}
-        disabled={deleteLoading}
+        loading={deleteMutation.isLoading}
+        disabled={deleteMutation.isLoading}
       >
-        {deleteLoading ? "Deleting" : "Delete"}
+        {deleteMutation.isLoading ? "Deleting" : "Delete"}
       </Button>
     </View>
   )
