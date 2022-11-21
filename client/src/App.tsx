@@ -21,7 +21,7 @@ import { SocketContext } from "./contexts/socket"
 import Header from "./components/Header/Header"
 
 import Login from "./screens/Login"
-import Main from "./screens/Main"
+import Widgets from "./screens/Widgets"
 import Devices from "./screens/Devices"
 import Users from "./screens/Users"
 
@@ -72,7 +72,7 @@ function App() {
                     headerMode: "float"
                   }}
                 >
-                  <Stack.Screen name="widgets" component={Main} />
+                  <Stack.Screen name="widgets" component={Widgets} />
                   <Stack.Screen
                     name="devices"
                     component={Devices}

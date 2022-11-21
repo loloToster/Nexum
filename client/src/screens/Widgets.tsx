@@ -9,7 +9,7 @@ import { TabData } from "src/components/Tab/types"
 import Tabs from "src/components/Tabs/Tabs"
 import Error from "src/components/Error/Error"
 
-function Main() {
+function Widgets() {
   const theme = useTheme()
   const styles = getStyles(theme)
 
@@ -29,7 +29,7 @@ function Main() {
   )
 }
 
-export default Main
+export default Widgets
 
 const getStyles = (theme: Theme) => {
   return StyleSheet.create({

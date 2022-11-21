@@ -9,13 +9,12 @@ import { useUser } from "src/contexts/user"
 // @ts-ignore
 import microcontrollerIcon from "assets/microcontroller.png"
 
-function Header({ options, back, navigation, route }: StackHeaderProps) {
+function Header({ options, navigation }: StackHeaderProps) {
   const { user, setUser } = useUser()
 
-  const title =
-    typeof options.headerTitle == "string" ? options.headerTitle : "Nexum"
+  const onSubRoute = typeof options.headerTitle == "string"
 
-  const headerStyle = route.name === "widgets" ? { elevation: 0 } : {}
+  const title = onSubRoute ? (options.headerTitle as string) : "Nexum"
 
   const handleLogout = useCallback(async () => {
     try {
@@ -26,8 +25,10 @@ function Header({ options, back, navigation, route }: StackHeaderProps) {
   }, [])
 
   return (
-    <Appbar.Header style={headerStyle}>
-      {back ? <Appbar.BackAction onPress={navigation.goBack} /> : null}
+    <Appbar.Header style={{ elevation: 0 }}>
+      {onSubRoute && (
+        <Appbar.BackAction onPress={() => navigation.navigate("widgets")} />
+      )}
       <Appbar.Content title={title} />
       {user?.isAdmin && (
         <>
