@@ -2,6 +2,7 @@ import {
   Controller,
   UseGuards,
   Get,
+  Patch,
   Post,
   Delete,
   Body,
@@ -16,6 +17,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime"
 import { IsAdminGuard } from "src/guards/isadmin.guard"
 
 import CreateDeviceDto from "src/dtos/createDevice.dto"
+import EditDto from "src/dtos/edit.dto"
 import RemoveByIdDto from "src/dtos/removeById.dto"
 
 @Controller("/devices")
@@ -44,6 +46,12 @@ export class DeviceController {
         throw err
       }
     }
+  }
+
+  @Patch("/")
+  @UseGuards(IsAdminGuard)
+  async editDevice(@Body() { id, key, value }: EditDto) {
+    return await this.deviceService.editDevice(id, key, value)
   }
 
   @Delete("/")

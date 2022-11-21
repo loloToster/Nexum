@@ -16,6 +16,13 @@ export class DeviceService {
     return newDevice
   }
 
+  async editDevice(id: string, key: string, value: Device[keyof Device]) {
+    return await this.db.device.update({
+      where: { id },
+      data: { [key]: value }
+    })
+  }
+
   async removeDevice(id: string) {
     return await this.db.device.delete({ where: { id } })
   }
