@@ -1,7 +1,6 @@
 import React, { useCallback } from "react"
 import { Image } from "react-native"
 import { StackHeaderProps } from "@react-navigation/stack"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Appbar } from "react-native-paper"
 
 import { useUser } from "src/contexts/user"
@@ -17,11 +16,7 @@ function Header({ options, navigation }: StackHeaderProps) {
   const title = onSubRoute ? (options.headerTitle as string) : "Nexum"
 
   const handleLogout = useCallback(async () => {
-    try {
-      await AsyncStorage.removeItem("user")
-    } finally {
-      setUser(null)
-    }
+    setUser(null)
   }, [])
 
   return (

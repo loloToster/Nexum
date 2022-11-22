@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { View, StyleSheet } from "react-native"
 import { ActivityIndicator, Theme, useTheme } from "react-native-paper"
 import { useQuery } from "react-query"
@@ -7,12 +7,25 @@ import api from "src/api"
 
 import { TabData } from "src/types"
 
+import { useSocket } from "src/contexts/socket"
+
 import Tabs from "src/components/Tabs/Tabs"
 import Error from "src/components/Error/Error"
 
 function Widgets() {
   const theme = useTheme()
   const styles = getStyles(theme)
+
+  const { socket } = useSocket()
+
+  // connect socket only if this components is mounted
+  useEffect(() => {
+    socket.connect()
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
 
   const { isLoading, isError, data } = useQuery("me", async () => {
     const res = await api.get("/users/me")

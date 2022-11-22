@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react"
 import { View, StyleSheet, Platform } from "react-native"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AxiosError } from "axios"
 import { useMutation } from "react-query"
 
@@ -19,7 +18,9 @@ import {
 import config from "src/config"
 import api from "src/api"
 
-import { useUser, User } from "src/contexts/user"
+import { BaseUser } from "src/types"
+import { useUser } from "src/contexts/user"
+
 import QrScanner from "src/components/QrScanner/QrScanner"
 
 function Login() {
@@ -32,8 +33,7 @@ function Login() {
   const [scannerOpened, setScannerOpened] = useState(false)
   const [userError, setUserError] = useState("")
 
-  const login = useCallback(async (user: User) => {
-    await AsyncStorage.setItem("user", JSON.stringify(user))
+  const login = useCallback(async (user: BaseUser) => {
     setUser(user)
   }, [])
 

@@ -1,7 +1,10 @@
-export interface User {
+export interface BaseUser {
   id: string
   name: string
   isAdmin: boolean
+}
+
+export interface User extends BaseUser {
   tabs: Array<{
     id: number
     name: string
