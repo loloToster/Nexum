@@ -1,16 +1,7 @@
 import React, { useRef, useState } from "react"
 import { View, StyleSheet, TextInput } from "react-native"
 import { useMutation } from "react-query"
-import {
-  Button,
-  Text,
-  IconButton,
-  Portal,
-  Divider,
-  Colors,
-  Dialog,
-  Paragraph
-} from "react-native-paper"
+import { Button, Text, IconButton, Divider, Colors } from "react-native-paper"
 
 import api from "src/api"
 
@@ -19,6 +10,8 @@ import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 import useObjectState from "src/hooks/useObjectState"
 
 import { DeviceI } from "./types"
+
+import RUSure from "src/components/RUSure/RUSure"
 
 function Device(props: {
   device: DeviceI
@@ -72,17 +65,13 @@ function Device(props: {
 
   return (
     <View style={styles.container}>
-      <Portal>
-        <Dialog visible={deleteActive}>
-          <Dialog.Content>
-            <Paragraph>Are you sure you want to delete this device?</Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setDeleteActive(false)}>Cancel</Button>
-            <Button onPress={handleDelete}>Yes</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      <RUSure
+        open={deleteActive}
+        onConfirm={handleDelete}
+        onDismiss={() => setDeleteActive(false)}
+      >
+        Are you sure you want to delete this device?
+      </RUSure>
       <View style={styles.row}>
         <Text numberOfLines={1}>ID: {device.id}</Text>
       </View>

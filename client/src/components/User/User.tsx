@@ -10,9 +10,7 @@ import {
   Portal,
   Modal,
   Divider,
-  Colors,
-  Dialog,
-  Paragraph
+  Colors
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
 
@@ -25,6 +23,8 @@ import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 import useObjectState from "src/hooks/useObjectState"
 
 import { UserI } from "./types"
+
+import RUSure from "src/components/RUSure/RUSure"
 
 function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
   const styles = getStyles()
@@ -94,17 +94,13 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
           </View>
         </Modal>
       </Portal>
-      <Portal>
-        <Dialog visible={deleteActive}>
-          <Dialog.Content>
-            <Paragraph>Are you sure you want to delete this user?</Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setDeleteActive(false)}>Cancel</Button>
-            <Button onPress={handleDelete}>Yes</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      <RUSure
+        open={deleteActive}
+        onConfirm={handleDelete}
+        onDismiss={() => setDeleteActive(false)}
+      >
+        Are you sure you want to delete this user?
+      </RUSure>
       <View style={styles.row}>
         <Text numberOfLines={1}>ID: {user.id}</Text>
         <IconButton icon="qrcode" size={20} onPress={() => setQrActive(true)} />
