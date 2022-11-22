@@ -2,3 +2,47 @@
 node_modules/
 dist/
 temp.*
+
+# client
+.expo/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# client / macOS
+.DS_Store
+
+# server
+.env
+*/prisma/*.db
+*/prisma/*.db-journal
+
+# server / Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# server / OS
+.DS_Store
+
+# server / Tests
+/coverage
+/.nyc_output
+
+# server / IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
