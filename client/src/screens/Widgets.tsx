@@ -5,7 +5,8 @@ import { useQuery } from "react-query"
 
 import api from "src/api"
 
-import { TabData } from "src/components/Tab/types"
+import { TabData } from "src/types"
+
 import Tabs from "src/components/Tabs/Tabs"
 import Error from "src/components/Error/Error"
 

@@ -3,13 +3,7 @@ import { useTheme } from "react-native-paper"
 
 import { useSocket, ValueUpdateFunc } from "src/contexts/socket"
 
-import {
-  WidgetProperties,
-  WidgetData,
-  WidgetProps,
-  SetWidgetValueAction,
-  WidgetValueHook
-} from "./types"
+import { WidgetProperties, WidgetData } from "src/types"
 
 // special component returned if provided type does not match any component in map
 import Unknown from "./Unknown/Unknown"
@@ -17,6 +11,22 @@ import Unknown from "./Unknown/Unknown"
 import Button from "./Button/Button"
 import SliderWidget from "./Slider/Slider"
 import Gauge from "./Gauge/Gauge"
+
+export type SetWidgetValueAction<T> = {
+  (newVal: React.SetStateAction<T>): void
+  // onlyServer option is used to prevent infinite loop
+  (newVal: React.SetStateAction<T>, onlyServer?: false): void
+  (newVal: T, onlyServer?: true): void
+}
+
+export type WidgetValueHook = <T = string | number | boolean>(
+  initialValue: T
+) => [T, SetWidgetValueAction<T>]
+
+export interface WidgetProps extends Omit<WidgetData, "properties"> {
+  properties: WidgetProperties
+  useWidgetValue: WidgetValueHook
+}
 
 // maps string type prop to component
 const map: Record<string, (props?: WidgetProps) => JSX.Element> = {

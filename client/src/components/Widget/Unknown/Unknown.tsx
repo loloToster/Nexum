@@ -1,9 +1,10 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
 import { Text, List, useTheme, Theme } from "react-native-paper"
-import { WidgetData } from "src/components/Widget/types"
 
-function Unknown({ type }: WidgetData) {
+import { WidgetProps } from "../Widget"
+
+function Unknown({ type }: WidgetProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 

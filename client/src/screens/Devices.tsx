@@ -4,7 +4,7 @@ import { FAB } from "react-native-paper"
 import { useQuery } from "react-query"
 
 import api from "src/api"
-import { DeviceI } from "src/components/Device/types"
+import { Device as DeviceI } from "src/types"
 
 import useDebounce from "src/hooks/useDebounce"
 

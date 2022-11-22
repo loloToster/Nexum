@@ -17,9 +17,9 @@ import { useMutation } from "react-query"
 
 import useObjectState from "src/hooks/useObjectState"
 import api from "src/api"
-import { DeviceI } from "src/components/Device/types"
+import { Device } from "src/types"
 
-type DeviceData = Omit<DeviceI, "tabs">
+type DeviceData = Omit<Device, "tabs">
 
 const emptyDeviceData = {
   id: "",

@@ -4,7 +4,7 @@ import { FAB } from "react-native-paper"
 import { useQuery } from "react-query"
 
 import api from "src/api"
-import { UserI } from "src/components/User/types"
+import { User as UserI } from "src/types"
 
 import useDebounce from "src/hooks/useDebounce"
 

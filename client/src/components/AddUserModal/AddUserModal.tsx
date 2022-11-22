@@ -19,7 +19,7 @@ import { useMutation } from "react-query"
 
 import useObjectState from "src/hooks/useObjectState"
 import api from "src/api"
-import { UserI } from "src/components/User/types"
+import { User as UserI } from "src/types"
 
 type UserData = Omit<UserI, "tabs">
 

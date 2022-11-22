@@ -9,7 +9,7 @@ import useDebounce from "src/hooks/useDebounce"
 import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 import useObjectState from "src/hooks/useObjectState"
 
-import { DeviceI } from "./types"
+import { Device as DeviceI } from "src/types"
 
 import RUSure from "src/components/RUSure/RUSure"
 

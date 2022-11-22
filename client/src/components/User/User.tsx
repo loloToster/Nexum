@@ -22,7 +22,7 @@ import useDebounce from "src/hooks/useDebounce"
 import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 import useObjectState from "src/hooks/useObjectState"
 
-import { UserI } from "./types"
+import { User as UserI } from "src/types"
 
 import RUSure from "src/components/RUSure/RUSure"
 
