@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { useTheme } from "react-native-paper"
 
-import { WidgetProperties, WidgetData } from "src/types"
+import { WidgetProperties, WidgetData, WidgetValue } from "src/types"
 import { EventEmitter } from "src/utils"
 
-import { useSocket, ValueUpdateFunc } from "src/contexts/socket"
+import { useSocket, ValueUpdateFunc, ValueUpdateObj } from "src/contexts/socket"
 
 // special component returned if provided type does not match any component in map
 import Unknown from "./Unknown/Unknown"
@@ -20,7 +20,7 @@ export type SetWidgetValueAction<T> = {
   (newVal: T, onlyServer?: true): void
 }
 
-export type WidgetValueHook = <T = string | number | boolean>(
+export type WidgetValueHook = <T = WidgetValue>(
   initialValue: T
 ) => [T, SetWidgetValueAction<T>]
 
@@ -34,6 +34,10 @@ const map: Record<string, (props?: WidgetProps) => JSX.Element> = {
   btn: Button,
   sldr: SliderWidget,
   gauge: Gauge
+}
+
+interface LocalValueUpdateObj extends ValueUpdateObj {
+  widgetId: number
 }
 
 const localChangeEmitter = new EventEmitter()
@@ -56,7 +60,7 @@ function Widget(props: WidgetData) {
         }
       }
 
-      const localListener = obj => {
+      const localListener = (obj: LocalValueUpdateObj) => {
         if (obj.widgetId !== props.id) listener(obj)
       }
 
@@ -69,7 +73,7 @@ function Widget(props: WidgetData) {
       }
     }, [])
 
-    const emit = val => {
+    const emit = (val: WidgetValue) => {
       const emitObj = {
         customId: props.customId,
         value: val

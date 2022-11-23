@@ -16,6 +16,8 @@ export interface Device {
   name: string
 }
 
+export type WidgetValue = string | boolean | number
+
 export interface WidgetProperties {
   color: string
   text: string

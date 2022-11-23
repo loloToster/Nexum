@@ -1,10 +1,14 @@
 import { createContext, useContext } from "react"
 import { Socket } from "socket.io-client"
 
-export type ValueUpdateFunc = (obj: {
+import { WidgetValue } from "src/types"
+
+export interface ValueUpdateObj {
   customId: string
-  value: string | boolean | number
-}) => void
+  value: WidgetValue
+}
+
+export type ValueUpdateFunc = (obj: ValueUpdateObj) => void
 
 export interface EventsMap {
   "update-value": ValueUpdateFunc
