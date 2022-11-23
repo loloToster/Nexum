@@ -5,7 +5,7 @@ import Slider from "src/components/Slider/Slider"
 import { WidgetProps } from "../Widget"
 
 function SliderWidget(props: WidgetProps) {
-  const { color, isVertical } = props.properties
+  const { color, isVertical, min, max, step } = props.properties
 
   const styles = getStyles()
 
@@ -16,6 +16,9 @@ function SliderWidget(props: WidgetProps) {
     <View style={styles.container}>
       <Slider
         initialValue={value}
+        min={min}
+        max={max}
+        step={step}
         minColor={color}
         thumbColor={color}
         maxColor="#040404"

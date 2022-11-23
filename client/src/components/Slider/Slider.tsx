@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { View, Platform, StyleSheet } from "react-native"
 import ReactNativeSlider from "@react-native-community/slider"
 
-import { map, uid } from "src/utils"
+import { map, roundBadFloat, roundByStep, uid } from "src/utils"
 
 interface SliderProps {
   min?: number
@@ -37,8 +37,6 @@ function Slider({
   }>({ width: 0, height: 0 })
 
   const sliderPercentage = ((value - min) / (max - min)) * 100
-  // round the number when using smaller steps to prevent floating point problems
-  const roundValue = (val: number) => (step >= 0.001 ? +val.toFixed(3) : val)
 
   // fix for web slider not updating when initial value is changed
   if (Platform.OS === "web")
@@ -66,11 +64,7 @@ function Slider({
         newVal = newVal > max ? max : newVal
         newVal = newVal < min ? min : newVal
 
-        // logic that takes step into account
-        newVal =
-          newVal - (newVal % step) + (newVal % step > step / 2 ? step : 0)
-
-        newVal = roundValue(newVal)
+        newVal = roundBadFloat(roundByStep(newVal, step))
 
         if (prevVal !== newVal) onChange(newVal)
         setValue(newVal)
@@ -148,7 +142,7 @@ function Slider({
             maximumTrackTintColor={maxColor}
             thumbTintColor={thumbColor}
             onValueChange={val => {
-              val = roundValue(val)
+              val = roundBadFloat(val)
               if (inputing) onChange(val)
               setValue(val)
             }}

@@ -3,7 +3,7 @@ import { View, StyleSheet, ColorValue } from "react-native"
 import { Text, useTheme, Theme } from "react-native-paper"
 import { AnimatedCircularProgress } from "react-native-circular-progress"
 
-import { map } from "src/utils"
+import { map, roundBadFloat, roundByStep } from "src/utils"
 
 import { WidgetProps } from "../Widget"
 
@@ -17,9 +17,6 @@ function Gauge(props: WidgetProps) {
   const [value] = useWidgetValue(min)
 
   const [size, setSize] = useState(0)
-  // TODO: calc by step
-  const roundDigits =
-    step % 1 === 0 ? 0 : step.toString().split(".").at(-1).length
 
   return (
     <View
@@ -40,7 +37,10 @@ function Gauge(props: WidgetProps) {
       >
         {() => (
           <Text style={styles.text}>
-            {text.replace(/\/val\//, value.toFixed(roundDigits))}
+            {text.replace(
+              /\/val\//,
+              roundBadFloat(roundByStep(value, step)).toString()
+            )}
           </Text>
         )}
       </AnimatedCircularProgress>
