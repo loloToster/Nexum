@@ -46,9 +46,9 @@ model WidgetProperties {
   text       String?
   isSwitch   Boolean?
   isVertical Boolean?
-  step       Int?
-  min        Int?
-  max        Int?
+  step       Float?
+  min        Float?
+  max        Float?
 
   @@unique([widgetId])
 }
