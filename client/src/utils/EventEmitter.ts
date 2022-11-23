@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ListenerArgs = any[]
 type Listener = (...args: ListenerArgs) => unknown
 

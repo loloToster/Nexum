@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { Platform } from "react-native"
 import { registerRootComponent } from "expo"
 import { StatusBar } from "expo-status-bar"
@@ -43,11 +43,6 @@ const socket = io(config.apiBaseUrl[Platform.OS] || config.apiBaseUrl.default, {
 })
 
 function App() {
-  useEffect(() => {
-    socket.on("connect", () => console.log("connected"))
-    socket.on("disconnect", () => console.log("disconnected"))
-  }, [])
-
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={DarkTheme}>
