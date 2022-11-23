@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { useTheme } from "react-native-paper"
 
-import { useSocket, ValueUpdateFunc } from "src/contexts/socket"
-
 import { WidgetProperties, WidgetData } from "src/types"
+import { EventEmitter } from "src/utils"
+
+import { useSocket, ValueUpdateFunc } from "src/contexts/socket"
 
 // special component returned if provided type does not match any component in map
 import Unknown from "./Unknown/Unknown"
@@ -35,6 +36,8 @@ const map: Record<string, (props?: WidgetProps) => JSX.Element> = {
   gauge: Gauge
 }
 
+const localChangeEmitter = new EventEmitter()
+
 function Widget(props: WidgetData) {
   const theme = useTheme()
   const ChoosenWidget = map[props.type] || Unknown
@@ -48,21 +51,36 @@ function Widget(props: WidgetData) {
         if (
           obj.customId === props.customId &&
           typeof obj.value === typeof initialValue
-        )
+        ) {
           setWidgetValue(obj.value as typeof initialValue)
+        }
       }
 
+      const localListener = obj => {
+        if (obj.widgetId !== props.id) listener(obj)
+      }
+
+      localChangeEmitter.on("update-value", localListener)
       socket.on("update-value", listener)
+
       return () => {
+        localChangeEmitter.off("update-value", localListener)
         socket.off("update-value", listener)
       }
     }, [])
 
     const emit = val => {
-      socket.emit("update-value", {
+      const emitObj = {
         customId: props.customId,
         value: val
+      }
+
+      localChangeEmitter.emit("update-value", {
+        widgetId: props.id,
+        ...emitObj
       })
+
+      socket.emit("update-value", emitObj)
     }
 
     const setValue: SetWidgetValueAction<typeof initialValue> = (
