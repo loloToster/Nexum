@@ -8,6 +8,7 @@ import {
 import { Server, Socket } from "socket.io"
 
 import { DatabaseService } from "src/database/database.service"
+import SocketAuthDto from "src/dtos/socketAuth.dto"
 
 @WebSocketGateway({ cors: true })
 export class EventsGateway {
@@ -25,19 +26,35 @@ export class EventsGateway {
     socket.broadcast
       .to("users")
       .emit("update-value", { customId, value, ori: socket.id })
+
+    socket.to("devices").emit("update-value", { customId, value })
   }
 
   @SubscribeMessage("connect")
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    const { auth } = socket.handshake
+    const { auth, query } = socket.handshake
+    const authorization = new SocketAuthDto({ ...auth, ...query })
 
-    switch (auth.as) {
+    switch (authorization.as) {
       case "user": {
         const userExists = Boolean(
-          await this.db.user.count({ where: { id: auth.token } })
+          await this.db.user.count({ where: { id: authorization.token } })
         )
-        socket.join("users")
+
         if (!userExists) socket.disconnect()
+
+        socket.join("users")
+        break
+      }
+
+      case "device": {
+        const deviceExists = Boolean(
+          await this.db.device.count({ where: { id: authorization.token } })
+        )
+
+        if (!deviceExists) socket.disconnect()
+
+        socket.join("devices")
         break
       }
 
