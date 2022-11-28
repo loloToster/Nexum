@@ -4,7 +4,7 @@ import { Socket } from "socket.io-client"
 import { WidgetValue } from "src/types"
 
 export interface ValueUpdateObj {
-  customId: string
+  target: string
   value: WidgetValue
 }
 

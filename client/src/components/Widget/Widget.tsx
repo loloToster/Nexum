@@ -53,7 +53,7 @@ function Widget(props: WidgetData) {
     useEffect(() => {
       const listener: ValueUpdateFunc = obj => {
         if (
-          obj.customId === props.customId &&
+          obj.target === props.target &&
           typeof obj.value === typeof initialValue
         ) {
           setWidgetValue(obj.value as typeof initialValue)
@@ -75,7 +75,7 @@ function Widget(props: WidgetData) {
 
     const emit = (val: WidgetValue) => {
       const emitObj = {
-        customId: props.customId,
+        target: props.target,
         value: val
       }
 

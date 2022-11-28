@@ -31,7 +31,7 @@ export interface WidgetProperties {
 export interface WidgetData {
   id: number
   type: string
-  customId: string
+  target: string
   x: number
   y: number
   width: number

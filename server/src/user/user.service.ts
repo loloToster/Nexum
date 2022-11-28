@@ -53,6 +53,16 @@ export class UserService {
       }
     })
 
-    return user
+    // this entire logic just adds target property to every widget
+    return {
+      ...user,
+      tabs: user.tabs.map(tab => ({
+        ...tab,
+        widgets: tab.widgets.map(widget => ({
+          ...widget,
+          target: `${widget.deviceId}-${widget.customId}`
+        }))
+      }))
+    }
   }
 }

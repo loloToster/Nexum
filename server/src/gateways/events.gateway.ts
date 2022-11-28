@@ -20,14 +20,11 @@ export class EventsGateway {
   @SubscribeMessage("update-value")
   handleMessage(
     @ConnectedSocket() socket: Socket,
-    @MessageBody("customId") customId: string,
+    @MessageBody("target") target: string,
     @MessageBody("value") value: string | boolean | number
   ) {
-    socket.broadcast
-      .to("users")
-      .emit("update-value", { customId, value, ori: socket.id })
-
-    socket.to("devices").emit("update-value", { customId, value })
+    socket.broadcast.to("users").emit("update-value", { target, value })
+    socket.to("devices").emit("update-value", { target, value })
   }
 
   @SubscribeMessage("connect")
