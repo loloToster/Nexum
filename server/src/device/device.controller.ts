@@ -48,17 +48,17 @@ export class DeviceController {
   }
 
   @Get("/:id")
-  getDevice(@Param("id") id: string) {
+  getDevice(@Param("id") id: number) {
     return this.deviceService.getDeviceById(id)
   }
 
   @Patch("/:id")
-  async editDevice(@Param("id") id: string, @Body() { key, value }: EditDto) {
+  async editDevice(@Param("id") id: number, @Body() { key, value }: EditDto) {
     return this.deviceService.editDevice(id, key, value)
   }
 
   @Delete("/:id")
-  async removeDevice(@Param("id") id: string) {
+  async removeDevice(@Param("id") id: number) {
     try {
       return await this.deviceService.removeDevice(id)
     } catch (err: unknown) {

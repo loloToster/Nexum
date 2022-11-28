@@ -49,7 +49,7 @@ export class EventsGateway {
 
       case "device": {
         const deviceExists = Boolean(
-          await this.db.device.count({ where: { id: authorization.token } })
+          await this.db.device.count({ where: { token: authorization.token } })
         )
 
         if (!deviceExists) socket.disconnect()

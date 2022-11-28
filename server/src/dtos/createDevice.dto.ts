@@ -3,7 +3,7 @@ import { IsOptional, IsString, IsNotEmpty } from "class-validator"
 export default class CreateDeviceDto {
   @IsOptional()
   @IsString()
-  id?: string
+  token?: string
 
   @IsString()
   @IsNotEmpty()

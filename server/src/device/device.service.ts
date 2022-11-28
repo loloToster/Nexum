@@ -6,24 +6,24 @@ import { DatabaseService } from "src/database/database.service"
 export class DeviceService {
   constructor(private db: DatabaseService) {}
 
-  async createDevice({ id, name }: Partial<Device>) {
-    if (!id) id = undefined
+  async createDevice({ token, name }: Partial<Device>) {
+    if (!token) token = undefined
 
     const newDevice = await this.db.device.create({
-      data: { id, name }
+      data: { token, name }
     })
 
     return newDevice
   }
 
-  async editDevice(id: string, key: string, value: Device[keyof Device]) {
+  async editDevice(id: number, key: string, value: Device[keyof Device]) {
     return await this.db.device.update({
       where: { id },
       data: { [key]: value }
     })
   }
 
-  async removeDevice(id: string) {
+  async removeDevice(id: number) {
     return await this.db.device.delete({ where: { id } })
   }
 
@@ -33,7 +33,7 @@ export class DeviceService {
     const where = {
       OR: [
         { name: { contains: searchQuery } },
-        { id: { contains: searchQuery } }
+        { token: { contains: searchQuery } }
       ]
     }
 
@@ -44,7 +44,7 @@ export class DeviceService {
     return devices
   }
 
-  async getDeviceById(id: string) {
+  async getDeviceById(id: number) {
     const user = await this.db.device.findUnique({
       where: { id }
     })
