@@ -22,7 +22,8 @@ import { Device } from "src/types"
 type DeviceData = Omit<Device, "tabs">
 
 const emptyDeviceData = {
-  id: "",
+  id: 0,
+  token: "",
   name: ""
 }
 
@@ -50,18 +51,18 @@ function AddDeviceModal(
     ...emptyDeviceData
   })
 
-  const [idError, setIdError] = useState("")
+  const [tokenError, setTokenError] = useState("")
   const [nameError, setNameError] = useState("")
 
   const handleDismiss = () => {
-    setIdError("")
+    setTokenError("")
     setNameError("")
     props.onDismiss()
   }
 
-  const handleIdChange = (val: string) => {
-    setIdError("")
-    setDeviceData("id", val)
+  const handleTokenChange = (val: string) => {
+    setTokenError("")
+    setDeviceData("token", val)
   }
 
   const handleNameChange = (val: string) => {
@@ -77,7 +78,7 @@ function AddDeviceModal(
         return null
       }
 
-      setIdError("")
+      setTokenError("")
       await new Promise(r => setTimeout(r, 1000))
 
       try {
@@ -88,7 +89,7 @@ function AddDeviceModal(
           err.response?.status === 409 &&
           err.response?.data?.conflictOn == "id"
         ) {
-          setIdError("This id is alredy taken")
+          setTokenError("This id is alredy taken")
           return null
         }
 
@@ -112,13 +113,13 @@ function AddDeviceModal(
           <Headline style={styles.row}>Create device</Headline>
           <TextInput
             style={styles.row}
-            label="ID (defaults to uuid)"
+            label="Token (defaults to uuid)"
             mode="outlined"
-            value={deviceData.id}
-            onChangeText={handleIdChange}
-            error={Boolean(idError)}
+            value={deviceData.token}
+            onChangeText={handleTokenChange}
+            error={Boolean(tokenError)}
           />
-          <ErrorText error={idError} />
+          <ErrorText error={tokenError} />
           <TextInput
             style={styles.row}
             label="Name"

@@ -61,6 +61,7 @@ function Devices() {
             style={{ width: size, height: size, opacity: 0.7 }}
           />
         )}
+        animated={false}
         onPress={() => setAddDeviceModalActive(true)}
       />
     </>

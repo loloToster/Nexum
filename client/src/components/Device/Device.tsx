@@ -15,7 +15,7 @@ import RUSure from "src/components/RUSure/RUSure"
 
 function Device(props: {
   device: DeviceI
-  deleteDevice: (id: string) => unknown
+  deleteDevice: (id: number) => unknown
 }) {
   const styles = getStyles()
 
@@ -27,7 +27,7 @@ function Device(props: {
   const nameInput = useRef<TextInput>()
 
   interface EditMutationParams {
-    id: string
+    id: number
     key: keyof DeviceI
     value: DeviceI[keyof DeviceI]
   }
@@ -47,12 +47,12 @@ function Device(props: {
 
   const deleteMutation = useMutation(
     "delete-device",
-    async (id: string) => {
+    async (id: number) => {
       await api.delete("/devices/" + id)
       return id
     },
     {
-      onSuccess: (id: string) => {
+      onSuccess: (id: number) => {
         deleteDevice(id)
       }
     }
@@ -74,6 +74,10 @@ function Device(props: {
       </RUSure>
       <View style={styles.row}>
         <Text numberOfLines={1}>ID: {device.id}</Text>
+      </View>
+      <Divider />
+      <View style={styles.row}>
+        <Text numberOfLines={1}>Token: {device.token}</Text>
       </View>
       <Divider />
       <View style={styles.row}>

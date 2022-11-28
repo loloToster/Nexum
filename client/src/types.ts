@@ -12,7 +12,8 @@ export interface User extends BaseUser {
 }
 
 export interface Device {
-  id: string
+  id: number
+  token: string
   name: string
 }
 
