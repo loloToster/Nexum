@@ -42,6 +42,7 @@ model WidgetProperties {
   id         Int    @id @default(autoincrement())
   widgetId   Int    @map("widget_id")
   widget     Widget @relation(fields: [widgetId], references: [id])
+  title      String?
   color      String?
   text       String?
   isSwitch   Boolean?

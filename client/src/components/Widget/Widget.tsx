@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
-import { useTheme } from "react-native-paper"
+import { View, StyleSheet } from "react-native"
+import { Text, useTheme, Colors } from "react-native-paper"
 
 import { WidgetProperties, WidgetData, WidgetValue } from "src/types"
 import { EventEmitter } from "src/utils"
@@ -45,6 +46,7 @@ const values: Record<number, WidgetValue | undefined> = {}
 
 function Widget(props: WidgetData) {
   const theme = useTheme()
+  const styles = getStyles()
   const ChoosenWidget = map[props.type] || Unknown
 
   const useWidgetValue: WidgetValueHook = initialValue => {
@@ -116,7 +118,9 @@ function Widget(props: WidgetData) {
     return [widgetValue, setValue]
   }
 
-  const defaultProperties: WidgetProperties = {
+  const widgetProperties: WidgetProperties = {
+    // default values
+    title: "",
     color: theme.colors.accent,
     text: "Text",
     isSwitch: true,
@@ -126,20 +130,39 @@ function Widget(props: WidgetData) {
     step: 1
   }
 
-  // asign default properties to undefined or null fields
-  const newProperties = props.properties || {}
-  Object.keys(defaultProperties).forEach(p => {
-    const val = newProperties[p]
-    if (val === null || val === undefined)
-      newProperties[p] = defaultProperties[p]
-  })
+  // assign all defined properties
+  for (const [key, val] of Object.entries(props.properties || {})) {
+    if (val !== null && val !== undefined) widgetProperties[key] = val
+  }
 
   const choosenWidgetProps: WidgetProps = {
-    ...{ ...props, properties: newProperties as WidgetProperties },
+    ...{ ...props, properties: widgetProperties },
     useWidgetValue
   }
 
-  return <ChoosenWidget {...choosenWidgetProps} />
+  return (
+    <View style={styles.wrapper}>
+      {Boolean(widgetProperties.title) && (
+        <Text style={styles.title}>{widgetProperties.title}</Text>
+      )}
+      <ChoosenWidget {...choosenWidgetProps} />
+    </View>
+  )
 }
 
 export default Widget
+
+const getStyles = () => {
+  return StyleSheet.create({
+    wrapper: {
+      flex: 1
+    },
+    title: {
+      textTransform: "uppercase",
+      fontSize: 9,
+      padding: 5,
+      paddingBottom: 0,
+      color: Colors.grey500
+    }
+  })
+}

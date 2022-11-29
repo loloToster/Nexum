@@ -20,6 +20,7 @@ export interface Device {
 export type WidgetValue = string | boolean | number
 
 export interface WidgetProperties {
+  title: string
   color: string
   text: string
   isSwitch: boolean
