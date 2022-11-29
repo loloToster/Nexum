@@ -13,6 +13,7 @@ import Unknown from "./Unknown/Unknown"
 import Button from "./Button/Button"
 import SliderWidget from "./Slider/Slider"
 import Gauge from "./Gauge/Gauge"
+import Label from "./Label/Label"
 
 export type SetWidgetValueAction<T> = {
   (newVal: React.SetStateAction<T>): void
@@ -34,7 +35,8 @@ export interface WidgetProps extends Omit<WidgetData, "properties"> {
 const map: Record<string, (props?: WidgetProps) => JSX.Element> = {
   btn: Button,
   sldr: SliderWidget,
-  gauge: Gauge
+  gauge: Gauge,
+  lbl: Label
 }
 
 interface LocalValueUpdateObj extends ValueUpdateObj {
