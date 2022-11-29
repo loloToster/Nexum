@@ -18,9 +18,14 @@ function Tab({ widgets }: { widgets: WidgetData[] }) {
   const [cellHeight, setCellHeight] = useState(0)
 
   useEffect(() => {
-    Dimensions.addEventListener("change", ({ window: { width } }) => {
-      setCellWidth(width / COLS)
-    })
+    const listener = Dimensions.addEventListener(
+      "change",
+      ({ window: { width } }) => {
+        setCellWidth(width / COLS)
+      }
+    )
+
+    return () => listener.remove()
   }, [])
 
   useEffect(() => {

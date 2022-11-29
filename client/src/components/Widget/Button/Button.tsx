@@ -44,7 +44,9 @@ function Button(props: WidgetProps) {
           { backgroundColor: value ? color : "transparent" }
         ]}
       >
-        <Text style={styles.text}>{text}</Text>
+        <Text selectable={false} style={styles.text}>
+          {text}
+        </Text>
       </View>
     </TouchableWithoutFeedback>
   )
