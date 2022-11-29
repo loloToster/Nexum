@@ -41,14 +41,22 @@ interface LocalValueUpdateObj extends ValueUpdateObj {
 }
 
 const localChangeEmitter = new EventEmitter()
+const values: Record<number, WidgetValue | undefined> = {}
 
 function Widget(props: WidgetData) {
   const theme = useTheme()
   const ChoosenWidget = map[props.type] || Unknown
 
   const useWidgetValue: WidgetValueHook = initialValue => {
+    if (values[props.id] !== undefined)
+      initialValue = values[props.id] as typeof initialValue
+
     const { socket } = useSocket()
     const [widgetValue, setWidgetValue] = useState(initialValue)
+
+    useEffect(() => {
+      values[props.id] = widgetValue as WidgetValue
+    }, [widgetValue])
 
     useEffect(() => {
       const listener: ValueUpdateFunc = obj => {
@@ -74,6 +82,8 @@ function Widget(props: WidgetData) {
     }, [])
 
     const emit = (val: WidgetValue) => {
+      values[props.id] = val
+
       const emitObj = {
         target: props.target,
         value: val
