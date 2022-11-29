@@ -147,7 +147,12 @@ function Slider({
               setValue(val)
             }}
             onSlidingStart={() => setInputing(true)}
-            onSlidingComplete={() => setInputing(false)}
+            onSlidingComplete={val => {
+              setInputing(false)
+              val = roundBadFloat(val)
+              onChange(val)
+              setValue(val)
+            }}
           />
         )}
       </View>
