@@ -49,39 +49,54 @@ async function main() {
           customId: "button",
           x: 0,
           y: 0,
-          width: 1,
-          height: 1,
+          width: 2,
+          height: 2,
           type: "btn",
           deviceId: createdDevices[0].id,
           properties: { isSwitch: true, text: "Button" }
         },
         {
           customId: "slider",
-          x: 1,
+          x: 3,
           y: 0,
-          width: 3,
+          width: 5,
           height: 2,
           type: "sldr",
           deviceId: createdDevices[0].id,
           properties: {
             color: "lime",
-            step: 1,
+            step: 0.1,
             min: 0,
             max: 10,
-            isVertical: true
+            isVertical: false
           }
         },
         {
-          customId: "temp-gauge",
+          customId: "slider",
+          x: 2,
+          y: 0,
+          width: 1,
+          height: 2,
+          type: "lbl",
+          deviceId: createdDevices[0].id,
+          properties: {
+            color: "pink",
+            text: "/val/°C",
+            step: 0.2
+          }
+        },
+        {
+          customId: "slider",
           x: 0,
-          y: 2,
-          width: 4,
-          height: 3,
+          y: 3,
+          width: 8,
+          height: 6,
           type: "gauge",
-          deviceId: createdDevices[1].id,
+          deviceId: createdDevices[0].id,
           properties: {
             color: "crimson",
-            text: "/val/°C"
+            text: "/val/°C",
+            step: 0.5
           }
         }
       ]
@@ -93,8 +108,8 @@ async function main() {
           customId: "idk",
           x: 1,
           y: 1,
-          width: 2,
-          height: 1,
+          width: 4,
+          height: 2,
           type: "unknwn",
           deviceId: createdDevices[1].id
         }
