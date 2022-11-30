@@ -1,7 +1,7 @@
 {
   "name": "nexum",
   "version": "1.0.0",
-  "description": "```mermaid\r erDiagram\r     USER ||--o{ USER_TAB : has-access-to",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
