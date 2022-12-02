@@ -3,6 +3,7 @@
 NexumClass::NexumClass()
     : _onConnect(NULL),
       _onDisconnect(NULL),
+      _onReceive(NULL),
       WiFiMulti(new ESP8266WiFiMulti()),
       socketIO(new SocketIOclient()) {}
 
@@ -39,7 +40,19 @@ void NexumClass::attachCb() {
           }
 
           case sIOtype_EVENT: {
-            Serial.printf("[IOc] get event: %s %u\n", payload, length);
+            StaticJsonDocument<64> doc;
+            DeserializationError error = deserializeJson(doc, payload);
+
+            if (error || doc[0] != "update-value") {
+              break;
+            }
+
+            String customId = doc[1]["customId"];
+            // TODO: dynamic type
+            String value = doc[1]["value"];
+
+            _onReceive(customId, value);
+
             break;
           }
         }
@@ -49,6 +62,10 @@ void NexumClass::attachCb() {
 void NexumClass::onConnect(void (*callback)()) { _onConnect = callback; }
 
 void NexumClass::onDisconnect(void (*callback)()) { _onDisconnect = callback; }
+
+void NexumClass::onReceive(void (*callback)(String, String)) {
+  _onReceive = callback;
+}
 
 void NexumClass::loop() { socketIO->loop(); }
 

@@ -24,7 +24,8 @@ export class EventsGateway {
     @MessageBody("value") value: string | boolean | number
   ) {
     socket.broadcast.to("users").emit("update-value", { target, value })
-    socket.to("devices").emit("update-value", { target, value })
+    const customId = target.substring(target.indexOf("-") + 1)
+    socket.to("devices").emit("update-value", { customId, value })
   }
 
   @SubscribeMessage("connect")

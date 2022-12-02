@@ -18,6 +18,7 @@ class NexumClass {
 
   void onConnect(void (*callback)());
   void onDisconnect(void (*callback)());
+  void onReceive(void (*callback)(String, String));
 
   void loop();
 
@@ -26,6 +27,7 @@ class NexumClass {
   SocketIOclient *socketIO;
   void (*_onConnect)();
   void (*_onDisconnect)();
+  void (*_onReceive)(String, String);
 
   void attachCb();
 };
