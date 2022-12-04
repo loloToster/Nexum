@@ -19,23 +19,51 @@ export class EventsGateway {
 
   constructor(private db: DatabaseService, private userService: UserService) {}
 
+  sendUpdate(
+    sender: Socket,
+    target: string,
+    customId: string,
+    deviceId: string,
+    value: string | boolean | number
+  ) {
+    // send update to every user that can read current target
+    sender.broadcast.to(target).emit("update-value", { target, value })
+
+    // send update to devices with id from target
+    sender.broadcast
+      .to(`device-${deviceId}`)
+      .emit("update-value", { customId, value })
+  }
+
   @SubscribeMessage("update-value")
   handleMessage(
     @ConnectedSocket() socket: Socket,
     @MessageBody("target") target: string,
+    @MessageBody("customId") customId: string,
     @MessageBody("value") value: string | boolean | number
   ) {
-    if (!socket.in(target)) return // user tried to update widget not available to him
+    let deviceId: string
 
-    const [deviceId, customId] = target.split(/-(.*)/s)
+    if (socket.rooms.has("users")) {
+      // user tried to update widget not available to him
+      if (!socket.rooms.has(target)) return
 
-    // send update to every user that can read current target
-    socket.broadcast.to(target).emit("update-value", { target, value })
+      const parsedTarget = target.split(/-(.*)/s) // split on first occurance
+      deviceId = parsedTarget[0]
+      customId = parsedTarget[1]
+    } else if (socket.rooms.has("devices")) {
+      deviceId = socket.data.id
+      target = `${deviceId}-${customId}`
+    } else {
+      console.warn(
+        "Someone was connected without being in a 'users' or 'devices' room"
+      )
 
-    // send update to devices with id from target
-    socket.broadcast
-      .to(`device-${deviceId}`)
-      .emit("update-value", { customId, value })
+      socket.disconnect()
+      return
+    }
+
+    this.sendUpdate(socket, target, customId, deviceId, value)
   }
 
   @SubscribeMessage("connect")
@@ -56,7 +84,7 @@ export class EventsGateway {
           ...new Set(user.tabs.map(t => t.widgets.map(w => w.target)).flat())
         ]
 
-        socket.join(availableTargets)
+        socket.join(["users", ...availableTargets])
         break
       }
 
@@ -70,7 +98,8 @@ export class EventsGateway {
           break
         }
 
-        socket.join(`device-${device.id}`)
+        socket.data.id = device.id.toString()
+        socket.join(["devices", `device-${device.id}`])
         break
       }
 

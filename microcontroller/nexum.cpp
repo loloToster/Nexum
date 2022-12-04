@@ -67,6 +67,12 @@ void NexumClass::onReceive(void (*callback)(String, String)) {
   _onReceive = callback;
 }
 
+void NexumClass::update(String customId, String value) {
+  String payload = "[\"update-value\", { \"customId\": \"" + customId +
+                   "\", \"value\": \"" + value + "\" }]";
+  socketIO->send(sIOtype_EVENT, payload);
+}
+
 void NexumClass::loop() { socketIO->loop(); }
 
 NexumClass Nexum;

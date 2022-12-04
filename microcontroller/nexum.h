@@ -20,6 +20,8 @@ class NexumClass {
   void onDisconnect(void (*callback)());
   void onReceive(void (*callback)(String, String));
 
+  void update(String customId, String value);
+
   void loop();
 
  private:
