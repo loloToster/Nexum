@@ -34,6 +34,7 @@ export interface WidgetData {
   id: number
   type: string
   target: string
+  value: WidgetValue | null
   x: number
   y: number
   width: number

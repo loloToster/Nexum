@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common"
-import { User } from "@prisma/client"
+import { User, Value } from "@prisma/client"
 import { DatabaseService } from "src/database/database.service"
 
 @Injectable()
@@ -53,15 +53,38 @@ export class UserService {
       }
     })
 
-    // this entire logic just adds target property to every widget
+    // get values for all widgets
+    const targetsQuery = user.tabs
+      .map(t => t.widgets)
+      .flat()
+      .map(w => ({ AND: { customId: w.customId, deviceId: w.deviceId } }))
+
+    const values = await this.db.value.findMany({
+      where: {
+        OR: targetsQuery
+      }
+    })
+
+    // this entire logic just adds target and value properties to every widget
     return {
       ...user,
       tabs: user.tabs.map(tab => ({
         ...tab,
-        widgets: tab.widgets.map(widget => ({
-          ...widget,
-          target: `${widget.deviceId}-${widget.customId}`
-        }))
+        widgets: tab.widgets.map(widget => {
+          const value: Value | undefined = values.find(
+            val =>
+              widget.deviceId === val.deviceId &&
+              widget.customId === val.customId
+          )
+
+          const parsedValue = value ? JSON.parse(value.value) : null
+
+          return {
+            ...widget,
+            value: parsedValue,
+            target: `${widget.deviceId}-${widget.customId}`
+          }
+        })
       }))
     }
   }

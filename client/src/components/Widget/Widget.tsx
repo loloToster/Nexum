@@ -54,6 +54,8 @@ function Widget(props: WidgetData) {
   const useWidgetValue: WidgetValueHook = initialValue => {
     if (values[props.id] !== undefined)
       initialValue = values[props.id] as typeof initialValue
+    else if (props.value !== null && typeof initialValue == typeof props.value)
+      initialValue = props.value as typeof initialValue
 
     const { socket } = useSocket()
     const [widgetValue, setWidgetValue] = useState(initialValue)
