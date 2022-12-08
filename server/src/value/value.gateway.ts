@@ -8,7 +8,7 @@ import {
 import { Server, Socket } from "socket.io"
 
 import { ValueService } from "./value.service"
-import { DatabaseService } from "src/database/database.service"
+import { DeviceService } from "src/device/device.service"
 import { UserService } from "src/user/user.service"
 
 import SocketAuthDto from "src/dtos/socketAuth.dto"
@@ -20,7 +20,7 @@ export class ValueGateway {
 
   constructor(
     private valueService: ValueService,
-    private db: DatabaseService,
+    private deviceService: DeviceService,
     private userService: UserService
   ) {}
 
@@ -84,9 +84,9 @@ export class ValueGateway {
       }
 
       case "device": {
-        const device = await this.db.device.findUnique({
-          where: { token: authorization.token }
-        })
+        const device = await this.deviceService.getDeviceByToken(
+          authorization.token
+        )
 
         if (!device) {
           socket.disconnect()

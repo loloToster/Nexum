@@ -45,10 +45,18 @@ export class DeviceService {
   }
 
   async getDeviceById(id: number) {
-    const user = await this.db.device.findUnique({
+    const device = await this.db.device.findUnique({
       where: { id }
     })
 
-    return user
+    return device
+  }
+
+  async getDeviceByToken(token: string) {
+    const device = await this.db.device.findUnique({
+      where: { token }
+    })
+
+    return device
   }
 }
