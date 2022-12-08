@@ -62,3 +62,12 @@ model Device {
 
   @@unique([token])
 }
+
+// TODO: add relations to widgets and devices
+model Value {
+  deviceId Int    @map("device_id")
+  customId String @map("custom_id")
+  value    String
+
+  @@id([deviceId, customId])
+}
