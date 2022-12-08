@@ -7,33 +7,22 @@ import {
 } from "@nestjs/websockets"
 import { Server, Socket } from "socket.io"
 
+import { ValueService } from "./value.service"
 import { DatabaseService } from "src/database/database.service"
 import { UserService } from "src/user/user.service"
 
 import SocketAuthDto from "src/dtos/socketAuth.dto"
 
 @WebSocketGateway({ cors: true })
-export class EventsGateway {
+export class ValueGateway {
   @WebSocketServer()
   server: Server
 
-  constructor(private db: DatabaseService, private userService: UserService) {}
-
-  sendUpdate(
-    sender: Socket,
-    target: string,
-    customId: string,
-    deviceId: string,
-    value: string | boolean | number
-  ) {
-    // send update to every user that can read current target
-    sender.broadcast.to(target).emit("update-value", { target, value })
-
-    // send update to devices with id from target
-    sender.broadcast
-      .to(`device-${deviceId}`)
-      .emit("update-value", { customId, value })
-  }
+  constructor(
+    private valueService: ValueService,
+    private db: DatabaseService,
+    private userService: UserService
+  ) {}
 
   @SubscribeMessage("update-value")
   handleMessage(
@@ -63,7 +52,13 @@ export class EventsGateway {
       return
     }
 
-    this.sendUpdate(socket, target, customId, deviceId, value)
+    this.valueService.updateValue(
+      socket,
+      target,
+      customId,
+      parseInt(deviceId),
+      value
+    )
   }
 
   @SubscribeMessage("connect")
