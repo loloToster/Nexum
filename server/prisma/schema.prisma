@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.db"
+  provider          = "postgresql"
+  url               = env("DB_URL")
+  shadowDatabaseUrl = env("SHADOW_DB_URL")
 }
 
 model User {
@@ -22,26 +23,26 @@ model Tab {
 }
 
 model Widget {
-  id       Int    @id @default(autoincrement())
-  customId String @map("custom_id")
-  tabId    Int    @map("tab_id")
-  tab      Tab    @relation(fields: [tabId], references: [id])
-  deviceId Int    @map("device_id")
-  device   Device @relation(fields: [deviceId], references: [id])
-  type     String
-  x        Int
-  y        Int
-  width    Int
-  height   Int
+  id         Int               @id @default(autoincrement())
+  customId   String            @map("custom_id")
+  tabId      Int               @map("tab_id")
+  tab        Tab               @relation(fields: [tabId], references: [id])
+  deviceId   Int               @map("device_id")
+  device     Device            @relation(fields: [deviceId], references: [id])
+  type       String
+  x          Int
+  y          Int
+  width      Int
+  height     Int
   properties WidgetProperties?
 
   @@unique([x, y, tabId]) // no widgets can have the same coordinates on the same tab
 }
 
 model WidgetProperties {
-  id         Int    @id @default(autoincrement())
-  widgetId   Int    @map("widget_id")
-  widget     Widget @relation(fields: [widgetId], references: [id])
+  id         Int      @id @default(autoincrement())
+  widgetId   Int      @map("widget_id")
+  widget     Widget   @relation(fields: [widgetId], references: [id])
   title      String?
   color      String?
   text       String?
