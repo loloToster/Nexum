@@ -67,10 +67,31 @@ void NexumClass::onReceive(void (*callback)(String, String)) {
   _onReceive = callback;
 }
 
-void NexumClass::update(String customId, String value) {
+void NexumClass::rawUpdate(String customId, String value) {
   String payload = "[\"update-value\", { \"customId\": \"" + customId +
-                   "\", \"value\": \"" + value + "\" }]";
+                   "\", \"value\": " + value + " }]";
+
   socketIO->send(sIOtype_EVENT, payload);
+}
+
+void NexumClass::update(String customId, String value) {
+  rawUpdate(customId, "\"" + value + "\"");
+}
+
+void NexumClass::update(String customId, const char *value) {
+  update(customId, (String)value);
+}
+
+void NexumClass::update(String customId, int value) {
+  rawUpdate(customId, String(value));
+}
+
+void NexumClass::update(String customId, double value) {
+  rawUpdate(customId, String(value));
+}
+
+void NexumClass::update(String customId, boolean value) {
+  rawUpdate(customId, value ? "true" : "false");
 }
 
 void NexumClass::loop() { socketIO->loop(); }

@@ -21,6 +21,10 @@ class NexumClass {
   void onReceive(void (*callback)(String, String));
 
   void update(String customId, String value);
+  void update(String customId, const char *value);
+  void update(String customId, int value);
+  void update(String customId, double value);
+  void update(String customId, boolean value);
 
   void loop();
 
@@ -32,6 +36,7 @@ class NexumClass {
   void (*_onReceive)(String, String);
 
   void attachCb();
+  void rawUpdate(String customId, String value);
 };
 
 extern NexumClass Nexum;
