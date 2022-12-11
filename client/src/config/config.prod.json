@@ -1,5 +1,6 @@
 {
   "userCodePrefix": "nexum-",
+  "tokenUrlSeparator": "&",
   "apiBaseUrl": {
     "default": ""
   }

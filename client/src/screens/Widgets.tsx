@@ -20,12 +20,14 @@ function Widgets() {
 
   // connect socket only if this components is mounted
   useEffect(() => {
+    if (!socket) return
+
     socket.connect()
 
     return () => {
       socket.disconnect()
     }
-  }, [])
+  }, [socket])
 
   const { isLoading, isError, data } = useQuery("me", async () => {
     const res = await api.get("/users/me")

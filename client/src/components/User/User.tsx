@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { View, StyleSheet, Dimensions, TextInput } from "react-native"
 import { useMutation } from "react-query"
 import {
@@ -16,7 +16,7 @@ import QRCode from "react-native-qrcode-svg"
 
 import api from "src/api"
 
-import config from "src/config"
+import config, { getBaseUrl } from "src/config"
 
 import useDebounce from "src/hooks/useDebounce"
 import useAfterMountEffect from "src/hooks/useAfterMountEffect"
@@ -34,6 +34,15 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
   const [user, setUser] = useObjectState(initialUser)
   const [qrActive, setQrActive] = useState(false)
   const [deleteActive, setDeleteActive] = useState(false)
+  const [qrCode, setQrCode] = useState("")
+
+  useEffect(() => {
+    getBaseUrl().then(baseUrl =>
+      setQrCode(
+        `${config.userCodePrefix}${user.id}${config.tokenUrlSeparator}${baseUrl}`
+      )
+    )
+  })
 
   const nameInput = useRef<TextInput>()
 
@@ -89,7 +98,7 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
           <View style={styles.qrWrapper}>
             <QRCode
               size={Dimensions.get("window").width / 1.5}
-              value={config.userCodePrefix + user.id}
+              value={qrCode}
             />
           </View>
         </Modal>
