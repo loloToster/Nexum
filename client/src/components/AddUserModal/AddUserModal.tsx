@@ -57,7 +57,7 @@ function AddUserModal(
   const handleDismiss = () => {
     setIdError("")
     setNameError("")
-    props.onDismiss()
+    props.onDismiss && props.onDismiss()
   }
 
   const handleIdChange = (val: string) => {

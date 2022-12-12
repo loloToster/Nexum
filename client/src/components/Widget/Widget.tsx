@@ -32,7 +32,10 @@ export interface WidgetProps extends Omit<WidgetData, "properties"> {
 }
 
 // maps string type prop to component
-const map: Record<string, (props?: WidgetProps) => JSX.Element> = {
+const map: Record<
+  string,
+  ((props: WidgetProps) => JSX.Element) | (() => JSX.Element)
+> = {
   btn: Button,
   sldr: SliderWidget,
   gauge: Gauge,
@@ -79,11 +82,11 @@ function Widget(props: WidgetData) {
       }
 
       localChangeEmitter.on("update-value", localListener)
-      socket.on("update-value", listener)
+      socket?.on("update-value", listener)
 
       return () => {
         localChangeEmitter.off("update-value", localListener)
-        socket.off("update-value", listener)
+        socket?.off("update-value", listener)
       }
     }, [])
 
@@ -100,7 +103,7 @@ function Widget(props: WidgetData) {
         ...emitObj
       })
 
-      socket.emit("update-value", emitObj)
+      socket?.emit("update-value", emitObj)
     }
 
     const setValue: SetWidgetValueAction<typeof initialValue> = (
@@ -109,12 +112,13 @@ function Widget(props: WidgetData) {
     ) => {
       if (typeof value === "function") {
         setWidgetValue(prev => {
+          // @ts-ignore
           const newVal = value(prev)
           emit(newVal)
           return newVal
         })
       } else {
-        emit(value)
+        emit(value as WidgetValue)
         if (!onlyServer) setWidgetValue(value)
       }
     }
@@ -136,7 +140,8 @@ function Widget(props: WidgetData) {
 
   // assign all defined properties
   for (const [key, val] of Object.entries(props.properties || {})) {
-    if (val !== null && val !== undefined) widgetProperties[key] = val
+    if (val !== null && val !== undefined)
+      (widgetProperties as Record<string, any>)[key] = val
   }
 
   const choosenWidgetProps: WidgetProps = {

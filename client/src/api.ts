@@ -11,6 +11,7 @@ const apiHandler = axios.create({
 apiHandler.interceptors.request.use(async axiosConfig => {
   try {
     const user = await getUserFromStorage()
+    if (!axiosConfig.headers) axiosConfig.headers = {}
     if (user) axiosConfig.headers.Authorization = `Bearer ${user.id}`
   } catch (e) {
     console.error(e)

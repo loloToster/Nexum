@@ -57,7 +57,7 @@ function AddDeviceModal(
   const handleDismiss = () => {
     setTokenError("")
     setNameError("")
-    props.onDismiss()
+    props.onDismiss && props.onDismiss()
   }
 
   const handleTokenChange = (val: string) => {

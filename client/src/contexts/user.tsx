@@ -6,8 +6,8 @@ import { BaseUser } from "src/types"
 import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 
 export interface UserContextI {
-  user: BaseUser
-  setUser: (user: BaseUser) => void
+  user: BaseUser | null
+  setUser: (user: BaseUser | null) => void
 }
 
 export async function getUserFromStorage(): Promise<BaseUser | null> {

@@ -35,7 +35,7 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
   const [qrActive, setQrActive] = useState(false)
   const [deleteActive, setDeleteActive] = useState(false)
 
-  const nameInput = useRef<TextInput>()
+  const nameInput = useRef<TextInput>(null)
 
   const deleteMutation = useMutation(
     "delete-user",
@@ -122,7 +122,7 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
         <IconButton
           icon="pencil"
           size={20}
-          onPress={() => nameInput.current.focus()}
+          onPress={() => nameInput.current?.focus()}
         />
       </View>
       <Divider />
