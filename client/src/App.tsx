@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { registerRootComponent } from "expo"
 import { StatusBar } from "expo-status-bar"
 
@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "react-query"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 
-import { io, Socket } from "socket.io-client"
+import { io } from "socket.io-client"
 
 import { DarkTheme, Provider as PaperProvider } from "react-native-paper"
 
@@ -33,26 +33,15 @@ DarkTheme.colors.surface = "#565656"
 const queryClient = new QueryClient()
 const Stack = createStackNavigator()
 
-function createSocket(url: string) {
-  return io(url, {
-    autoConnect: false,
-    auth: async cb => {
-      const user = await getUserFromStorage()
-      cb({ as: "user", token: user.id })
-    }
-  })
-}
+const socket = io(getBaseUrl(), {
+  autoConnect: false,
+  auth: async cb => {
+    const user = await getUserFromStorage()
+    cb({ as: "user", token: user.id })
+  }
+})
 
 function App() {
-  const [socket, setSocket] = useState<Socket>()
-  // used to refresh base url in socket
-  // TODO: get rid of it
-  const [urlBumper, setUrlBumber] = useState(0)
-
-  useEffect(() => {
-    getBaseUrl().then(url => setSocket(createSocket(url)))
-  }, [urlBumper])
-
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={DarkTheme}>
@@ -84,7 +73,7 @@ function App() {
                   </NavigationContainer>
                 </SocketContext.Provider>
               ) : (
-                <Login onLogin={() => setUrlBumber(p => ++p)} />
+                <Login />
               )
             }
           </UserContextConsumer>

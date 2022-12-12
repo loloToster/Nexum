@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Platform } from "react-native"
 
 import devConfig from "./config.dev.json"
@@ -6,30 +5,20 @@ import prodConfig from "./config.prod.json"
 
 interface Config {
   userCodePrefix: string
-  tokenUrlSeparator: string
   apiBaseUrl: {
     default: string
     [key: string]: string
   }
 }
 
-// TODO: evaluate if prod or dev
-const isProd = false
+const isProd = process.env.NODE_ENV === "production"
 const config: Config = isProd ? prodConfig : devConfig
 
-export async function setBaseUrl(url: string | null) {
-  if (url) await AsyncStorage.setItem("baseUrl", url)
-  else await AsyncStorage.removeItem("baseUrl")
+if (isProd && process.env.API_URL) {
+  config.apiBaseUrl.default = process.env.API_URL
 }
 
-export async function getBaseUrl() {
-  try {
-    const savedUrl = await AsyncStorage.getItem("baseUrl")
-    if (savedUrl) return savedUrl
-  } catch (err) {
-    console.warn(err)
-  }
-
+export function getBaseUrl() {
   return config.apiBaseUrl[Platform.OS] || config.apiBaseUrl.default
 }
 
