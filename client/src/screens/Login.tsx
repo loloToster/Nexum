@@ -12,31 +12,25 @@ import {
   Button,
   Portal,
   Modal,
-  ActivityIndicator,
-  Dialog,
-  Paragraph
+  ActivityIndicator
 } from "react-native-paper"
 
-import config, { setBaseUrl } from "src/config"
+import config from "src/config"
 import api from "src/api"
 
 import { useUser } from "src/contexts/user"
 
 import QrScanner from "src/components/QrScanner/QrScanner"
 
-function Login({ onLogin }: { onLogin: () => void }) {
+function Login() {
   const theme = useTheme()
   const styles = getStyles(theme)
 
   const { setUser } = useUser()
 
-  const [url, setUrl] = useState("") // url in dialog box
-  const [urlDialogOpen, setUrlDialogOpen] = useState(false)
-
   const [code, setCode] = useState("")
-  const [userError, setUserError] = useState("")
-
   const [scannerOpened, setScannerOpened] = useState(false)
+  const [userError, setUserError] = useState("")
 
   const loginMutation = useMutation(
     "login",
@@ -58,45 +52,18 @@ function Login({ onLogin }: { onLogin: () => void }) {
     },
     {
       onSuccess: data => {
-        onLogin()
         if (data) setUser(data)
       }
     }
   )
 
-  const handleLogin = async (code: string, noUrl = false) => {
-    if (noUrl) {
-      setUrlDialogOpen(false)
-      await setBaseUrl(null)
-      loginMutation.mutate(code)
-      return
-    }
-
-    if (code.includes(config.tokenUrlSeparator)) {
-      const [token, baseUrl] = code.split(config.tokenUrlSeparator)
-      await setBaseUrl(baseUrl)
-      loginMutation.mutate(token)
-      return
-    }
-
-    if (url) {
-      await setBaseUrl(url)
-      loginMutation.mutate(code)
-      return
-    }
-
-    setUrlDialogOpen(true)
-  }
-
   const handleScan = ({ data }: { data: string }) => {
     if (!data.startsWith(config.userCodePrefix) || loginMutation.isLoading)
       return
 
-    const providedCode = data.slice(config.userCodePrefix.length)
-
-    setCode(providedCode)
+    const token = data.slice(config.userCodePrefix.length)
+    loginMutation.mutate(token)
     setScannerOpened(false)
-    handleLogin(providedCode)
   }
 
   return (
@@ -105,30 +72,6 @@ function Login({ onLogin }: { onLogin: () => void }) {
         <Modal visible={loginMutation.isLoading} dismissable={false}>
           <ActivityIndicator size="large" />
         </Modal>
-        <Dialog
-          visible={urlDialogOpen}
-          onDismiss={() => setUrlDialogOpen(false)}
-        >
-          <Dialog.Content>
-            <Paragraph>
-              Your code does not include a base url, please provide one or use
-              default.
-            </Paragraph>
-            <TextInput
-              style={{ backgroundColor: "transparent" }}
-              mode="outlined"
-              placeholder="Base url"
-              onChangeText={setUrl}
-              value={url}
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => handleLogin(code, true)}>Use Default</Button>
-            <Button disabled={!url} onPress={() => handleLogin(code)}>
-              OK
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
       </Portal>
       {Platform.OS !== "web" && (
         <QrScanner
@@ -160,7 +103,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
         <Button
           style={styles.rowItem}
           mode="contained"
-          onPress={() => handleLogin(code)}
+          onPress={() => loginMutation.mutate(code)}
           disabled={loginMutation.isLoading || code.length <= 3}
         >
           Login

@@ -24,7 +24,7 @@ function Device(props: {
   const [device, setDevice] = useObjectState(initialDevice)
   const [deleteActive, setDeleteActive] = useState(false)
 
-  const nameInput = useRef<TextInput>()
+  const nameInput = useRef<TextInput>(null)
 
   interface EditMutationParams {
     id: number
@@ -96,7 +96,7 @@ function Device(props: {
         <IconButton
           icon="pencil"
           size={20}
-          onPress={() => nameInput.current.focus()}
+          onPress={() => nameInput.current?.focus()}
         />
       </View>
       <Button

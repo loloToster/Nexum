@@ -40,7 +40,7 @@ function SearchableList<T>({
 
   const renderItem = ({ item }: { item: T }) => {
     return (
-      <List.Accordion title={item[titleKey]}>
+      <List.Accordion title={(item as Record<string, string>)[titleKey]}>
         {renderContent(item)}
       </List.Accordion>
     )
