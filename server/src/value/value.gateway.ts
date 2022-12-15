@@ -31,17 +31,11 @@ export class ValueGateway {
     @MessageBody("customId") customId: string,
     @MessageBody("value") value: string | boolean | number
   ) {
-    let deviceId: string
-
     if (socket.rooms.has("users")) {
       // user tried to update widget not available to him
       if (!socket.rooms.has(target)) return
-
-      const parsedTarget = target.split(/-(.*)/s) // split on first occurance
-      deviceId = parsedTarget[0]
-      customId = parsedTarget[1]
     } else if (socket.rooms.has("devices")) {
-      deviceId = socket.data.id
+      const deviceId = socket.data.id
       target = `${deviceId}-${customId}`
     } else {
       console.warn(
@@ -52,13 +46,7 @@ export class ValueGateway {
       return
     }
 
-    this.valueService.updateValue(
-      socket,
-      target,
-      customId,
-      parseInt(deviceId),
-      value
-    )
+    this.valueService.updateValue(socket, target, value)
   }
 
   @SubscribeMessage("connect")

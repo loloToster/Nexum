@@ -3,14 +3,14 @@ import {
   Get,
   Param,
   Query,
-  BadRequestException
+  BadRequestException,
+  NotFoundException
 } from "@nestjs/common"
 
 import { ValueService } from "./value.service"
-import { DeviceService } from "../device/device.service"
 import { ValueGateway } from "./value.gateway"
+import { DeviceService } from "../device/device.service"
 
-// todo: cleanup & and dry
 @Controller("/api")
 export class ValueController {
   constructor(
@@ -19,33 +19,33 @@ export class ValueController {
     private deviceService: DeviceService
   ) {}
 
-  @Get("/:token/get/:customId")
-  async getValue(
+  @Get("/:token/:action/:customId")
+  async valueAction(
     @Param("token") token: string,
-    @Param("customId") customId: string
-  ) {
-    const device = await this.deviceService.getDeviceByToken(token)
-    const { value } = await this.valueService.getValue(device.id, customId)
-    return value
-  }
-
-  @Get("/:token/update/:customId")
-  async updateValue(
-    @Param("token") token: string,
+    @Param("action") action: string,
     @Param("customId") customId: string,
     @Query("value") value: string
   ) {
-    if (!value) throw new BadRequestException()
+    // only 2 actions are allowed
+    if (!["get", "update"].includes(action)) throw new NotFoundException()
+    // there needs to be a value when updating
+    if (action === "update" && !value)
+      throw new BadRequestException("include value in request")
 
-    const parsedValue = JSON.parse(value)
     const device = await this.deviceService.getDeviceByToken(token)
 
-    await this.valueService.updateValue(
-      this.valueGateway.server,
-      `${device.id}-${customId}`,
-      customId,
-      device.id,
-      parsedValue
-    )
+    if (action === "get") {
+      const value = await this.valueService.getValue(device.id, customId)
+      return value.value
+    } else {
+      const parsedValue = JSON.parse(value)
+
+      await this.valueService.updateValue(
+        this.valueGateway.server,
+        customId,
+        device.id,
+        parsedValue
+      )
+    }
   }
 }

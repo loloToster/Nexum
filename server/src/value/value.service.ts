@@ -3,18 +3,43 @@ import { Socket, Server } from "socket.io"
 
 import { DatabaseService } from "src/database/database.service"
 
+type Value = string | boolean | number
+
 @Injectable()
 export class ValueService {
   constructor(private db: DatabaseService) {}
 
+  async updateValue(origin: Socket | Server, target: string, value: Value)
   async updateValue(
     origin: Socket | Server,
-    target: string,
     customId: string,
     deviceId: number,
-    value: string | boolean | number
+    value: Value
+  )
+  async updateValue(
+    origin: Socket | Server,
+    targetOrCustomId: string,
+    deviceIdOrValue: Value | number,
+    valueOrUndefined?: Value
   ) {
     const updater = origin instanceof Server ? origin : origin.broadcast
+
+    let value: Value, target: string, deviceId: number, customId: string
+
+    if (valueOrUndefined === undefined) {
+      // 1st overload
+      value = deviceIdOrValue
+      target = targetOrCustomId
+      const deviceIdAndCustomId = target.split(/-(.*)/s)
+      deviceId = parseInt(deviceIdAndCustomId[0])
+      customId = deviceIdAndCustomId[1]
+    } else {
+      // 2nd overload
+      value = valueOrUndefined
+      deviceId = deviceIdOrValue as number
+      customId = targetOrCustomId
+      target = `${deviceId}-${customId}`
+    }
 
     // send update to every user that can read current target
     updater.to(target).emit("update-value", { target, value })
