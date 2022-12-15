@@ -8,8 +8,7 @@ import {
   Body,
   Query,
   Param,
-  ConflictException,
-  NotFoundException
+  ConflictException
 } from "@nestjs/common"
 import { UserService } from "./user.service"
 
@@ -71,17 +70,6 @@ export class UserController {
   @Delete("/:id")
   @UseGuards(IsAdminGuard)
   async removeUser(@Param("id") id: string) {
-    try {
-      return await this.userService.removeUser(id)
-    } catch (err: unknown) {
-      if (
-        err instanceof PrismaClientKnownRequestError &&
-        err.code === "P2025"
-      ) {
-        throw new NotFoundException("No user with this id")
-      } else {
-        throw err
-      }
-    }
+    return this.userService.removeUser(id)
   }
 }

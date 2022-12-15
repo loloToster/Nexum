@@ -8,8 +8,7 @@ import {
   Body,
   Query,
   Param,
-  ConflictException,
-  NotFoundException
+  ConflictException
 } from "@nestjs/common"
 import { DeviceService } from "./device.service"
 
@@ -59,17 +58,6 @@ export class DeviceController {
 
   @Delete("/:id")
   async removeDevice(@Param("id") id: number) {
-    try {
-      return await this.deviceService.removeDevice(id)
-    } catch (err: unknown) {
-      if (
-        err instanceof PrismaClientKnownRequestError &&
-        err.code === "P2025"
-      ) {
-        throw new NotFoundException("No device with this id")
-      } else {
-        throw err
-      }
-    }
+    return this.deviceService.removeDevice(id)
   }
 }
