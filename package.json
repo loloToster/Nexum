@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cd ./client && npm i --force && npm run build:web && cd ../server && npm i && npm run build",
-    "start": "cd ./server && npm start",
+    "build-client": "cd ./client && npm i --force && npm run build:web",
+    "build-server": "cd ./server && npm i && npm run build",
+    "build": "npm run build-client && npm run build-server",
+    "start": "cd ./server && npm run start:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ignore-path ./.gitignore"
   },
