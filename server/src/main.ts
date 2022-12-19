@@ -11,7 +11,11 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }))
   app.useGlobalInterceptors(new NotFoundInterceptor())
 
-  await app.listen(3000)
+  const port = process.env.PORT || 3000
+  await app.listen(port, "0.0.0.0", () => {
+    // eslint-disable-next-line no-console
+    console.log("listening on port:", port)
+  })
 }
 
 bootstrap()
