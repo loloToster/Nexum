@@ -1,4 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common"
+import { ServeStaticModule } from "@nestjs/serve-static"
 
 import { AuthMiddleware } from "./middleware/auth.middleware"
 
@@ -9,7 +10,16 @@ import { DeviceModule } from "./device/device.module"
 import { UserModule } from "./user/user.module"
 
 @Module({
-  imports: [AuthModule, DeviceModule, UserModule, DatabaseModule, ValueModule]
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: `${__dirname}/../../../client/web-build`
+    }),
+    AuthModule,
+    DeviceModule,
+    UserModule,
+    DatabaseModule,
+    ValueModule
+  ]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
