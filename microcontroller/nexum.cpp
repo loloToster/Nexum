@@ -1,30 +1,34 @@
 #include "nexum.h"
 
+ESP8266WiFiMulti WiFiMulti;
+SocketIOclient socketIO;
+
 NexumClass::NexumClass()
-    : _onConnect(NULL),
-      _onDisconnect(NULL),
-      _onReceive(NULL),
-      WiFiMulti(new ESP8266WiFiMulti()),
-      socketIO(new SocketIOclient()) {}
+    : _onConnect(NULL), _onDisconnect(NULL), _onReceive(NULL) {}
 
 void NexumClass::begin(String token, const char *ssid, const char *pass,
-                       const char *host) {
+                       const char *host, uint16_t port, boolean useSSL) {
   if (WiFi.getMode() & WIFI_AP) {
     WiFi.softAPdisconnect(true);
   }
 
-  WiFiMulti->addAP(ssid, pass);
+  WiFiMulti.addAP(ssid, pass);
 
-  while (WiFiMulti->run() != WL_CONNECTED) {
+  while (WiFiMulti.run() != WL_CONNECTED) {
     delay(100);
   }
 
-  socketIO->begin(host, 3000, "/socket.io/?EIO=4&as=device&token=" + token);
+  if (useSSL) {
+    socketIO.beginSSL(host, port, "/socket.io/?EIO=4&as=device&token=" + token);
+  } else {
+    socketIO.begin(host, port, "/socket.io/?EIO=4&as=device&token=" + token);
+  }
+
   attachCb();
 }
 
 void NexumClass::attachCb() {
-  socketIO->onEvent(
+  socketIO.onEvent(
       [this](socketIOmessageType_t type, uint8_t *payload, size_t length) {
         switch (type) {
           case sIOtype_DISCONNECT: {
@@ -35,7 +39,7 @@ void NexumClass::attachCb() {
           case sIOtype_CONNECT: {
             _onConnect();
             // join default namespace (no auto join in Socket.IO V3)
-            socketIO->send(sIOtype_CONNECT, "/");
+            socketIO.send(sIOtype_CONNECT, "/");
             break;
           }
 
@@ -71,7 +75,7 @@ void NexumClass::rawUpdate(String customId, String value) {
   String payload = "[\"update-value\", { \"customId\": \"" + customId +
                    "\", \"value\": " + value + " }]";
 
-  socketIO->send(sIOtype_EVENT, payload);
+  socketIO.send(sIOtype_EVENT, payload);
 }
 
 void NexumClass::update(String customId, String value) {
@@ -94,6 +98,6 @@ void NexumClass::update(String customId, boolean value) {
   rawUpdate(customId, value ? "true" : "false");
 }
 
-void NexumClass::loop() { socketIO->loop(); }
+void NexumClass::loop() { socketIO.loop(); }
 
 NexumClass Nexum;

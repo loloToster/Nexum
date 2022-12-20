@@ -13,8 +13,8 @@ class NexumClass {
  public:
   NexumClass();
 
-  void begin(String token, const char *ssid, const char *pass,
-             const char *host);
+  void begin(String token, const char *ssid, const char *pass, const char *host,
+             uint16_t port, boolean useSSL);
 
   void onConnect(void (*callback)());
   void onDisconnect(void (*callback)());
@@ -29,8 +29,6 @@ class NexumClass {
   void loop();
 
  private:
-  ESP8266WiFiMulti *WiFiMulti;
-  SocketIOclient *socketIO;
   void (*_onConnect)();
   void (*_onDisconnect)();
   void (*_onReceive)(String, String);
