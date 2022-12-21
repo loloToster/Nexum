@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, StyleSheet, Dimensions } from "react-native"
+import { View, StyleSheet, Dimensions, ScrollView } from "react-native"
 import { useTheme, Theme } from "react-native-paper"
 
 import { WidgetData } from "src/types"
@@ -32,23 +32,28 @@ function Tab({ widgets }: { widgets: WidgetData[] }) {
     setCellHeight((cellWidth / CELL_ASPECT_RATIO[0]) * CELL_ASPECT_RATIO[1])
   }, [cellWidth])
 
+  // neccessary because all widgets are positioned absolutely
+  const viewHeight = Math.max(...widgets.map(w => w.height + w.y))
+
   return (
-    <View style={styles.tab}>
-      {widgets.map((widgetData, i) => (
-        <View
-          key={i}
-          style={{
-            position: "absolute",
-            width: cellWidth * widgetData.width,
-            height: cellHeight * widgetData.height,
-            left: cellWidth * widgetData.x,
-            top: cellHeight * widgetData.y
-          }}
-        >
-          <Widget {...widgetData} />
-        </View>
-      ))}
-    </View>
+    <ScrollView style={styles.tab}>
+      <View style={{ height: viewHeight * cellHeight }}>
+        {widgets.map((widgetData, i) => (
+          <View
+            key={i}
+            style={{
+              position: "absolute",
+              width: cellWidth * widgetData.width,
+              height: cellHeight * widgetData.height,
+              left: cellWidth * widgetData.x,
+              top: cellHeight * widgetData.y
+            }}
+          >
+            <Widget {...widgetData} />
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   )
 }
 
