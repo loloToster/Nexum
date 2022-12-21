@@ -81,7 +81,7 @@ export class ValueGateway {
           break
         }
 
-        socket.data.id = device.id.toString()
+        socket.data.id = device.id
         socket.join(["devices", `device-${device.id}`])
         break
       }
