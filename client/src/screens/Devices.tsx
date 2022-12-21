@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import { StyleSheet, Image } from "react-native"
-import { FAB } from "react-native-paper"
+import { StyleSheet, Image, View } from "react-native"
+import { Colors, FAB, Text } from "react-native-paper"
 import { useQuery } from "react-query"
 
 import api from "src/api"
@@ -34,6 +34,25 @@ function Devices() {
     return res.data
   })
 
+  const renderTitle = (device: DeviceI) => {
+    return (
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text>{device.name}</Text>
+        <View
+          style={{
+            marginLeft: 7,
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: device.active
+              ? Colors.lightGreenA700
+              : Colors.grey800
+          }}
+        ></View>
+      </View>
+    )
+  }
+
   const renderDevice = (device: DeviceI) => {
     return <Device device={device} deleteDevice={() => refetchDevices()} />
   }
@@ -47,7 +66,7 @@ function Devices() {
       />
       <SearchableList
         data={data}
-        titleKey={"name"}
+        renderTitle={renderTitle}
         renderContent={renderDevice}
         loading={isLoading}
         error={isError ? "Could not load devices" : ""}

@@ -44,7 +44,7 @@ function Users() {
       />
       <SearchableList
         data={data}
-        titleKey={"name"}
+        renderTitle={i => i.name}
         renderContent={renderUser}
         loading={isLoading}
         error={isError ? "Could not load users" : ""}

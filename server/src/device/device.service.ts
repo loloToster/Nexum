@@ -1,10 +1,15 @@
 import { Injectable } from "@nestjs/common"
 import { Device } from "@prisma/client"
+
 import { DatabaseService } from "src/database/database.service"
+import { DeviceGateway } from "./device.gateway"
 
 @Injectable()
 export class DeviceService {
-  constructor(private db: DatabaseService) {}
+  constructor(
+    private db: DatabaseService,
+    private deviceGateway: DeviceGateway
+  ) {}
 
   async createDevice({ token, name }: Partial<Device>) {
     if (!token) token = undefined
@@ -41,7 +46,16 @@ export class DeviceService {
       where: searchQuery ? where : undefined
     })
 
-    return devices
+    const connectedDevices = await this.deviceGateway.server
+      .in("devices")
+      .fetchSockets()
+
+    return devices.map(device => ({
+      ...device,
+      active: connectedDevices.some(
+        connectedDevice => device.id === connectedDevice.data.id
+      )
+    }))
   }
 
   async getDeviceById(id: number) {

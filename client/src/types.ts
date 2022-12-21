@@ -15,6 +15,7 @@ export interface Device {
   id: number
   token: string
   name: string
+  active?: boolean
 }
 
 export type WidgetValue = string | boolean | number

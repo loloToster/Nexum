@@ -15,7 +15,7 @@ export interface SearchableListProps<T> {
   loading?: boolean
   error?: string
   data: T[]
-  titleKey: string
+  renderTitle: (itemData: T) => React.ReactNode
   renderContent: (itemData: T) => JSX.Element
   onSearch?: (q: string) => void
 }
@@ -25,7 +25,7 @@ function SearchableList<T>({
   loading = false,
   error,
   data,
-  titleKey,
+  renderTitle,
   renderContent,
   onSearch = () => null
 }: SearchableListProps<T>) {
@@ -40,7 +40,7 @@ function SearchableList<T>({
 
   const renderItem = ({ item }: { item: T }) => {
     return (
-      <List.Accordion title={(item as Record<string, string>)[titleKey]}>
+      <List.Accordion title={renderTitle(item)}>
         {renderContent(item)}
       </List.Accordion>
     )
