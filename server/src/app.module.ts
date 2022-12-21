@@ -8,6 +8,7 @@ import { ValueModule } from "./value/value.module"
 import { AuthModule } from "./auth/auth.module"
 import { DeviceModule } from "./device/device.module"
 import { UserModule } from "./user/user.module"
+import { TabModule } from "./tab/tab.module"
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { UserModule } from "./user/user.module"
     DeviceModule,
     UserModule,
     DatabaseModule,
-    ValueModule
+    ValueModule,
+    TabModule
   ]
 })
 export class AppModule implements NestModule {

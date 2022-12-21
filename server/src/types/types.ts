@@ -1,4 +1,4 @@
-import { User } from "@prisma/client"
+import { Tab, User } from "@prisma/client"
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -9,4 +9,6 @@ declare global {
   }
 }
 
-export {}
+export interface UserWithTabs extends User {
+  tabs: Tab[]
+}

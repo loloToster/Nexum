@@ -20,9 +20,9 @@ function Users() {
   const [addUserModalActive, setAddUserModalActive] = useState(false)
 
   const {
-    isLoading,
-    isError,
-    data,
+    isLoading: usersLoading,
+    isError: usersError,
+    data: users,
     refetch: refetchUsers
   } = useQuery(["users", debouncedSearchValue], async ({ queryKey }) => {
     const query = encodeURIComponent(queryKey[1] || "")
@@ -31,9 +31,24 @@ function Users() {
     return res.data
   })
 
+  const {
+    isLoading: tabsLoading,
+    isError: tabsError,
+    data: tabs
+  } = useQuery(["tabs"], async () => {
+    const res = await api.get("/tabs")
+    return res.data
+  })
+
   const renderUser = (user: UserI) => {
-    return <User user={user} deleteUser={() => refetchUsers()} />
+    return <User user={user} tabs={tabs} deleteUser={() => refetchUsers()} />
   }
+
+  const error = usersError
+    ? "Could not load users"
+    : tabsError
+      ? "Could not load tabs"
+      : ""
 
   return (
     <>
@@ -43,11 +58,11 @@ function Users() {
         onAdd={() => refetchUsers()}
       />
       <SearchableList
-        data={data}
+        data={users}
         renderTitle={i => i.name}
         renderContent={renderUser}
-        loading={isLoading}
-        error={isError ? "Could not load users" : ""}
+        loading={usersLoading || tabsLoading}
+        error={error}
         onSearch={setSearchValue}
       ></SearchableList>
       <FAB

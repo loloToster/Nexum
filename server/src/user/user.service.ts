@@ -1,6 +1,9 @@
 import { Injectable } from "@nestjs/common"
-import { User, Value } from "@prisma/client"
+import { Tab, User, Value } from "@prisma/client"
+
 import { DatabaseService } from "src/database/database.service"
+
+import { UserWithTabs } from "src/types/types"
 
 @Injectable()
 export class UserService {
@@ -16,11 +19,22 @@ export class UserService {
     return newUser
   }
 
-  async editUser(id: string, key: string, value: User[keyof User]) {
-    return await this.db.user.update({
-      where: { id },
-      data: { [key]: value }
-    })
+  async editUser<K extends keyof UserWithTabs>(
+    id: string,
+    key: K,
+    value: UserWithTabs[K]
+  ) {
+    if (key === "tabs") {
+      return await this.db.user.update({
+        where: { id },
+        data: { tabs: { set: (value as Tab[]).map(t => ({ id: t.id })) } }
+      })
+    } else {
+      return await this.db.user.update({
+        where: { id },
+        data: { [key]: value }
+      })
+    }
   }
 
   async removeUser(id: string) {

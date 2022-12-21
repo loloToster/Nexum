@@ -43,6 +43,11 @@ export interface WidgetData {
   properties?: Partial<WidgetProperties>
 }
 
+export interface Tab {
+  id: number
+  name: string
+}
+
 export interface TabData {
   name: string
   widgets: WidgetData[]

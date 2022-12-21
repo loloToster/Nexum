@@ -10,7 +10,11 @@ import {
   Portal,
   Modal,
   Divider,
-  Colors
+  Colors,
+  Headline,
+  Surface,
+  Theme,
+  useTheme
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
 
@@ -22,17 +26,25 @@ import useDebounce from "src/hooks/useDebounce"
 import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 import useObjectState from "src/hooks/useObjectState"
 
-import { User as UserI } from "src/types"
+import { User as UserI, Tab as TabI } from "src/types"
 
 import RUSure from "src/components/RUSure/RUSure"
 
-function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
-  const styles = getStyles()
+export interface UserProps {
+  user: UserI
+  tabs: TabI[]
+  deleteUser: (id: string) => unknown
+}
 
-  const { user: initialUser, deleteUser } = props
+function User(props: UserProps) {
+  const theme = useTheme()
+  const styles = getStyles(theme)
+
+  const { user: initialUser, tabs, deleteUser } = props
 
   const [user, setUser] = useObjectState(initialUser)
   const [qrActive, setQrActive] = useState(false)
+  const [tabsModalActive, setTabsModalActive] = useState(false)
   const [deleteActive, setDeleteActive] = useState(false)
 
   const nameInput = useRef<TextInput>(null)
@@ -78,6 +90,9 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
     }, [debouncedState])
   })
 
+  const userTabsIds = user.tabs.map(t => t.id)
+  const modalTabs = tabs.filter(t => !userTabsIds.includes(t.id))
+
   return (
     <View style={styles.container}>
       <Portal>
@@ -92,6 +107,39 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
               value={config.userCodePrefix + user.id}
             />
           </View>
+        </Modal>
+        <Modal
+          style={styles.tabsModal}
+          visible={tabsModalActive}
+          onDismiss={() => setTabsModalActive(false)}
+        >
+          <Surface style={styles.tabsModalContent}>
+            <Headline style={styles.row}>Add tab</Headline>
+            <View style={styles.tabs}>
+              {modalTabs.map(tab => (
+                <Chip
+                  onPress={() =>
+                    setUser(prev => {
+                      const newTabs = [...prev.tabs, tab]
+
+                      editMutation.mutate({
+                        id: prev.id,
+                        key: "tabs",
+                        value: newTabs
+                      })
+
+                      return { ...prev, tabs: newTabs }
+                    })
+                  }
+                  style={styles.tab}
+                  key={tab.id}
+                  mode="flat"
+                >
+                  {tab.name}
+                </Chip>
+              ))}
+            </View>
+          </Surface>
         </Modal>
       </Portal>
       <RUSure
@@ -137,11 +185,34 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
       <Text style={{ marginTop: 10 }}>Available tabs:</Text>
       <View style={styles.tabs}>
         {user.tabs.map((tab, i) => (
-          <Chip style={styles.tab} key={i} mode="flat" closeIcon="minus-circle">
+          <Chip
+            onClose={() =>
+              setUser(prev => {
+                const newTabs = prev.tabs.filter(t => t.id !== tab.id)
+
+                editMutation.mutate({
+                  id: prev.id,
+                  key: "tabs",
+                  value: newTabs
+                })
+
+                return { ...prev, tabs: newTabs }
+              })
+            }
+            style={styles.tab}
+            key={i}
+            mode="flat"
+            closeIcon="minus-circle"
+          >
             {tab.name}
           </Chip>
         ))}
-        <IconButton style={[styles.tab, styles.addTab]} icon="plus" />
+        <IconButton
+          disabled={!modalTabs.length}
+          onPress={() => setTabsModalActive(true)}
+          style={[styles.tab, styles.addTab]}
+          icon="plus"
+        />
       </View>
       <Button
         style={styles.delete}
@@ -160,7 +231,7 @@ function User(props: { user: UserI; deleteUser: (id: string) => unknown }) {
 
 export default User
 
-const getStyles = () => {
+const getStyles = (theme: Theme) => {
   return StyleSheet.create({
     container: {
       paddingHorizontal: 15
@@ -198,6 +269,16 @@ const getStyles = () => {
     qrWrapper: {
       backgroundColor: "white",
       padding: 20
+    },
+    tabsModal: {
+      alignItems: "center",
+      justifyContent: "center"
+    },
+    tabsModalContent: {
+      width: Dimensions.get("window").width / 1.2,
+      padding: 20,
+      borderRadius: theme.roundness,
+      backgroundColor: theme.colors.background
     }
   })
 }

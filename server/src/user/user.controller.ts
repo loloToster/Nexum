@@ -10,6 +10,7 @@ import {
   Param,
   ConflictException
 } from "@nestjs/common"
+
 import { UserService } from "./user.service"
 
 import { User as UserI } from "@prisma/client"
@@ -21,6 +22,8 @@ import { User } from "src/decorators/user.decorator"
 
 import CreateUserDto from "src/dtos/createUser.dto"
 import EditDto from "src/dtos/edit.dto"
+
+import { UserWithTabs } from "src/types/types"
 
 @Controller("/users")
 @UseGuards(LoggedInGuard)
@@ -64,7 +67,7 @@ export class UserController {
 
   @Patch("/:id")
   async editDevice(@Param("id") id: string, @Body() { key, value }: EditDto) {
-    return this.userService.editUser(id, key, value)
+    return this.userService.editUser(id, key as keyof UserWithTabs, value)
   }
 
   @Delete("/:id")
