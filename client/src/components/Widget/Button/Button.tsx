@@ -11,7 +11,7 @@ import { Text, useTheme } from "react-native-paper"
 import { WidgetProps } from "../Widget"
 
 function Button(props: WidgetProps) {
-  const { color, text, isSwitch } = props.properties
+  const { color, text, onText, offText, isSwitch } = props.properties
 
   const theme = useTheme()
   const styles = getStyles(color)
@@ -32,6 +32,9 @@ function Button(props: WidgetProps) {
     pressOutHandler = () => setValue(false)
   }
 
+  let renderedText = value ? onText : offText
+  renderedText = renderedText || text
+
   return (
     <TouchableWithoutFeedback
       onPress={pressHandler}
@@ -48,7 +51,7 @@ function Button(props: WidgetProps) {
         ]}
       >
         <Text selectable={false} style={styles.text}>
-          {text}
+          {renderedText}
         </Text>
       </View>
     </TouchableWithoutFeedback>

@@ -24,6 +24,8 @@ export interface WidgetProperties {
   title: string
   color: string
   text: string
+  onText: string
+  offText: string
   isSwitch: boolean
   isVertical: boolean
   min: number

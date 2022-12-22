@@ -130,7 +130,9 @@ function Widget(props: WidgetData) {
     // default values
     title: "",
     color: theme.colors.accent,
-    text: "Text",
+    text: "",
+    onText: "",
+    offText: "",
     isSwitch: true,
     isVertical: false,
     min: 0,

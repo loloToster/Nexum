@@ -46,6 +46,8 @@ model WidgetProperties {
   title      String?
   color      String?
   text       String?
+  onText     String?  @map("on_text")
+  offText    String?  @map("off_text")
   isSwitch   Boolean?
   isVertical Boolean?
   step       Float?
