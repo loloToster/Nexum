@@ -37,7 +37,7 @@ function Tab({ widgets }: { widgets: WidgetData[] }) {
 
   return (
     <ScrollView style={styles.tab}>
-      <View style={{ height: viewHeight * cellHeight }}>
+      <View style={{ minHeight: isFinite(viewHeight) ? (viewHeight * cellHeight) : 0 }}>
         {widgets.map((widgetData, i) => (
           <View
             key={i}

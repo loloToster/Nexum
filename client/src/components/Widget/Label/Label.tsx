@@ -16,7 +16,7 @@ function Label(props: WidgetProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>
+      <Text style={[styles.text, { fontSize: props.width === 1 ? 16 : 26 }]}>
         {text.replace(
           /\/val\//,
           roundBadFloat(roundByStep(value, step)).toString()
@@ -35,9 +35,6 @@ const getStyles = (color: ColorValue) => {
       justifyContent: "center",
       alignItems: "center"
     },
-    text: {
-      fontSize: 20,
-      color: color
-    }
+    text: { color }
   })
 }

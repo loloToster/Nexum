@@ -164,7 +164,8 @@ export default Widget
 const getStyles = () => {
   return StyleSheet.create({
     wrapper: {
-      flex: 1
+      flex: 1,
+      padding: 4
     },
     title: {
       textTransform: "uppercase",

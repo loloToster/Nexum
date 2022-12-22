@@ -6,7 +6,7 @@ import {
   ColorValue,
   GestureResponderEvent
 } from "react-native"
-import { Text, useTheme, Theme } from "react-native-paper"
+import { Text, useTheme } from "react-native-paper"
 
 import { WidgetProps } from "../Widget"
 
@@ -14,7 +14,7 @@ function Button(props: WidgetProps) {
   const { color, text, isSwitch } = props.properties
 
   const theme = useTheme()
-  const styles = getStyles(theme, color)
+  const styles = getStyles(color)
 
   const { useWidgetValue } = props
   const [value, setValue] = useWidgetValue(false)
@@ -41,7 +41,10 @@ function Button(props: WidgetProps) {
       <View
         style={[
           styles.container,
-          { backgroundColor: value ? color : "transparent" }
+          {
+            backgroundColor: value ? color : "transparent",
+            borderRadius: props.height === 2 ? 1000 : theme.roundness
+          }
         ]}
       >
         <Text selectable={false} style={styles.text}>
@@ -54,7 +57,7 @@ function Button(props: WidgetProps) {
 
 export default Button
 
-const getStyles = (theme: Theme, color: ColorValue) => {
+const getStyles = (color: ColorValue) => {
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -62,8 +65,7 @@ const getStyles = (theme: Theme, color: ColorValue) => {
       alignItems: "center",
       borderColor: color,
       borderWidth: 3,
-      margin: 5,
-      borderRadius: theme.roundness
+      margin: 5
     },
     text: {
       fontSize: 20
