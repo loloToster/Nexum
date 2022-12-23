@@ -154,7 +154,7 @@ function Widget(props: WidgetData) {
   return (
     <View style={styles.wrapper}>
       {Boolean(widgetProperties.title) && (
-        <Text style={styles.title}>{widgetProperties.title}</Text>
+        <Text selectable={false} style={styles.title}>{widgetProperties.title}</Text>
       )}
       <ChoosenWidget {...choosenWidgetProps} />
     </View>

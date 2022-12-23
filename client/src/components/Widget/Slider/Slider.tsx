@@ -1,5 +1,5 @@
 import React from "react"
-import { View, StyleSheet } from "react-native"
+import { View, StyleSheet, Platform } from "react-native"
 import Slider from "src/components/Slider/Slider"
 
 import { WidgetProps } from "../Widget"
@@ -36,7 +36,8 @@ const getStyles = () => {
     container: {
       flex: 1,
       justifyContent: "center",
-      alignItems: "center"
+      alignItems: "center",
+      padding: Platform.OS === "web" ? 5 : 0
     }
   })
 }

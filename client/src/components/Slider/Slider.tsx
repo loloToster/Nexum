@@ -101,13 +101,27 @@ function Slider({
                   height: 5px;
                   background: linear-gradient(to right, ${minColor} 0%, ${minColor} ${sliderPercentage}%, ${maxColor} ${sliderPercentage}%, ${maxColor} 100%);
                   border-radius: 100vh;
+                  width: 100%;
                 }
 
+                /* .x, .y { styles } was not working ? */
+                
                 .slider-widget-${inputId}::-webkit-slider-thumb {
                   -webkit-appearance: none;
                   appearance: none;
                   width: 15px;
                   height: 15px;
+                  border: none;
+                  border-radius: 50%;
+                  background-color: ${thumbColor};
+                }
+
+                .slider-widget-${inputId}::-moz-range-thumb {
+                  -webkit-appearance: none;
+                  appearance: none;
+                  width: 15px;
+                  height: 15px;
+                  border: none;
                   border-radius: 50%;
                   background-color: ${thumbColor};
                 }
