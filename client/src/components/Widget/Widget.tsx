@@ -15,11 +15,17 @@ import SliderWidget from "./Slider/Slider"
 import Gauge from "./Gauge/Gauge"
 import Label from "./Label/Label"
 
+export enum EmitTarget {
+  Server,
+  Local,
+  ServerAndLocal,
+  All
+}
+
 export type SetWidgetValueAction<T> = {
   (newVal: React.SetStateAction<T>): void
   // onlyServer option is used to prevent infinite loop
-  (newVal: React.SetStateAction<T>, onlyServer?: false): void
-  (newVal: T, onlyServer?: true): void
+  (newVal: T, target?: EmitTarget): void
 }
 
 export type WidgetValueHook = <T = WidgetValue>(
@@ -90,7 +96,7 @@ function Widget(props: WidgetData) {
       }
     }, [])
 
-    const emit = (val: WidgetValue) => {
+    const emit = (val: WidgetValue, target: EmitTarget) => {
       values[props.id] = val
 
       const emitObj = {
@@ -98,28 +104,31 @@ function Widget(props: WidgetData) {
         value: val
       }
 
-      localChangeEmitter.emit("update-value", {
-        widgetId: props.id,
-        ...emitObj
-      })
+      if (target === EmitTarget.Local || target === EmitTarget.ServerAndLocal || target === EmitTarget.All) {
+        localChangeEmitter.emit("update-value", {
+          widgetId: props.id,
+          ...emitObj
+        })
+      }
 
-      socket?.emit("update-value", emitObj)
+      if (target === EmitTarget.Server || target === EmitTarget.ServerAndLocal || target === EmitTarget.All) {
+        socket?.emit("update-value", emitObj)
+      }
     }
 
     const setValue: SetWidgetValueAction<typeof initialValue> = (
-      value,
-      onlyServer = false
+      value, target: EmitTarget = EmitTarget.All
     ) => {
       if (typeof value === "function") {
         setWidgetValue(prev => {
           // @ts-ignore
           const newVal = value(prev)
-          emit(newVal)
+          emit(newVal, target)
           return newVal
         })
       } else {
-        emit(value as WidgetValue)
-        if (!onlyServer) setWidgetValue(value)
+        emit(value as WidgetValue, target)
+        if (target === EmitTarget.All) setWidgetValue(value)
       }
     }
 

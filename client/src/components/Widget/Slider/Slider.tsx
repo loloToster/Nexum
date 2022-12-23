@@ -2,7 +2,7 @@ import React from "react"
 import { View, StyleSheet, Platform } from "react-native"
 import Slider from "src/components/Slider/Slider"
 
-import { WidgetProps } from "../Widget"
+import { EmitTarget, WidgetProps } from "../Widget"
 
 function SliderWidget(props: WidgetProps) {
   const { color, isVertical, min, max, step } = props.properties
@@ -23,7 +23,8 @@ function SliderWidget(props: WidgetProps) {
         thumbColor={color}
         maxColor="#040404"
         vertical={isVertical}
-        onChange={v => setValue(v, true)}
+        onChange={v => setValue(v, EmitTarget.Local)}
+        onTouchEnd={v => setValue(v, EmitTarget.ServerAndLocal)}
       />
     </View>
   )

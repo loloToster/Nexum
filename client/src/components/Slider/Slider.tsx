@@ -3,6 +3,7 @@ import { View, Platform, StyleSheet } from "react-native"
 import ReactNativeSlider from "@react-native-community/slider"
 
 import { map, roundBadFloat, roundByStep, uid } from "src/utils"
+import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 
 interface SliderProps {
   min?: number
@@ -14,6 +15,8 @@ interface SliderProps {
   thumbColor?: string
   vertical?: boolean
   onChange?: (value: number) => void
+  onTouchStart?: (value: number) => void
+  onTouchEnd?: (value: number) => void
 }
 
 function Slider({
@@ -25,7 +28,9 @@ function Slider({
   maxColor = "gray",
   thumbColor = "teal",
   vertical = false,
-  onChange = () => null
+  onChange = () => null,
+  onTouchStart = () => null,
+  onTouchEnd = () => null
 }: SliderProps) {
   const styles = getStyles()
 
@@ -35,6 +40,10 @@ function Slider({
     width: number
     height: number
   }>({ width: 0, height: 0 })
+
+  useAfterMountEffect(() => {
+    inputing ? onTouchStart(value) : onTouchEnd(value)
+  }, [inputing])
 
   const sliderPercentage = ((value - min) / (max - min)) * 100
 
