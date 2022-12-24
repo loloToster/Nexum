@@ -15,6 +15,12 @@ class NexumClass {
 
   void begin(String token, const char *ssid, const char *pass, const char *host,
              uint16_t port, boolean useSSL);
+  void begin(String token, const char *ssid, const char *pass, const char *host,
+             uint16_t port);
+  void begin(String token, const char *ssid, const char *pass, const char *host,
+             boolean useSSL);
+  void begin(String token, const char *ssid, const char *pass,
+             const char *host);
 
   void onConnect(void (*callback)());
   void onDisconnect(void (*callback)());
@@ -25,6 +31,8 @@ class NexumClass {
   void update(String customId, int value);
   void update(String customId, double value);
   void update(String customId, boolean value);
+
+  bool isConnected();
 
   void loop();
 

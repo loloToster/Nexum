@@ -27,23 +27,44 @@ void NexumClass::begin(String token, const char *ssid, const char *pass,
   attachCb();
 }
 
+void NexumClass::begin(String token, const char *ssid, const char *pass,
+                       const char *host, uint16_t port) {
+  begin(token, ssid, pass, host, port, false);
+}
+
+void NexumClass::begin(String token, const char *ssid, const char *pass,
+                       const char *host, boolean useSSL) {
+  if (useSSL) {
+    begin(token, ssid, pass, host, 443, useSSL);
+  } else {
+    begin(token, ssid, pass, host, 80, useSSL);
+  }
+}
+
+void NexumClass::begin(String token, const char *ssid, const char *pass,
+                       const char *host) {
+  begin(token, ssid, pass, host, 80, false);
+}
+
 void NexumClass::attachCb() {
   socketIO.onEvent(
       [this](socketIOmessageType_t type, uint8_t *payload, size_t length) {
         switch (type) {
           case sIOtype_DISCONNECT: {
-            _onDisconnect();
+            if (_onDisconnect) _onDisconnect();
             break;
           }
 
           case sIOtype_CONNECT: {
-            _onConnect();
+            if (_onConnect) _onConnect();
             // join default namespace (no auto join in Socket.IO V3)
             socketIO.send(sIOtype_CONNECT, "/");
             break;
           }
 
           case sIOtype_EVENT: {
+            if (!_onReceive) break;
+
             StaticJsonDocument<64> doc;
             DeserializationError error = deserializeJson(doc, payload);
 
@@ -97,6 +118,8 @@ void NexumClass::update(String customId, double value) {
 void NexumClass::update(String customId, boolean value) {
   rawUpdate(customId, value ? "true" : "false");
 }
+
+bool NexumClass::isConnected() { return socketIO.isConnected(); }
 
 void NexumClass::loop() { socketIO.loop(); }
 
