@@ -1,5 +1,5 @@
 import { NestFactory } from "@nestjs/core"
-import { ValidationPipe } from "@nestjs/common"
+import { Logger, ValidationPipe } from "@nestjs/common"
 import axios from "axios"
 
 import { AppModule } from "./app.module"
@@ -15,12 +15,10 @@ async function bootstrap() {
   const port = process.env.PORT || 3000
 
   await app.listen(port, "0.0.0.0", () => {
-    // eslint-disable-next-line no-console
-    console.log("listening on port:", port)
+    Logger.log("listening on port: " + port, "main")
 
     if (process.env.KEEP_ALIVE_URL) {
-      // eslint-disable-next-line no-console
-      console.log(`keeping ${process.env.KEEP_ALIVE_URL} alive`)
+      Logger.log(`keeping ${process.env.KEEP_ALIVE_URL} alive`, "main")
 
       setInterval(() => {
         axios.get(process.env.KEEP_ALIVE_URL).catch(() => null)

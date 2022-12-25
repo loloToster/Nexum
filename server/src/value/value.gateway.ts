@@ -5,6 +5,8 @@ import {
   ConnectedSocket,
   MessageBody
 } from "@nestjs/websockets"
+import { Logger } from "@nestjs/common"
+
 import { Server, Socket } from "socket.io"
 
 import { ValueService } from "./value.service"
@@ -17,6 +19,8 @@ import SocketAuthDto from "src/dtos/socketAuth.dto"
 export class ValueGateway {
   @WebSocketServer()
   server: Server
+
+  private readonly logger = new Logger(ValueGateway.name)
 
   constructor(
     private valueService: ValueService,
@@ -38,7 +42,7 @@ export class ValueGateway {
       const deviceId = socket.data.id
       target = `${deviceId}-${customId}`
     } else {
-      console.warn(
+      this.logger.warn(
         "Someone was connected without being in a 'users' or 'devices' room"
       )
 
@@ -54,6 +58,10 @@ export class ValueGateway {
     const { auth, query } = socket.handshake
     const authorization = new SocketAuthDto({ ...auth, ...query })
 
+    this.logger.log(
+      `connection attempt as ${authorization.as} with token: '${authorization.token}'`
+    )
+
     switch (authorization.as) {
       case "user": {
         const user = await this.userService.getUserById(authorization.token)
@@ -68,6 +76,9 @@ export class ValueGateway {
         ]
 
         socket.join(["users", ...availableTargets])
+
+        this.logger.log(`user with name: '${user.name}' successfully connected`)
+
         break
       }
 
@@ -83,6 +94,11 @@ export class ValueGateway {
 
         socket.data.id = device.id
         socket.join(["devices", `device-${device.id}`])
+
+        this.logger.log(
+          `device with name: '${device.name}' successfully connected`
+        )
+
         break
       }
 
