@@ -9,7 +9,6 @@
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
-  "overrides": [],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
@@ -29,5 +28,15 @@
     "no-duplicate-imports": "error",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/examples/**/*.js"],
+      "rules": {
+        "no-console": "off",
+        "no-undef": "off",
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ]
 }
