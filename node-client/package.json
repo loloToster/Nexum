@@ -1,0 +1,24 @@
+{
+  "name": "nexum-node-client",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "loloToster",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io-client": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "directories": {
+    "example": "examples"
+  }
+}
