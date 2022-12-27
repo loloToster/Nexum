@@ -91,9 +91,7 @@ export class ValueGateway {
 
         this.logger.log(`user named: '${user.name}' successfully connected`)
 
-        socket.on("disconnect", () => {
-          this.logger.log(`user named: '${user.name}' disconnected`)
-        })
+        this.handleDisconnection(socket, "user")
 
         break
       }
@@ -114,9 +112,7 @@ export class ValueGateway {
 
         this.logger.log(`device named: '${device.name}' successfully connected`)
 
-        socket.on("disconnect", () => {
-          this.logger.log(`device named: '${device.name}' disconnected`)
-        })
+        this.handleDisconnection(socket, "device")
 
         break
       }
@@ -125,5 +121,13 @@ export class ValueGateway {
         socket.disconnect()
       }
     }
+  }
+
+  handleDisconnection(socket: Socket, name: string) {
+    socket.on("disconnect", reason => {
+      this.logger.log(
+        `${name} named: '${socket.data.name}' disconnected because of: ${reason}`
+      )
+    })
   }
 }
