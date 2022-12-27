@@ -7,13 +7,17 @@ import {
 } from "@nestjs/websockets"
 import { Logger } from "@nestjs/common"
 
-import { Server, Socket } from "socket.io"
+import { Server, Socket as RawSocket } from "socket.io"
+
+import { Device, User } from "@prisma/client"
 
 import { ValueService } from "./value.service"
 import { DeviceService } from "src/device/device.service"
 import { UserService } from "src/user/user.service"
 
 import SocketAuthDto from "src/dtos/socketAuth.dto"
+
+type Socket = RawSocket<undefined, undefined, undefined, User | Device>
 
 @WebSocketGateway({ cors: true })
 export class ValueGateway {
@@ -50,6 +54,12 @@ export class ValueGateway {
       return
     }
 
+    const origin = socket.rooms.has("users") ? "user" : "device"
+
+    this.logger.log(
+      `${origin} named: '${socket.data.name}' changed value of '${target}' to '${value}'`
+    )
+
     this.valueService.updateValue(socket, target, value)
   }
 
@@ -77,7 +87,13 @@ export class ValueGateway {
 
         socket.join(["users", ...availableTargets])
 
-        this.logger.log(`user with name: '${user.name}' successfully connected`)
+        socket.data = user
+
+        this.logger.log(`user named: '${user.name}' successfully connected`)
+
+        socket.on("disconnect", () => {
+          this.logger.log(`user named: '${user.name}' disconnected`)
+        })
 
         break
       }
@@ -92,12 +108,15 @@ export class ValueGateway {
           break
         }
 
-        socket.data.id = device.id
         socket.join(["devices", `device-${device.id}`])
 
-        this.logger.log(
-          `device with name: '${device.name}' successfully connected`
-        )
+        socket.data = device
+
+        this.logger.log(`device named: '${device.name}' successfully connected`)
+
+        socket.on("disconnect", () => {
+          this.logger.log(`device named: '${device.name}' disconnected`)
+        })
 
         break
       }
