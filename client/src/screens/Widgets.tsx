@@ -9,6 +9,8 @@ import { TabData } from "src/types"
 
 import { useSocket } from "src/contexts/socket"
 
+import useForceRerender from "src/hooks/useForceRerender"
+
 import Tabs from "src/components/Tabs/Tabs"
 import Error from "src/components/Error/Error"
 
@@ -16,15 +18,22 @@ function Widgets() {
   const theme = useTheme()
   const styles = getStyles(theme)
 
+  const rerender = useForceRerender()
+
   const { socket } = useSocket()
 
   // connect socket only if this components is mounted
   useEffect(() => {
     if (!socket) return
 
+    socket.on("connect", rerender)
+    socket.on("disconnect", rerender)
+
     socket.connect()
 
     return () => {
+      socket.off("connect", rerender)
+      socket.off("disconnect", rerender)
       socket.disconnect()
     }
   }, [socket])
@@ -34,7 +43,7 @@ function Widgets() {
     return res.data
   })
 
-  return isLoading ? (
+  return isLoading || socket?.disconnected ? (
     <View style={styles.loading}>
       <ActivityIndicator size="large" />
     </View>
