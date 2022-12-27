@@ -68,13 +68,25 @@ export class ValueService {
   }
 
   async getValue(deviceId: number, customId: string) {
-    return this.db.value.findUnique({
+    return await this.db.value.findUnique({
       where: {
         deviceId_customId: {
           deviceId,
           customId
         }
       }
+    })
+  }
+
+  async getDeviceValues(deviceId: number) {
+    return await this.db.value.findMany({
+      where: { deviceId }
+    })
+  }
+
+  async getCustomIdValues(customId: string) {
+    return await this.db.value.findMany({
+      where: { customId }
     })
   }
 }

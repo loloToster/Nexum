@@ -17,7 +17,7 @@ import { UserService } from "src/user/user.service"
 
 import SocketAuthDto from "src/dtos/socketAuth.dto"
 
-type Socket = RawSocket<undefined, undefined, undefined, User | Device>
+type Socket = RawSocket<undefined, any, undefined, User | Device>
 
 @WebSocketGateway({ cors: true })
 export class ValueGateway {
@@ -104,6 +104,16 @@ export class ValueGateway {
         if (!device) {
           socket.disconnect()
           break
+        }
+
+        // synchronize data on connection
+        const values = await this.valueService.getDeviceValues(device.id)
+
+        for (const value of values) {
+          socket.emit("update-value", {
+            customId: value.customId,
+            value: JSON.parse(value.value)
+          })
         }
 
         socket.join(["devices", `device-${device.id}`])
