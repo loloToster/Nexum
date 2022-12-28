@@ -19,7 +19,7 @@ import { IsAdminGuard } from "src/guards/isadmin.guard"
 import CreateDeviceDto from "src/dtos/createDevice.dto"
 import EditDto from "src/dtos/edit.dto"
 
-@Controller("/devices")
+@Controller("/api/devices")
 @UseGuards(IsAdminGuard)
 export class DeviceController {
   constructor(private deviceService: DeviceService) {}

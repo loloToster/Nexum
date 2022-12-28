@@ -11,7 +11,7 @@ import { ValueService } from "./value.service"
 import { ValueGateway } from "./value.gateway"
 import { DeviceService } from "../device/device.service"
 
-@Controller("/api")
+@Controller("/api/value")
 export class ValueController {
   constructor(
     private valueService: ValueService,

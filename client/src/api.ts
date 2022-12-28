@@ -4,7 +4,7 @@ import { getBaseUrl } from "./config"
 import { getUserFromStorage } from "./contexts/user"
 
 const apiHandler = axios.create({
-  baseURL: getBaseUrl()
+  baseURL: getBaseUrl() + "api"
 })
 
 // add saved user token to every request

@@ -25,7 +25,7 @@ import EditDto from "src/dtos/edit.dto"
 
 import { UserWithTabs } from "src/types/types"
 
-@Controller("/users")
+@Controller("/api/users")
 @UseGuards(LoggedInGuard)
 export class UserController {
   constructor(private userService: UserService) {}

@@ -10,7 +10,7 @@ import { AuthService } from "./auth.service"
 
 import LoginDto from "src/dtos/login.dto"
 
-@Controller("/auth")
+@Controller("/api/auth")
 export class AuthController {
   private readonly logger = new Logger(AuthController.name)
 

@@ -4,7 +4,7 @@ import { IsAdminGuard } from "src/guards/isadmin.guard"
 
 import { TabService } from "./tab.service"
 
-@Controller("/tabs")
+@Controller("/api/tabs")
 export class TabController {
   constructor(private tabService: TabService) {}
 
