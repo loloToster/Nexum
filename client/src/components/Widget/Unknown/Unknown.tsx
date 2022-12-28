@@ -4,6 +4,8 @@ import { Text, List, useTheme, Theme } from "react-native-paper"
 
 import { WidgetProps } from "../Widget"
 
+import Translatable from "src/components/Translatable/Translatable"
+
 function Unknown({ type }: WidgetProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
@@ -16,9 +18,13 @@ function Unknown({ type }: WidgetProps) {
           icon="alert"
           color={theme.colors.surface}
         />
-        <Text
-          style={styles.text}
-        >{`There is no\nwidget of "${type}" type`}</Text>
+        <Translatable>
+          <View>
+            <Text
+              style={styles.text}
+            >{`There is no\nwidget of "${type}" type`}</Text>
+          </View>
+        </Translatable>
       </View>
     </View>
   )

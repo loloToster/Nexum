@@ -1,4 +1,5 @@
-import React from "react"
+import React, { useEffect } from "react"
+import { Platform } from "react-native"
 import { registerRootComponent } from "expo"
 import { StatusBar } from "expo-status-bar"
 
@@ -37,11 +38,21 @@ const socket = io(getBaseUrl(), {
   autoConnect: false,
   auth: async cb => {
     const user = await getUserFromStorage()
-    cb({ as: "user", token: user.id })
+    cb({ as: "user", token: user?.id })
   }
 })
 
 function App() {
+  /**
+   * disable translation of entire document.
+   * can be overridden by `Translatable` component
+   */
+  if (Platform.OS === "web")
+    useEffect(() => {
+      const html = document.querySelector("html")
+      if (html) html.translate = false
+    })
+
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={DarkTheme}>

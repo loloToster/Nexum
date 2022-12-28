@@ -21,6 +21,7 @@ import api from "src/api"
 import { useUser } from "src/contexts/user"
 
 import QrScanner from "src/components/QrScanner/QrScanner"
+import Translatable from "src/components/Translatable/Translatable"
 
 function Login() {
   const theme = useTheme()
@@ -67,62 +68,64 @@ function Login() {
   }
 
   return (
-    <View style={styles.container}>
-      <Portal>
-        <Modal visible={loginMutation.isLoading} dismissable={false}>
-          <ActivityIndicator size="large" />
-        </Modal>
-      </Portal>
-      {Platform.OS !== "web" && (
-        <QrScanner
-          visible={scannerOpened}
-          onDismiss={() => setScannerOpened(false)}
-          onScan={handleScan}
-        />
-      )}
-      <Headline style={[styles.head, styles.rowItem]}>
-        {loginMutation.isError
-          ? "Something went wrong\nplease try again"
-          : "Log in to start\nusing the app"}
-      </Headline>
-      <TextInput
-        style={styles.rowItem}
-        label={
-          userError || Platform.OS === "web"
-            ? "Insert your code"
-            : "Insert your code manually"
-        }
-        value={code}
-        onChangeText={val => {
-          setCode(val)
-          setUserError("")
-        }}
-        error={Boolean(userError)}
-      />
-      {(code.length > 3 || Platform.OS === "web") && (
-        <Button
+    <Translatable>
+      <View style={styles.container}>
+        <Portal>
+          <Modal visible={loginMutation.isLoading} dismissable={false}>
+            <ActivityIndicator size="large" />
+          </Modal>
+        </Portal>
+        {Platform.OS !== "web" && (
+          <QrScanner
+            visible={scannerOpened}
+            onDismiss={() => setScannerOpened(false)}
+            onScan={handleScan}
+          />
+        )}
+        <Headline style={[styles.head, styles.rowItem]}>
+          {loginMutation.isError
+            ? "Something went wrong\nplease try again"
+            : "Log in to start\nusing the app"}
+        </Headline>
+        <TextInput
           style={styles.rowItem}
-          mode="contained"
-          onPress={() => loginMutation.mutate(code)}
-          disabled={loginMutation.isLoading || code.length <= 3}
-        >
-          Login
-        </Button>
-      )}
-      {Platform.OS !== "web" && (
-        <>
-          <Text style={[styles.or, styles.rowItem]}>OR</Text>
+          label={
+            userError || Platform.OS === "web"
+              ? "Insert your code"
+              : "Insert your code manually"
+          }
+          value={code}
+          onChangeText={val => {
+            setCode(val)
+            setUserError("")
+          }}
+          error={Boolean(userError)}
+        />
+        {(code.length > 3 || Platform.OS === "web") && (
           <Button
             style={styles.rowItem}
             mode="contained"
-            icon="qrcode"
-            onPress={() => setScannerOpened(true)}
+            onPress={() => loginMutation.mutate(code)}
+            disabled={loginMutation.isLoading || code.length <= 3}
           >
-            Scan the QR Code
+            Login
           </Button>
-        </>
-      )}
-    </View>
+        )}
+        {Platform.OS !== "web" && (
+          <>
+            <Text style={[styles.or, styles.rowItem]}>OR</Text>
+            <Button
+              style={styles.rowItem}
+              mode="contained"
+              icon="qrcode"
+              onPress={() => setScannerOpened(true)}
+            >
+              Scan the QR Code
+            </Button>
+          </>
+        )}
+      </View>
+    </Translatable>
   )
 }
 
