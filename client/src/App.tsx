@@ -10,7 +10,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 
 import { io } from "socket.io-client"
 
-import { DarkTheme, Provider as PaperProvider } from "react-native-paper"
+import { Colors, DarkTheme, Provider as PaperProvider } from "react-native-paper"
 
 import { getBaseUrl } from "./config"
 
@@ -30,6 +30,8 @@ import Users from "./screens/Users"
 
 DarkTheme.mode = "exact"
 DarkTheme.colors.surface = "#565656"
+DarkTheme.colors.primary = Colors.teal300
+DarkTheme.colors.accent = Colors.cyan400
 
 const queryClient = new QueryClient()
 const Stack = createStackNavigator()
@@ -61,7 +63,7 @@ function App() {
             {({ user }) =>
               user ? (
                 <SocketContext.Provider value={{ socket }}>
-                  <NavigationContainer linking={{ prefixes: [] }}>
+                  <NavigationContainer documentTitle={{ enabled: false }} linking={{ prefixes: [] }}>
                     <Stack.Navigator
                       initialRouteName="widgets"
                       screenOptions={{
