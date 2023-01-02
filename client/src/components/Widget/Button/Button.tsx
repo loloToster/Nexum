@@ -38,10 +38,10 @@ function Button(props: WidgetProps) {
   return (
     <TouchableWithoutFeedback
       onPress={pressHandler}
-      onPressIn={pressInHandler}
-      onPressOut={pressOutHandler}
     >
       <View
+        onTouchStart={pressInHandler}
+        onTouchEnd={pressOutHandler}
         style={[
           styles.container,
           {
