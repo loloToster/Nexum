@@ -4,7 +4,10 @@ ESP8266WiFiMulti WiFiMulti;
 SocketIOclient socketIO;
 
 NexumClass::NexumClass()
-    : _onConnect(NULL), _onDisconnect(NULL), _onReceive(NULL) {}
+    : _onConnect(NULL),
+      _onDisconnect(NULL),
+      _onReceive(NULL),
+      _connected(false) {}
 
 void NexumClass::begin(String token, const char *ssid, const char *pass,
                        const char *host, uint16_t port, boolean useSSL) {
@@ -13,10 +16,7 @@ void NexumClass::begin(String token, const char *ssid, const char *pass,
   }
 
   WiFiMulti.addAP(ssid, pass);
-
-  while (WiFiMulti.run() != WL_CONNECTED) {
-    delay(100);
-  }
+  WiFiMulti.run();
 
   if (useSSL) {
     socketIO.beginSSL(host, port, "/socket.io/?EIO=4&as=device&token=" + token);
@@ -51,14 +51,19 @@ void NexumClass::attachCb() {
       [this](socketIOmessageType_t type, uint8_t *payload, size_t length) {
         switch (type) {
           case sIOtype_DISCONNECT: {
+            if (!_connected) break;
+            _connected = false;
             if (_onDisconnect) _onDisconnect();
             break;
           }
 
           case sIOtype_CONNECT: {
-            if (_onConnect) _onConnect();
             // join default namespace (no auto join in Socket.IO V3)
             socketIO.send(sIOtype_CONNECT, "/");
+
+            if (_connected) break;
+            _connected = true;
+            if (_onConnect) _onConnect();
             break;
           }
 
@@ -119,7 +124,7 @@ void NexumClass::update(String customId, boolean value) {
   rawUpdate(customId, value ? "true" : "false");
 }
 
-bool NexumClass::isConnected() { return socketIO.isConnected(); }
+boolean NexumClass::isConnected() { return _connected; }
 
 void NexumClass::loop() { socketIO.loop(); }
 

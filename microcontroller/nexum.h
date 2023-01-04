@@ -32,11 +32,12 @@ class NexumClass {
   void update(String customId, double value);
   void update(String customId, boolean value);
 
-  bool isConnected();
+  boolean isConnected();
 
   void loop();
 
  private:
+  boolean _connected;
   void (*_onConnect)();
   void (*_onDisconnect)();
   void (*_onReceive)(String, String);
