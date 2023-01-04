@@ -13,14 +13,10 @@ class NexumClass {
  public:
   NexumClass();
 
-  void begin(String token, const char *ssid, const char *pass, const char *host,
-             uint16_t port, boolean useSSL);
-  void begin(String token, const char *ssid, const char *pass, const char *host,
-             uint16_t port);
-  void begin(String token, const char *ssid, const char *pass, const char *host,
-             boolean useSSL);
-  void begin(String token, const char *ssid, const char *pass,
-             const char *host);
+  void begin(const char *token, const char *ssid, const char *pass,
+             const char *host, uint16_t port, boolean useSSL);
+  void begin(const char *token, const char *ssid, const char *pass,
+             const char *url);
 
   void onConnect(void (*callback)());
   void onDisconnect(void (*callback)());

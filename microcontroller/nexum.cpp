@@ -1,5 +1,46 @@
 #include "nexum.h"
 
+struct URL {
+  String protocol;
+  String host;
+  int port;
+  String path;
+};
+
+URL parseUrl(String url) {
+  URL parsedUrl;
+
+  parsedUrl.protocol = "http";
+  parsedUrl.host = "";
+  parsedUrl.port = 0;
+  parsedUrl.path = "/";
+
+  int idxOfProtoSeparator = url.indexOf("://");
+
+  if (idxOfProtoSeparator > -1) {
+    parsedUrl.protocol = url.substring(0, idxOfProtoSeparator);
+    url = url.substring(idxOfProtoSeparator + 3);
+  }
+
+  int idxOfPathSeparator = url.indexOf("/");
+
+  if (idxOfPathSeparator > -1) {
+    parsedUrl.path = url.substring(idxOfPathSeparator);
+    url = url.substring(0, idxOfPathSeparator);
+  }
+
+  int idxOfPortSeparator = url.indexOf(":");
+
+  if (idxOfPortSeparator > -1) {
+    parsedUrl.host = url.substring(0, idxOfPortSeparator);
+    parsedUrl.port = url.substring(idxOfPortSeparator + 1).toInt();
+  } else {
+    parsedUrl.host = url;
+  }
+
+  return parsedUrl;
+}
+
 ESP8266WiFiMulti WiFiMulti;
 SocketIOclient socketIO;
 
@@ -9,7 +50,7 @@ NexumClass::NexumClass()
       _onReceive(NULL),
       _connected(false) {}
 
-void NexumClass::begin(String token, const char *ssid, const char *pass,
+void NexumClass::begin(const char *token, const char *ssid, const char *pass,
                        const char *host, uint16_t port, boolean useSSL) {
   if (WiFi.getMode() & WIFI_AP) {
     WiFi.softAPdisconnect(true);
@@ -18,32 +59,28 @@ void NexumClass::begin(String token, const char *ssid, const char *pass,
   WiFiMulti.addAP(ssid, pass);
   WiFiMulti.run();
 
+  String path = "/socket.io/?EIO=4&as=device&token=" + String(token);
+
   if (useSSL) {
-    socketIO.beginSSL(host, port, "/socket.io/?EIO=4&as=device&token=" + token);
+    socketIO.beginSSL(host, port, path);
   } else {
-    socketIO.begin(host, port, "/socket.io/?EIO=4&as=device&token=" + token);
+    socketIO.begin(host, port, path);
   }
 
   attachCb();
 }
 
-void NexumClass::begin(String token, const char *ssid, const char *pass,
-                       const char *host, uint16_t port) {
-  begin(token, ssid, pass, host, port, false);
-}
+void NexumClass::begin(const char *token, const char *ssid, const char *pass,
+                       const char *url) {
+  URL parsedUrl = parseUrl(url);
 
-void NexumClass::begin(String token, const char *ssid, const char *pass,
-                       const char *host, boolean useSSL) {
-  if (useSSL) {
-    begin(token, ssid, pass, host, 443, useSSL);
-  } else {
-    begin(token, ssid, pass, host, 80, useSSL);
+  boolean useSSL = parsedUrl.protocol == "https" || parsedUrl.protocol == "wss";
+
+  if (!parsedUrl.port) {
+    parsedUrl.port = useSSL ? 443 : 80;
   }
-}
 
-void NexumClass::begin(String token, const char *ssid, const char *pass,
-                       const char *host) {
-  begin(token, ssid, pass, host, 80, false);
+  begin(token, ssid, pass, parsedUrl.host.c_str(), parsedUrl.port, useSSL);
 }
 
 void NexumClass::attachCb() {
