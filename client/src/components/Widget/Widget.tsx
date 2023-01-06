@@ -3,9 +3,12 @@ import { View, StyleSheet } from "react-native"
 import { Text, useTheme, Colors } from "react-native-paper"
 
 import { WidgetProperties, WidgetData, WidgetValue } from "src/types"
-import { EventEmitter } from "src/utils"
 
-import { useSocket, ValueUpdateFunc, ValueUpdateObj } from "src/contexts/socket"
+import {
+  EmitTarget,
+  LocalValueUpdateObj,
+  useValueBridge
+} from "src/contexts/valueBridge"
 
 // special component returned if provided type does not match any component in map
 import Unknown from "./Unknown/Unknown"
@@ -15,12 +18,7 @@ import SliderWidget from "./Slider/Slider"
 import Gauge from "./Gauge/Gauge"
 import Label from "./Label/Label"
 
-export enum EmitTarget {
-  Server,
-  Local,
-  ServerAndLocal,
-  All
-}
+export { EmitTarget } from "src/contexts/valueBridge"
 
 export type SetWidgetValueAction<T> = {
   (newVal: React.SetStateAction<T>): void
@@ -48,76 +46,44 @@ const map: Record<
   lbl: Label
 }
 
-interface LocalValueUpdateObj extends ValueUpdateObj {
-  widgetId: number
-}
-
-const localChangeEmitter = new EventEmitter()
-const values: Record<number, WidgetValue | undefined> = {}
-
 function Widget(props: WidgetData) {
   const theme = useTheme()
   const styles = getStyles()
   const ChoosenWidget = map[props.type] || Unknown
 
   const useWidgetValue: WidgetValueHook = initialValue => {
-    if (values[props.id] !== undefined)
-      initialValue = values[props.id] as typeof initialValue
+    const { bridge, values, emit: rawEmit } = useValueBridge()
+    const emit = (val: WidgetValue, target: EmitTarget) =>
+      rawEmit(props, val, target)
+
+    if (values[props.target] !== undefined)
+      initialValue = values[props.target] as typeof initialValue
     else if (props.value !== null && typeof initialValue == typeof props.value)
       initialValue = props.value as typeof initialValue
 
-    const { socket } = useSocket()
     const [widgetValue, setWidgetValue] = useState(initialValue)
 
     useEffect(() => {
-      values[props.id] = widgetValue as WidgetValue
-    }, [widgetValue])
-
-    useEffect(() => {
-      const listener: ValueUpdateFunc = obj => {
+      const listener = (obj: LocalValueUpdateObj) => {
         if (
           obj.target === props.target &&
-          typeof obj.value === typeof initialValue
+          typeof obj.value === typeof initialValue &&
+          obj.widgetId !== props.id
         ) {
           setWidgetValue(obj.value as typeof initialValue)
         }
       }
 
-      const localListener = (obj: LocalValueUpdateObj) => {
-        if (obj.widgetId !== props.id) listener(obj)
-      }
-
-      localChangeEmitter.on("update-value", localListener)
-      socket?.on("update-value", listener)
+      bridge.on("update-value", listener)
 
       return () => {
-        localChangeEmitter.off("update-value", localListener)
-        socket?.off("update-value", listener)
+        bridge.off("update-value", listener)
       }
     }, [])
 
-    const emit = (val: WidgetValue, target: EmitTarget) => {
-      values[props.id] = val
-
-      const emitObj = {
-        target: props.target,
-        value: val
-      }
-
-      if (target === EmitTarget.Local || target === EmitTarget.ServerAndLocal || target === EmitTarget.All) {
-        localChangeEmitter.emit("update-value", {
-          widgetId: props.id,
-          ...emitObj
-        })
-      }
-
-      if (target === EmitTarget.Server || target === EmitTarget.ServerAndLocal || target === EmitTarget.All) {
-        socket?.emit("update-value", emitObj)
-      }
-    }
-
     const setValue: SetWidgetValueAction<typeof initialValue> = (
-      value, target: EmitTarget = EmitTarget.All
+      value,
+      target: EmitTarget = EmitTarget.All
     ) => {
       if (typeof value === "function") {
         setWidgetValue(prev => {
@@ -163,7 +129,9 @@ function Widget(props: WidgetData) {
   return (
     <View style={styles.wrapper}>
       {Boolean(widgetProperties.title) && (
-        <Text selectable={false} style={styles.title}>{widgetProperties.title}</Text>
+        <Text selectable={false} style={styles.title}>
+          {widgetProperties.title}
+        </Text>
       )}
       <ChoosenWidget {...choosenWidgetProps} />
     </View>
