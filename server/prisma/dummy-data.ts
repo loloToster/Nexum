@@ -1,4 +1,10 @@
-import { PrismaClient, User, Widget, WidgetProperties } from "@prisma/client"
+import {
+  Device,
+  PrismaClient,
+  User,
+  Widget,
+  WidgetProperties
+} from "@prisma/client"
 
 async function main() {
   const prisma = new PrismaClient({ log: ["info", "warn", "error"] })
@@ -16,21 +22,20 @@ async function main() {
     { name: "y.tester", isAdmin: false }
   ]
 
-  for (const user of users) {
-    await prisma.user.create({
-      data: user
-    })
-  }
+  await prisma.user.createMany({
+    data: users
+  })
 
   const createdUsers = await prisma.user.findMany()
 
-  const devices = ["arduino1", "esp2"]
+  const devices: (Omit<Device, "token" | "id"> & { token?: string })[] = [
+    { name: "arduino1", token: "testtoken" },
+    { name: "esp2" }
+  ]
 
-  for (const deviceName of devices) {
-    await prisma.device.create({
-      data: { name: deviceName }
-    })
-  }
+  await prisma.device.createMany({
+    data: devices
+  })
 
   const createdDevices = await prisma.device.findMany()
 
