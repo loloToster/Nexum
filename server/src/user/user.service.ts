@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common"
-import { Tab, User, Value } from "@prisma/client"
+import { Tab, User } from "@prisma/client"
 
 import { DatabaseService } from "src/database/database.service"
 
-import { UserWithTabs } from "src/types/types"
+import { UserWithTabs, UserWithTabsAndWidgets } from "src/types/types"
 
 @Injectable()
 export class UserService {
@@ -59,7 +59,7 @@ export class UserService {
     return users
   }
 
-  async getUserById(id: string) {
+  async getUserById(id: string): Promise<UserWithTabsAndWidgets> {
     const user = await this.db.user.findUnique({
       where: { id },
       include: {
@@ -67,35 +67,14 @@ export class UserService {
       }
     })
 
-    // get values for all widgets
-    const targetsQuery = user.tabs
-      .map(t => t.widgets)
-      .flat()
-      .map(w => ({ AND: { customId: w.customId, deviceId: w.deviceId } }))
-
-    const values = await this.db.value.findMany({
-      where: {
-        OR: targetsQuery
-      }
-    })
-
-    // this entire logic just adds target and value properties to every widget
+    // this entire logic just adds target property to every widget
     return {
       ...user,
       tabs: user.tabs.map(tab => ({
         ...tab,
         widgets: tab.widgets.map(widget => {
-          const value: Value | undefined = values.find(
-            val =>
-              widget.deviceId === val.deviceId &&
-              widget.customId === val.customId
-          )
-
-          const parsedValue = value ? JSON.parse(value.value) : null
-
           return {
             ...widget,
-            value: parsedValue,
             target: `${widget.deviceId}-${widget.customId}`
           }
         })

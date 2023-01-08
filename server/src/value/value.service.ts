@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { Socket, Server } from "socket.io"
 
 import { DatabaseService } from "src/database/database.service"
+import { UserWithTabsAndWidgets } from "src/types/types"
 
 type Value = string | boolean | number
 
@@ -88,5 +89,21 @@ export class ValueService {
     return await this.db.value.findMany({
       where: { customId }
     })
+  }
+
+  async getUserValues(user: UserWithTabsAndWidgets) {
+    // get values for all widgets
+    const targetsQuery = user.tabs
+      .map(t => t.widgets)
+      .flat()
+      .map(w => ({ AND: { customId: w.customId, deviceId: w.deviceId } }))
+
+    const values = await this.db.value.findMany({
+      where: {
+        OR: targetsQuery
+      }
+    })
+
+    return values
   }
 }

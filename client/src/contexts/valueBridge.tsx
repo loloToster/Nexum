@@ -44,8 +44,16 @@ export const ValueBridgeProvider = (props: { children: React.ReactNode }) => {
       bridge.emit("update-value", v)
     }
 
+    // TODO: show loading if not received sync
+    const syncListener = (v: ValueUpdateObj[]) => {
+      v.forEach(listener)
+    }
+
+    socket.on("sync", syncListener)
     socket.on("update-value", listener)
+
     return () => {
+      socket.off("sync", syncListener)
       socket.off("update-value", listener)
     }
   }, [socket])

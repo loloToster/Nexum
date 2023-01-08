@@ -80,6 +80,16 @@ export class ValueGateway {
           break
         }
 
+        const userValues = await this.valueService.getUserValues(user)
+
+        socket.emit(
+          "sync",
+          userValues.map(v => ({
+            target: `${v.deviceId}-${v.customId}`,
+            value: JSON.parse(v.value)
+          }))
+        )
+
         // targets that the user can read and write to
         const availableTargets = [
           ...new Set(user.tabs.map(t => t.widgets.map(w => w.target)).flat())

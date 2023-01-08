@@ -9,9 +9,11 @@ export interface ValueUpdateObj {
 }
 
 export type ValueUpdateFunc = (obj: ValueUpdateObj) => void
+export type SyncFunc = (obj: ValueUpdateObj[]) => void
 
 export interface EventsMap {
   "update-value": ValueUpdateFunc
+  sync: SyncFunc
 }
 
 export const SocketContext = createContext<{
