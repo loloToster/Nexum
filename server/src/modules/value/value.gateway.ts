@@ -12,8 +12,8 @@ import { Server, Socket as RawSocket } from "socket.io"
 import { Device, User } from "@prisma/client"
 
 import { ValueService } from "./value.service"
-import { DeviceService } from "src/device/device.service"
-import { UserService } from "src/user/user.service"
+import { DeviceService } from "src/modules/device/device.service"
+import { UserService } from "src/modules/user/user.service"
 
 import SocketAuthDto from "src/dtos/socketAuth.dto"
 

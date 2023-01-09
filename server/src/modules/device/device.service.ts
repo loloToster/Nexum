@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { Device } from "@prisma/client"
 
-import { DatabaseService } from "src/database/database.service"
+import { DatabaseService } from "src/modules/database/database.service"
 import { DeviceGateway } from "./device.gateway"
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { Socket, Server } from "socket.io"
 
-import { DatabaseService } from "src/database/database.service"
+import { DatabaseService } from "src/modules/database/database.service"
 import { UserWithTabsAndWidgets } from "src/types/types"
 
 type Value = string | boolean | number

@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from "@nestjs/common"
 import { Request, Response, NextFunction } from "express"
 
-import { DatabaseService } from "src/database/database.service"
+import { DatabaseService } from "src/modules/database/database.service"
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {

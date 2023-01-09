@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common"
-import { DeviceModule } from "src/device/device.module"
-import { UserModule } from "src/user/user.module"
+import { DeviceModule } from "src/modules/device/device.module"
+import { UserModule } from "src/modules/user/user.module"
 
 import { ValueController } from "./value.controller"
 import { ValueGateway } from "./value.gateway"

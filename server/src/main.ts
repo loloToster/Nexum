@@ -2,7 +2,7 @@ import { NestFactory } from "@nestjs/core"
 import { Logger, ValidationPipe } from "@nestjs/common"
 import axios from "axios"
 
-import { AppModule } from "./app.module"
+import { AppModule } from "./modules/app.module"
 
 import { NotFoundInterceptor } from "./interceptors/notfound.interceptor"
 
