@@ -6,10 +6,15 @@
     color: "#55aea5",
     defaults: {
       name: { value: "" },
-      server: { value: "", type: "nexum-client" }
+      device: { value: "", type: "nexum-client" },
+      customId: { value: "", required: true }
     },
     label: function () {
-      return this.name || "receive"
+      if (this.name) {
+        return this.name
+      } else {
+        return "Receive" + (this.customId ? ` ${this.customId}` : "")
+      }
     },
     icon: "logo.png"
   })
@@ -17,8 +22,16 @@
 
 <script type="text/html" data-template-name="receive">
   <div class="form-row">
-    <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
-    <input type="text" id="node-input-server" placeholder="Server" />
+    <label for="node-input-device"
+      ><i class="fa fa-microchip"></i> Device</label
+    >
+    <input type="text" id="node-input-device" placeholder="Device" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-customId"
+      ><i class="fa fa-bookmark"></i> Custom Id</label
+    >
+    <input type="text" id="node-input-customId" placeholder="Custom Id" />
   </div>
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>

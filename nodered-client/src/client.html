@@ -2,8 +2,10 @@
   RED.nodes.registerType("nexum-client", {
     category: "config",
     defaults: {
-      url: { value: "http://localhost:3000", required: true }
+      url: { value: "http://localhost:3000", required: true },
+      token: { value: "", required: true }
     },
+    defaults: {},
     label: function () {
       return this.url
     }
@@ -12,9 +14,13 @@
 
 <script type="text/html" data-template-name="nexum-client">
   <div class="form-row">
-    <label for="node-config-input-url"
-      ><i class="fa fa-bookmark"></i> URL</label
-    >
+    <label for="node-config-input-url"><i class="fa fa-globe"></i> URL</label>
     <input type="text" id="node-config-input-url" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-token"
+      ><i class="fa fa-lock"></i> Token</label
+    >
+    <input type="text" id="node-config-input-token" />
   </div>
 </script>
