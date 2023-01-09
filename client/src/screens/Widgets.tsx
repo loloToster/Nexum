@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { View, StyleSheet } from "react-native"
 import { ActivityIndicator, Theme, useTheme } from "react-native-paper"
 import { useQuery } from "react-query"
@@ -9,8 +9,6 @@ import { TabData } from "src/types"
 
 import { useSocket } from "src/contexts/socket"
 
-import useForceRerender from "src/hooks/useForceRerender"
-
 import Tabs from "src/components/Tabs/Tabs"
 import Error from "src/components/Error/Error"
 
@@ -18,22 +16,23 @@ function Widgets() {
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const rerender = useForceRerender()
-
   const { socket } = useSocket()
+  const [connected, setConnected] = useState(false)
 
   // connect socket only if this components is mounted
   useEffect(() => {
     if (!socket) return
 
-    socket.on("connect", rerender)
-    socket.on("disconnect", rerender)
+    const onConnect = () => setConnected(true)
+    const onDisconnect = () => setConnected(false)
 
+    socket.on("connect", onConnect)
+    socket.on("disconnect", onDisconnect)
     socket.connect()
 
     return () => {
-      socket.off("connect", rerender)
-      socket.off("disconnect", rerender)
+      socket.off("connect", onConnect)
+      socket.off("disconnect", onDisconnect)
       socket.disconnect()
     }
   }, [socket])
@@ -43,7 +42,7 @@ function Widgets() {
     return res.data
   })
 
-  return isLoading || socket?.disconnected ? (
+  return isLoading || !connected ? (
     <View style={styles.loading}>
       <ActivityIndicator size="large" />
     </View>
