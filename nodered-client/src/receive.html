@@ -1,0 +1,31 @@
+<script type="text/javascript">
+  RED.nodes.registerType("receive", {
+    category: "nexum",
+    inputs: 0,
+    outputs: 1,
+    color: "#55aea5",
+    defaults: {
+      name: { value: "" },
+      server: { value: "", type: "nexum-client" }
+    },
+    label: function () {
+      return this.name || "receive"
+    },
+    icon: "logo.png"
+  })
+</script>
+
+<script type="text/html" data-template-name="receive">
+  <div class="form-row">
+    <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
+    <input type="text" id="node-input-server" placeholder="Server" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name" />
+  </div>
+</script>
+
+<script type="text/html" data-help-name="receive">
+  <p>Receive</p>
+</script>
