@@ -10,7 +10,7 @@ export type ReceiveCallback = (customId: string, value: WidgetValue) => any
 export type ConnectCallback = () => any
 export type DisonnectCallback = () => any
 
-export interface NexumEvents {
+export type NexumEvents = {
   receive: ReceiveCallback
   connect: ConnectCallback
   disconnect: DisonnectCallback

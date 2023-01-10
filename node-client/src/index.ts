@@ -1,9 +1,10 @@
 import { io, Socket } from "socket.io-client"
+import TypedEmitter from "typed-emitter"
 import EventEmitter from "events"
 
 import { NexumClientOpts, NexumEvents, WidgetValue } from "./types"
 
-export class NexumClient extends EventEmitter {
+export class NexumClient extends (EventEmitter as new () => TypedEmitter<NexumEvents>) {
   private socket: Socket
 
   constructor({ host, token, autoConnect = true }: NexumClientOpts) {
@@ -22,18 +23,6 @@ export class NexumClient extends EventEmitter {
     this.socket.on("disconnect", () => {
       this.emit("disconnect")
     })
-  }
-
-  on<K extends keyof NexumEvents>(event: K, listener: NexumEvents[K]) {
-    return super.on(event, listener)
-  }
-
-  once<K extends keyof NexumEvents>(event: K, listener: NexumEvents[K]) {
-    return super.once(event, listener)
-  }
-
-  off<K extends keyof NexumEvents>(event: K, listener: NexumEvents[K]) {
-    return super.off(event, listener)
   }
 
   update(customId: string, value: WidgetValue) {
