@@ -17,7 +17,7 @@
     }
   },
   "dependencies": {
-    "nexum-client": "https://gitpkg.now.sh/loloToster/Nexum/node-client?master&scripts.postinstall=npm%20run%20build"
+    "nexum-client": "^0.0.2"
   },
   "devDependencies": {
     "@types/node-red": "^1.2.1",
