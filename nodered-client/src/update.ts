@@ -1,33 +1,41 @@
-import { NexumClient } from "nexum-client"
 import * as nodered from "node-red"
+
+import { DeviceConfigNode, UpdateConfig, UpdateNode } from "./types"
+import { attachStatus } from "./utils"
 
 export = function (RED: nodered.NodeAPI) {
   RED.nodes.registerType(
     "update",
-    function (
-      this: nodered.Node & { device: nodered.Node & { client: NexumClient } },
-      config: any
-    ) {
+    function (this: UpdateNode, config: UpdateConfig) {
       RED.nodes.createNode(this, config)
 
-      this.device = RED.nodes.getNode(config.device) as any
+      this.device = RED.nodes.getNode(config.device) as DeviceConfigNode
 
       this.on("input", (msg: nodered.NodeMessage) => {
-        this.device.client.update(
-          config.customId || msg.topic,
-          msg.payload as any
-        )
+        const customId = config.customId || msg.topic
+
+        if (typeof customId !== "string") {
+          this.error("customId cannot be undefined")
+          return
+        }
+
+        const value = msg.payload
+
+        if (
+          typeof value !== "string" ||
+          typeof value !== "number" ||
+          typeof value !== "boolean"
+        ) {
+          this.error(
+            "type of values/msg.payload can only be a string, number or boolean"
+          )
+          return
+        }
+
+        this.device.client.update(customId, value)
       })
 
-      const syncStatus = () => {
-        this.device.client.connected
-          ? this.status({ fill: "green", shape: "dot", text: "connected" })
-          : this.status({ fill: "red", shape: "ring", text: "disconnected" })
-      }
-
-      this.device.client.on("connect", syncStatus)
-      this.device.client.on("disconnect", syncStatus)
-      syncStatus()
+      attachStatus(this)
     }
   )
 }
