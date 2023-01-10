@@ -1,6 +1,6 @@
 {
   "name": "nexum-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,13 +12,13 @@
   "author": "loloToster",
   "license": "ISC",
   "dependencies": {
-    "socket.io-client": "^4.5.4"
+    "socket.io-client": "^4.5.4",
+    "typed-emitter": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.1",
-    "typed-emitter": "^2.1.0",
     "typescript": "^4.9.4"
   },
   "directories": {
