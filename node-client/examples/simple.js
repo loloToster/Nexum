@@ -5,18 +5,18 @@ const client = new NexumClient({
   token: "token"
 })
 
-client.onConnect(() => {
+client.on("connect", () => {
   console.log("connected")
 })
 
-client.onDisconnect(() => {
+client.on("disconnect", () => {
   console.log("disconnected")
 })
 
-client.onReceive(console.log)
+client.on("receive", console.log)
 
 let i = 0
 setInterval(() => {
   client.update("slider", i)
-  i += 0.2
+  i = i > 10 ? 0 : i + 0.2
 }, 1000)

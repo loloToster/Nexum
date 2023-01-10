@@ -1,44 +1,39 @@
 import { io, Socket } from "socket.io-client"
+import EventEmitter from "events"
 
-import { NexumClientOpts, ReceiveCallback, WidgetValue } from "./types"
+import { NexumClientOpts, NexumEvents, WidgetValue } from "./types"
 
-export class NexumClient {
+export class NexumClient extends EventEmitter {
   private socket: Socket
 
-  private receiveCb: ReceiveCallback | null
-  private connectCb: (() => any) | null
-  private disconnectCb: (() => any) | null
+  constructor({ host, token, autoConnect = true }: NexumClientOpts) {
+    super()
 
-  constructor({ host, token }: NexumClientOpts) {
-    this.socket = io(host, { auth: { as: "device", token } })
-
-    this.receiveCb = null
-    this.connectCb = null
-    this.disconnectCb = null
+    this.socket = io(host, { auth: { as: "device", token }, autoConnect })
 
     this.socket.on("update-value", data => {
-      if (this.receiveCb) this.receiveCb(data.customId, data.value)
+      this.emit("receive", data.customId, data.value)
     })
 
     this.socket.on("connect", () => {
-      if (this.connectCb) this.connectCb()
+      this.emit("connect")
     })
 
     this.socket.on("disconnect", () => {
-      if (this.disconnectCb) this.disconnectCb()
+      this.emit("disconnect")
     })
   }
 
-  onReceive(listener: ReceiveCallback | null) {
-    this.receiveCb = listener
+  on<K extends keyof NexumEvents>(event: K, listener: NexumEvents[K]) {
+    return super.on(event, listener)
   }
 
-  onConnect(listener: (() => any) | null) {
-    this.connectCb = listener
+  once<K extends keyof NexumEvents>(event: K, listener: NexumEvents[K]) {
+    return super.once(event, listener)
   }
 
-  onDisconnect(listener: (() => any) | null) {
-    this.disconnectCb = listener
+  off<K extends keyof NexumEvents>(event: K, listener: NexumEvents[K]) {
+    return super.off(event, listener)
   }
 
   update(customId: string, value: WidgetValue) {
@@ -47,5 +42,13 @@ export class NexumClient {
 
   get connected() {
     return this.socket.connected
+  }
+
+  connect() {
+    this.socket.connect()
+  }
+
+  disconnect() {
+    this.socket.disconnect()
   }
 }
