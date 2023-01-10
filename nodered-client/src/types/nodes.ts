@@ -6,7 +6,7 @@ export interface DeviceConfigNode extends nodered.Node {
 }
 
 export interface BaseNode extends nodered.Node {
-  device: DeviceConfigNode
+  device: DeviceConfigNode | null
 }
 
 export type UpdateNode = BaseNode

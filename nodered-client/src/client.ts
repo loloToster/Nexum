@@ -1,15 +1,27 @@
 import * as nodered from "node-red"
 import { NexumClient } from "nexum-client"
 
-import { DeviceConfigNode } from "./types"
+import { DeviceConfig, DeviceConfigNode } from "./types"
 
 export = function (RED: nodered.NodeAPI) {
   RED.nodes.registerType(
     "nexum-client",
-    function (this: DeviceConfigNode, config: any) {
+    function (this: DeviceConfigNode, config: DeviceConfig) {
       RED.nodes.createNode(this, config)
 
-      this.client = new NexumClient({ host: config.url, token: config.token })
+      const client = new NexumClient({
+        host: config.url,
+        token: config.token,
+        autoConnect: false
+      })
+
+      client.connect()
+
+      this.on("close", () => {
+        client.disconnect()
+      })
+
+      this.client = client
     }
   )
 }

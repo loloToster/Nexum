@@ -9,7 +9,7 @@ export = function (RED: nodered.NodeAPI) {
     function (this: UpdateNode, config: UpdateConfig) {
       RED.nodes.createNode(this, config)
 
-      this.device = RED.nodes.getNode(config.device) as DeviceConfigNode
+      this.device = RED.nodes.getNode(config.device) as DeviceConfigNode | null
 
       this.on("input", (msg: nodered.NodeMessage) => {
         const customId = config.customId || msg.topic
@@ -32,7 +32,7 @@ export = function (RED: nodered.NodeAPI) {
           return
         }
 
-        this.device.client.update(customId, value)
+        this.device?.client.update(customId, value)
       })
 
       attachStatus(this)
