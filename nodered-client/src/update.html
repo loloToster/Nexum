@@ -7,9 +7,7 @@
     defaults: {
       name: { value: "" },
       device: { value: "", type: "nexum-client" },
-      customId: { value: "" },
-      value: { value: "" },
-      valueType: { value: "str" }
+      customId: { value: "" }
     },
     label: function () {
       if (this.name) {
@@ -41,11 +39,6 @@
       ><i class="fa fa-bookmark"></i> Custom Id</label
     >
     <input type="text" id="node-input-customId" placeholder="Custom Id" />
-  </div>
-  <div class="form-row">
-    <label for="node-input-value"><i class="fa fa-cog"></i> Value</label>
-    <input type="text" id="node-input-value" placeholder="Value" />
-    <input type="hidden" id="node-input-valueType" />
   </div>
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>

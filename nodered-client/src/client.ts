@@ -1,12 +1,13 @@
 import * as nodered from "node-red"
+import { NexumClient } from "nexum-client"
 
 export = function (RED: nodered.NodeAPI) {
   RED.nodes.registerType(
     "nexum-client",
-    function (this: nodered.Node & { url: string }, config: any) {
+    function (this: nodered.Node & { client: NexumClient }, config: any) {
       RED.nodes.createNode(this, config)
 
-      this.url = config.url
+      this.client = new NexumClient({ host: config.url, token: config.token })
     }
   )
 }
