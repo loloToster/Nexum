@@ -41,3 +41,5 @@ export class NexumClient extends (EventEmitter as new () => TypedEmitter<NexumEv
     this.socket.disconnect()
   }
 }
+
+export * from "./types"
