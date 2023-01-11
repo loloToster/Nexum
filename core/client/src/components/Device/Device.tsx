@@ -12,6 +12,7 @@ import useObjectState from "src/hooks/useObjectState"
 import { Device as DeviceI } from "src/types"
 
 import RUSure from "src/components/RUSure/RUSure"
+import CopyButton from "src/components/CopyButton/CopyButton"
 
 function Device(props: {
   device: DeviceI
@@ -78,6 +79,7 @@ function Device(props: {
       <Divider />
       <View style={styles.row}>
         <Text numberOfLines={1}>Token: {device.token}</Text>
+        <CopyButton text={device.token} />
       </View>
       <Divider />
       <View style={styles.row}>
@@ -122,7 +124,6 @@ const getStyles = () => {
       paddingHorizontal: 15
     },
     row: {
-      flex: 1,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
