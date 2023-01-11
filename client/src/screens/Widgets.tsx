@@ -8,6 +8,10 @@ import api from "src/api"
 import { TabData } from "src/types"
 
 import { useSocket } from "src/contexts/socket"
+import {
+  ValueBridgeProvider,
+  ValueBridgeContext
+} from "src/contexts/valueBridge"
 
 import Tabs from "src/components/Tabs/Tabs"
 import Error from "src/components/Error/Error"
@@ -19,7 +23,6 @@ function Widgets() {
   const { socket } = useSocket()
   const [connected, setConnected] = useState(false)
 
-  // connect socket only if this components is mounted
   useEffect(() => {
     if (!socket) return
 
@@ -28,12 +31,10 @@ function Widgets() {
 
     socket.on("connect", onConnect)
     socket.on("disconnect", onDisconnect)
-    socket.connect()
 
     return () => {
       socket.off("connect", onConnect)
       socket.off("disconnect", onDisconnect)
-      socket.disconnect()
     }
   }, [socket])
 
@@ -42,14 +43,22 @@ function Widgets() {
     return res.data
   })
 
-  return isLoading || !connected ? (
-    <View style={styles.loading}>
-      <ActivityIndicator size="large" />
-    </View>
-  ) : isError ? (
-    <Error text="Could not load widgets" />
-  ) : (
-    <Tabs data={data.tabs as TabData[]} />
+  return (
+    <ValueBridgeProvider>
+      <ValueBridgeContext.Consumer>
+        {({ synced }) =>
+          isLoading || !connected || !synced ? (
+            <View style={styles.loading}>
+              <ActivityIndicator size="large" />
+            </View>
+          ) : isError ? (
+            <Error text="Could not load widgets" />
+          ) : (
+            <Tabs data={data.tabs as TabData[]} />
+          )
+        }
+      </ValueBridgeContext.Consumer>
+    </ValueBridgeProvider>
   )
 }
 
