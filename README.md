@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="client/assets/adaptive.png" alt="logo" width="35%">
+  <img src="core/client/assets/adaptive.png" alt="logo" width="35%">
 </p>
 <h1 align="center">Nexum</h1>
 <p align="center">
