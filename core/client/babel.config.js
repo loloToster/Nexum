@@ -1,9 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
-require("dotenv").config()
-
 // eslint-disable-next-line no-undef
-module.exports = function (api) {
-  api.cache(true)
+module.exports = api => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
+  require("dotenv").config()
+
+  api.cache(false)
+
   return {
     presets: ["babel-preset-expo"],
     plugins: [

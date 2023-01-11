@@ -29,6 +29,7 @@ import useObjectState from "src/hooks/useObjectState"
 import { User as UserI, Tab as TabI } from "src/types"
 
 import RUSure from "src/components/RUSure/RUSure"
+import CopyButton from "src/components/CopyButton/CopyButton"
 
 export interface UserProps {
   user: UserI
@@ -151,7 +152,14 @@ function User(props: UserProps) {
       </RUSure>
       <View style={styles.row}>
         <Text numberOfLines={1}>ID: {user.id}</Text>
-        <IconButton icon="qrcode" size={20} onPress={() => setQrActive(true)} />
+        <View style={styles.btnsWrapper}>
+          <CopyButton text={user.id} />
+          <IconButton
+            icon="qrcode"
+            size={20}
+            onPress={() => setQrActive(true)}
+          />
+        </View>
       </View>
       <Divider />
       <View style={styles.row}>
@@ -237,11 +245,14 @@ const getStyles = (theme: Theme) => {
       paddingHorizontal: 15
     },
     row: {
-      flex: 1,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       minHeight: 50
+    },
+    btnsWrapper: {
+      flexDirection: "row",
+      alignItems: "center"
     },
     tabs: {
       flexDirection: "row",

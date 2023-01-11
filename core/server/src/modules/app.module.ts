@@ -13,7 +13,7 @@ import { TabModule } from "./tab/tab.module"
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: `${__dirname}/../../../../client/web-build`
+      rootPath: `${__dirname}/../../../client/web-build`
     }),
     AuthModule,
     DeviceModule,

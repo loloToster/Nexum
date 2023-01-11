@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from "react"
+import React, { createContext, useContext, useEffect, useState } from "react"
 
 import { WidgetData, WidgetValue } from "src/types"
 import { EventEmitter } from "src/utils"
@@ -22,19 +22,22 @@ interface ValueBridgeContextI {
   bridge: EventEmitter
   values: ValuesMap
   emit: (widget: WidgetData, val: WidgetValue, target: EmitTarget) => any
+  synced: boolean
 }
 
 const bridge = new EventEmitter()
 const values: ValuesMap = {}
 
-const ValueBridgeContext = createContext<ValueBridgeContextI>({
+export const ValueBridgeContext = createContext<ValueBridgeContextI>({
   bridge,
   values,
-  emit: () => null
+  emit: () => null,
+  synced: false
 })
 
 export const ValueBridgeProvider = (props: { children: React.ReactNode }) => {
   const { socket } = useSocket()
+  const [synced, setSynced] = useState(false)
 
   useEffect(() => {
     if (!socket) return
@@ -44,17 +47,19 @@ export const ValueBridgeProvider = (props: { children: React.ReactNode }) => {
       bridge.emit("update-value", v)
     }
 
-    // TODO: show loading if not received sync
     const syncListener = (v: ValueUpdateObj[]) => {
       v.forEach(listener)
+      setSynced(true)
     }
 
     socket.on("sync", syncListener)
     socket.on("update-value", listener)
+    socket.connect()
 
     return () => {
       socket.off("sync", syncListener)
       socket.off("update-value", listener)
+      socket.disconnect()
     }
   }, [socket])
 
@@ -91,7 +96,8 @@ export const ValueBridgeProvider = (props: { children: React.ReactNode }) => {
       value={{
         bridge,
         values,
-        emit
+        emit,
+        synced
       }}
     >
       {props.children}
