@@ -122,7 +122,10 @@ export class ValueGateway {
         if (query.v === "2") {
           socket.emit(
             "sync",
-            values.map(v => ({ customId: v.customId, value: v.value }))
+            values.map(v => ({
+              customId: v.customId,
+              value: JSON.parse(v.value)
+            }))
           )
         } else {
           // TODO: deprecate
