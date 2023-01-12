@@ -13,7 +13,11 @@ client.on("disconnect", () => {
   console.log("disconnected")
 })
 
-client.on("receive", console.log)
+client.on("sync", data => console.log("sync:", data))
+
+client.on("receive", (customId, value) =>
+  console.log("received:", { customId, value })
+)
 
 let i = 0
 setInterval(() => {

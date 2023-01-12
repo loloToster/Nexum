@@ -10,10 +10,18 @@ export class NexumClient extends (EventEmitter as new () => TypedEmitter<NexumEv
   constructor({ host, token, autoConnect = true }: NexumClientOpts) {
     super()
 
-    this.socket = io(host, { auth: { as: "device", token }, autoConnect })
+    this.socket = io(host, {
+      auth: { as: "device", token },
+      query: { v: "2" },
+      autoConnect
+    })
 
     this.socket.on("update-value", data => {
       this.emit("receive", data.customId, data.value)
+    })
+
+    this.socket.on("sync", data => {
+      this.emit("sync", data)
     })
 
     this.socket.on("connect", () => {
