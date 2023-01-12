@@ -119,11 +119,19 @@ export class ValueGateway {
         // synchronize data on connection
         const values = await this.valueService.getDeviceValues(device.id)
 
-        for (const value of values) {
-          socket.emit("update-value", {
-            customId: value.customId,
-            value: JSON.parse(value.value)
-          })
+        if (query.v === "2") {
+          socket.emit(
+            "sync",
+            values.map(v => ({ customId: v.customId, value: v.value }))
+          )
+        } else {
+          // TODO: deprecate
+          for (const value of values) {
+            socket.emit("update-value", {
+              customId: value.customId,
+              value: JSON.parse(value.value)
+            })
+          }
         }
 
         socket.join(["devices", `device-${device.id}`])
