@@ -47,6 +47,7 @@ SocketIOclient socketIO;
 NexumClass::NexumClass()
     : _onConnect(NULL),
       _onDisconnect(NULL),
+      _onSync(NULL),
       _onReceive(NULL),
       _connected(false) {}
 
@@ -59,7 +60,7 @@ void NexumClass::begin(const char *token, const char *ssid, const char *pass,
   WiFiMulti.addAP(ssid, pass);
   WiFiMulti.run();
 
-  String path = "/socket.io/?EIO=4&as=device&token=" + String(token);
+  String path = "/socket.io/?EIO=4&v=2&as=device&token=" + String(token);
 
   if (useSSL) {
     socketIO.beginSSL(host, port, path);
@@ -105,20 +106,36 @@ void NexumClass::attachCb() {
           }
 
           case sIOtype_EVENT: {
-            if (!_onReceive) break;
-
-            StaticJsonDocument<64> doc;
+            StaticJsonDocument<1024> doc;
             DeserializationError error = deserializeJson(doc, payload);
 
-            if (error || doc[0] != "update-value") {
-              break;
+            if (error) break;
+
+            String event = doc[0];
+            auto data = doc[1];
+
+            if (event == "sync") {
+              if (!_onSync) break;
+
+              for (int i = 0; true; i++) {
+                boolean exists = data[i]["customId"];
+
+                if (!exists) break;
+
+                String customId = data[i]["customId"];
+                String value = data[i]["value"];
+
+                _onSync(customId, value);
+              }
+            } else if (event == "update-value") {
+              if (!_onReceive) break;
+
+              String customId = data["customId"];
+              // TODO: dynamic type
+              String value = data["value"];
+
+              _onReceive(customId, value);
             }
-
-            String customId = doc[1]["customId"];
-            // TODO: dynamic type
-            String value = doc[1]["value"];
-
-            _onReceive(customId, value);
 
             break;
           }
@@ -130,8 +147,14 @@ void NexumClass::onConnect(void (*callback)()) { _onConnect = callback; }
 
 void NexumClass::onDisconnect(void (*callback)()) { _onDisconnect = callback; }
 
-void NexumClass::onReceive(void (*callback)(String, String)) {
+void NexumClass::onSync(void (*callback)(String, String)) {
+  _onSync = callback;
+}
+
+void NexumClass::onReceive(void (*callback)(String, String),
+                           boolean attachToSync /* = false */) {
   _onReceive = callback;
+  if (attachToSync) _onSync = callback;
 }
 
 void NexumClass::rawUpdate(String customId, String value) {

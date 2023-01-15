@@ -20,7 +20,9 @@ class NexumClass {
 
   void onConnect(void (*callback)());
   void onDisconnect(void (*callback)());
-  void onReceive(void (*callback)(String, String));
+  void onSync(void (*callback)(String, String));
+  void onReceive(void (*callback)(String, String),
+                 boolean attachToSync = false);
 
   void update(String customId, String value);
   void update(String customId, const char *value);
@@ -36,6 +38,7 @@ class NexumClass {
   boolean _connected;
   void (*_onConnect)();
   void (*_onDisconnect)();
+  void (*_onSync)(String, String);
   void (*_onReceive)(String, String);
 
   void attachCb();
