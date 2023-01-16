@@ -9,5 +9,6 @@ export interface BaseNode extends nodered.Node {
   device: DeviceConfigNode | null
 }
 
-export type UpdateNode = BaseNode
+export type SyncNode = BaseNode
 export type ReceiveNode = BaseNode
+export type UpdateNode = BaseNode

@@ -12,12 +12,13 @@
   "node-red": {
     "nodes": {
       "nexum-client": "./dist/client.js",
+      "sync": "./dist/sync.js",
       "receive": "./dist/receive.js",
       "update": "./dist/update.js"
     }
   },
   "dependencies": {
-    "nexum-client": "^0.0.2"
+    "nexum-client": "^0.0.3"
   },
   "devDependencies": {
     "@types/node-red": "^1.2.1",

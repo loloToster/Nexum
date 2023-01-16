@@ -9,8 +9,13 @@ export interface BaseConfig extends nodered.NodeDef {
   device: string
 }
 
+export interface SyncConfig extends BaseConfig {
+  customId: string
+}
+
 export interface ReceiveConfig extends BaseConfig {
   customId: string
+  callOnSync: boolean
 }
 
 export interface UpdateConfig extends BaseConfig {

@@ -1,5 +1,5 @@
 <script type="text/javascript">
-  RED.nodes.registerType("receive", {
+  RED.nodes.registerType("sync", {
     category: "nexum",
     inputs: 0,
     outputs: 1,
@@ -7,21 +7,20 @@
     defaults: {
       name: { value: "" },
       device: { value: "", type: "nexum-client" },
-      customId: { value: "", required: true },
-      callOnSync: { value: false }
+      customId: { value: "", required: true }
     },
     label: function () {
       if (this.name) {
         return this.name
       } else {
-        return "Receive" + (this.customId ? ` ${this.customId}` : "")
+        return "Sync" + (this.customId ? ` ${this.customId}` : "")
       }
     },
     icon: "logo.png"
   })
 </script>
 
-<script type="text/html" data-template-name="receive">
+<script type="text/html" data-template-name="sync">
   <div class="form-row">
     <label for="node-input-device"
       ><i class="fa fa-microchip"></i> Device</label
@@ -35,21 +34,11 @@
     <input type="text" id="node-input-customId" placeholder="Custom Id" />
   </div>
   <div class="form-row">
-    <label for="node-input-callOnSync"
-      ><i class="fa fa-refresh"></i> Call on sync</label
-    >
-    <input
-      type="checkbox"
-      id="node-input-callOnSync"
-      style="width: fit-content;"
-    />
-  </div>
-  <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name" />
   </div>
 </script>
 
-<script type="text/html" data-help-name="receive">
-  <p>Receive</p>
+<script type="text/html" data-help-name="sync">
+  <p>Sync</p>
 </script>
