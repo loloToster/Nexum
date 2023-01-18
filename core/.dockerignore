@@ -1,0 +1,12 @@
+microcontroller/
+**/node_modules/
+
+**/dist/
+
+**/web-build/
+**/.expo/
+
+**/test/
+
+**/.env
+**/README.md

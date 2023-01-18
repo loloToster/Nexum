@@ -4,10 +4,16 @@
   "description": "",
   "private": true,
   "scripts": {
+    "install:all": "cd ./server && npm i && cd ../client && npm i --force",
     "build-client": "cd ./client && npm i --force && npm run build:web",
     "build-server": "cd ./server && npm i && npm run build",
+    "build-client:raw": "cd ./client && npm run build:web",
+    "build-server:raw": "cd ./server && npm run build",
     "build": "npm run build-client && npm run build-server",
-    "start": "cd ./server && npm run start:prod"
+    "build:raw": "npm run build-client:raw && npm run build-server:raw",
+    "migrate": "cd ./server && npm run migrate:prod",
+    "start": "cd ./server && npm run start:prod",
+    "migrate:start:prod": "npm run migrate && npm run start"
   },
   "keywords": [],
   "author": "loloToster",
