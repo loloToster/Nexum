@@ -59,13 +59,15 @@ export class UserService {
     return users
   }
 
-  async getUserById(id: string): Promise<UserWithTabsAndWidgets> {
+  async getUserById(id: string): Promise<UserWithTabsAndWidgets | null> {
     const user = await this.db.user.findUnique({
       where: { id },
       include: {
         tabs: { include: { widgets: { include: { properties: true } } } }
       }
     })
+
+    if (!user) return null
 
     // this entire logic just adds target property to every widget
     return {
