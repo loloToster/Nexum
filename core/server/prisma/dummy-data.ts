@@ -61,6 +61,16 @@ async function main() {
           properties: { isSwitch: true, text: "Button" }
         },
         {
+          customId: "num",
+          x: 0,
+          y: 9,
+          width: 4,
+          height: 1,
+          type: "number",
+          deviceId: createdDevices[0].id,
+          properties: {}
+        },
+        {
           customId: "slider",
           x: 3,
           y: 0,
