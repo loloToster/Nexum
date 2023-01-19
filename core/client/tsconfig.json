@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
+    "module": "CommonJS",
     "strict": true
   },
   "extends": "expo/tsconfig.base"
