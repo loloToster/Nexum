@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build:raw
 
 
-FROM node:16-alpine AS runner
+FROM node:16-alpine3.16 AS runner
 
 WORKDIR /app
 
@@ -35,6 +35,4 @@ COPY --from=builder /tmp/app/server/dist ./server/dist
 
 EXPOSE 3000
 
-# TODO: fix prisma migration
-CMD ["npm", "run", "migrate:start:prod"]
-
+CMD ["npm", "start"]
