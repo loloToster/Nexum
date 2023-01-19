@@ -17,6 +17,7 @@ import Button from "./Button/Button"
 import SliderWidget from "./Slider/Slider"
 import Gauge from "./Gauge/Gauge"
 import Label from "./Label/Label"
+import NumberInput from "./NumberInput/NumberInput"
 
 export { EmitTarget } from "src/contexts/valueBridge"
 
@@ -43,7 +44,8 @@ const map: Record<
   btn: Button,
   sldr: SliderWidget,
   gauge: Gauge,
-  lbl: Label
+  lbl: Label,
+  number: NumberInput
 }
 
 function Widget(props: WidgetData) {
