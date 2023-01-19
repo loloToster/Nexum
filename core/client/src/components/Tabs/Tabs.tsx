@@ -26,13 +26,13 @@ function Tabs({ data }: { data: TabData[] }) {
         <Text style={styles.noTabs}>
           {user?.isAdmin ? (
             <>
-              You don't have access to any tabs. You can add additional
+              You don&apos;t have access to any tabs. You can add additional
               permissions on Users tab by clicking:
               <List.Icon style={styles.icon} icon="account-multiple" />
             </>
           ) : (
             <>
-              You don't have access to any tabs. Ask an administrator for
+              You don&apos;t have access to any tabs. Ask an administrator for
               additional permissions.
             </>
           )}
