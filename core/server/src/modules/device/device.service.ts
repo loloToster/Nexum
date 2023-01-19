@@ -35,15 +35,15 @@ export class DeviceService {
   async getDevices(searchQuery?: string) {
     if (searchQuery) searchQuery = decodeURIComponent(searchQuery)
 
-    const where = {
-      OR: [
-        { name: { contains: searchQuery } },
-        { token: { contains: searchQuery } }
-      ]
-    }
-
     const devices = await this.db.device.findMany({
-      where: searchQuery ? where : undefined
+      where: searchQuery
+        ? {
+          OR: [
+            { name: { contains: searchQuery, mode: "insensitive" } },
+            { token: { contains: searchQuery, mode: "insensitive" } }
+          ]
+        }
+        : undefined
     })
 
     const connectedDevices = await this.deviceGateway.server

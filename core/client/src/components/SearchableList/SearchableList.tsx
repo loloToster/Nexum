@@ -5,15 +5,18 @@ import {
   Theme,
   Searchbar,
   ActivityIndicator,
-  List
+  List,
+  Text
 } from "react-native-paper"
 
 import Error from "src/components/Error/Error"
+import Translatable from "src/components/Translatable/Translatable"
 
 export interface SearchableListProps<T> {
   searchBarPlaceHolder?: string
   loading?: boolean
   error?: string
+  notFound?: string
   data: T[]
   renderTitle: (itemData: T) => React.ReactNode
   renderContent: (itemData: T) => JSX.Element
@@ -24,6 +27,7 @@ function SearchableList<T>({
   searchBarPlaceHolder = "Search",
   loading = false,
   error,
+  notFound = "",
   data,
   renderTitle,
   renderContent,
@@ -60,6 +64,12 @@ function SearchableList<T>({
         </View>
       ) : error ? (
         <Error text={error} />
+      ) : !data.length ? (
+        <Translatable>
+          <View style={styles.notFoundWrapper}>
+            <Text style={styles.notFound}>{notFound}</Text>
+          </View>
+        </Translatable>
       ) : (
         <FlatList data={data} renderItem={renderItem} />
       )}
@@ -86,6 +96,15 @@ const getStyles = (theme: Theme) => {
       flex: 1,
       alignItems: "center",
       justifyContent: "center"
+    },
+    notFoundWrapper: {
+      padding: 30,
+      alignItems: "center"
+    },
+    notFound: {
+      color: theme.colors.surface,
+      textAlign: "center",
+      fontSize: 20
     }
   })
 }

@@ -63,8 +63,9 @@ function Users() {
         renderContent={renderUser}
         loading={usersLoading || tabsLoading}
         error={error}
+        notFound="No users where found"
         onSearch={setSearchValue}
-      ></SearchableList>
+      />
       <FAB
         style={styles.fab}
         icon="account-plus"

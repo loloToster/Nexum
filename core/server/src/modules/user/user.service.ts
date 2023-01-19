@@ -44,16 +44,16 @@ export class UserService {
   async getUsers(searchQuery?: string) {
     if (searchQuery) searchQuery = decodeURIComponent(searchQuery)
 
-    const where = {
-      OR: [
-        { name: { contains: searchQuery } },
-        { id: { contains: searchQuery } }
-      ]
-    }
-
     const users = await this.db.user.findMany({
       include: { tabs: true },
-      where: searchQuery ? where : undefined
+      where: searchQuery
+        ? {
+          OR: [
+            { name: { contains: searchQuery, mode: "insensitive" } },
+            { id: { contains: searchQuery, mode: "insensitive" } }
+          ]
+        }
+        : undefined
     })
 
     return users

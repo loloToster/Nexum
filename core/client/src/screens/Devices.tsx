@@ -70,8 +70,9 @@ function Devices() {
         renderContent={renderDevice}
         loading={isLoading}
         error={isError ? "Could not load devices" : ""}
+        notFound="No devices were found"
         onSearch={setSearchValue}
-      ></SearchableList>
+      />
       <FAB
         style={styles.fab}
         icon={({ size }) => (
