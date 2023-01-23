@@ -35,8 +35,7 @@ export class ValueController {
     const device = await this.deviceService.getDeviceByToken(token)
 
     if (action === "get") {
-      const value = await this.valueService.getValue(device.id, customId)
-      return value.value
+      return await this.valueService.getValue(device.id, customId)
     } else {
       const parsedValue = JSON.parse(value)
 

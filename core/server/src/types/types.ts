@@ -24,3 +24,5 @@ export interface TabWithWidgets extends Tab {
 export interface UserWithTabsAndWidgets extends User {
   tabs: TabWithWidgets[]
 }
+
+export type WidgetValue = string | boolean | number

@@ -83,13 +83,7 @@ export class ValueGateway {
 
         const userValues = await this.valueService.getUserValues(user)
 
-        socket.emit(
-          "sync",
-          userValues.map(v => ({
-            target: this.valueService.createTarget(v.deviceId, v.customId),
-            value: JSON.parse(v.value)
-          }))
-        )
+        socket.emit("sync", userValues)
 
         // targets that the user can read and write to
         const availableTargets = [
@@ -121,20 +115,11 @@ export class ValueGateway {
         const values = await this.valueService.getDeviceValues(device.id)
 
         if (query.v === "2") {
-          socket.emit(
-            "sync",
-            values.map(v => ({
-              customId: v.customId,
-              value: JSON.parse(v.value)
-            }))
-          )
+          socket.emit("sync", values)
         } else {
           // TODO: deprecate
           for (const value of values) {
-            socket.emit("update-value", {
-              customId: value.customId,
-              value: JSON.parse(value.value)
-            })
+            socket.emit("update-value", value)
           }
         }
 
