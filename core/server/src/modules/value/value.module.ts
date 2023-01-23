@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common"
+import { forwardRef, Module } from "@nestjs/common"
 import { DeviceModule } from "src/modules/device/device.module"
 import { UserModule } from "src/modules/user/user.module"
 
@@ -8,7 +8,7 @@ import { ValueService } from "./value.service"
 
 @Module({
   controllers: [ValueController],
-  imports: [DeviceModule, UserModule],
+  imports: [DeviceModule, forwardRef(() => UserModule)],
   providers: [ValueGateway, ValueService],
   exports: [ValueGateway, ValueService]
 })

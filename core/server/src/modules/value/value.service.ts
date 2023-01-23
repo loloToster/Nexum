@@ -10,6 +10,19 @@ type Value = string | boolean | number
 export class ValueService {
   constructor(private db: DatabaseService) {}
 
+  createTarget(deviceId: number | string, customId: string) {
+    return `${deviceId}-${customId}`
+  }
+
+  parseTarget(target: string) {
+    const [deviceId, customId] = target.split(/-(.*)/s)
+
+    return {
+      deviceId: parseInt(deviceId),
+      customId
+    }
+  }
+
   async updateValue(origin: Socket | Server, target: string, value: Value)
   async updateValue(
     origin: Socket | Server,
@@ -31,15 +44,15 @@ export class ValueService {
       // 1st overload
       value = deviceIdOrValue
       target = targetOrCustomId
-      const deviceIdAndCustomId = target.split(/-(.*)/s)
-      deviceId = parseInt(deviceIdAndCustomId[0])
-      customId = deviceIdAndCustomId[1]
+      const parsedTarget = this.parseTarget(target) // target.split(/-(.*)/s)
+      deviceId = parsedTarget.deviceId
+      customId = parsedTarget.customId
     } else {
       // 2nd overload
       value = valueOrUndefined
       deviceId = deviceIdOrValue as number
       customId = targetOrCustomId
-      target = `${deviceId}-${customId}`
+      target = this.createTarget(deviceId, customId)
     }
 
     // send update to every user that can read current target

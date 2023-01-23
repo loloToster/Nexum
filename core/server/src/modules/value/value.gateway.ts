@@ -5,7 +5,7 @@ import {
   ConnectedSocket,
   MessageBody
 } from "@nestjs/websockets"
-import { Logger } from "@nestjs/common"
+import { forwardRef, Inject, Logger } from "@nestjs/common"
 
 import { Server, Socket as RawSocket } from "socket.io"
 
@@ -29,6 +29,7 @@ export class ValueGateway {
   constructor(
     private valueService: ValueService,
     private deviceService: DeviceService,
+    @Inject(forwardRef(() => UserService))
     private userService: UserService
   ) {}
 
@@ -44,7 +45,7 @@ export class ValueGateway {
       if (!socket.rooms.has(target)) return
     } else if (socket.rooms.has("devices")) {
       const deviceId = socket.data.id
-      target = `${deviceId}-${customId}`
+      target = this.valueService.createTarget(deviceId, customId)
     } else {
       this.logger.warn(
         "Someone was connected without being in a 'users' or 'devices' room"
@@ -85,7 +86,7 @@ export class ValueGateway {
         socket.emit(
           "sync",
           userValues.map(v => ({
-            target: `${v.deviceId}-${v.customId}`,
+            target: this.valueService.createTarget(v.deviceId, v.customId),
             value: JSON.parse(v.value)
           }))
         )

@@ -1,13 +1,18 @@
-import { Injectable } from "@nestjs/common"
+import { forwardRef, Inject, Injectable } from "@nestjs/common"
 import { Tab, User } from "@prisma/client"
 
 import { DatabaseService } from "src/modules/database/database.service"
+import { ValueService } from "src/modules/value/value.service"
 
 import { UserWithTabs, UserWithTabsAndWidgets } from "src/types/types"
 
 @Injectable()
 export class UserService {
-  constructor(private db: DatabaseService) {}
+  constructor(
+    private db: DatabaseService,
+    @Inject(forwardRef(() => ValueService))
+    private valueService: ValueService
+  ) {}
 
   async createUser({ id, name, isAdmin = false }: Partial<User>) {
     if (!id) id = undefined
@@ -77,7 +82,10 @@ export class UserService {
         widgets: tab.widgets.map(widget => {
           return {
             ...widget,
-            target: `${widget.deviceId}-${widget.customId}`
+            target: this.valueService.createTarget(
+              widget.deviceId,
+              widget.customId
+            )
           }
         })
       }))
