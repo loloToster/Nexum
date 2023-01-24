@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { View, StyleSheet } from "react-native"
 
 import { List, Text, Theme, useTheme } from "react-native-paper"
@@ -20,11 +20,13 @@ export interface TabsProps {
   onTabCreate?: (tabName: string) => any
 }
 
-function Tabs({ data, onTabCreate }: TabsProps) {
+function Tabs({ data, onTabCreate = () => null }: TabsProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
   const { user } = useUser()
+
+  const [addTabActive, setAddTabActive] = useState(false)
 
   const renderTabs = () => {
     let tabs = data.map((tab, i) => (
@@ -44,7 +46,14 @@ function Tabs({ data, onTabCreate }: TabsProps) {
     return tabs
   }
 
-  return !data.length ? (
+  return addTabActive ? (
+    <AddTab
+      onTabCreate={n => {
+        setAddTabActive(false)
+        onTabCreate(n)
+      }}
+    />
+  ) : !data.length ? (
     <Translatable>
       <View style={styles.noTabsWrapper}>
         <Text style={styles.noTabs}>
@@ -53,6 +62,13 @@ function Tabs({ data, onTabCreate }: TabsProps) {
               You don&apos;t have access to any tabs. You can add additional
               permissions on Users tab by clicking:
               <List.Icon style={styles.icon} icon="account-multiple" />
+              or{" "}
+              <Text
+                onPress={() => setAddTabActive(true)}
+                style={{ textDecorationLine: "underline" }}
+              >
+                create a new tab
+              </Text>
             </>
           ) : (
             <>
