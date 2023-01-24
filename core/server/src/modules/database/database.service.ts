@@ -8,19 +8,21 @@ export class DatabaseService extends PrismaClient {
   constructor() {
     super()
 
-    this.user
-      .findFirst({ where: { isAdmin: true } })
-      .then(async user => {
-        if (user) return
+    this.createInitialAdmin("admin", "admin")
+  }
 
-        const initAdmin = await this.user.create({
-          data: { isAdmin: true, name: "admin", id: "admin" }
-        })
+  async createInitialAdmin(id: string, name: string) {
+    try {
+      const user = await this.user.findFirst({ where: { isAdmin: true } })
+      if (user) return
 
-        this.logger.log(`Created initial admin with id: '${initAdmin.id}'`)
+      const initAdmin = await this.user.create({
+        data: { isAdmin: true, id, name }
       })
-      .catch(err => {
-        this.logger.warn("Error while creating initial admin: " + err)
-      })
+
+      this.logger.log(`Created initial admin with id: '${initAdmin.id}'`)
+    } catch (err) {
+      this.logger.warn("Error while creating initial admin: " + err)
+    }
   }
 }

@@ -17,21 +17,40 @@ export class RedisService {
     this.r.connect()
   }
 
-  set(key: string, value: string) {
-    return this.r.set(key, value)
-  }
-
-  get(key: string): Promise<string>
-  get(keys: string[]): Promise<string[]>
-  get(keyOrKeys: string | string[]) {
-    if (Array.isArray(keyOrKeys)) {
-      return this.r.mGet(keyOrKeys)
-    } else {
-      return this.r.get(keyOrKeys)
+  async set(key: string, value: string) {
+    try {
+      return this.r.set(key, value)
+    } catch (err) {
+      this.logger.error(err)
     }
   }
 
-  keys(pattern: string) {
-    return this.r.keys(pattern)
+  async get(key: string): Promise<string | null>
+  async get(keys: string[]): Promise<(string | null)[]>
+  async get(keyOrKeys: string | string[]) {
+    if (Array.isArray(keyOrKeys)) {
+      try {
+        return await this.r.mGet(keyOrKeys)
+      } catch (err) {
+        this.logger.error(err)
+        return keyOrKeys.map(() => null)
+      }
+    } else {
+      try {
+        return await this.r.get(keyOrKeys)
+      } catch (err) {
+        this.logger.error(err)
+        return null
+      }
+    }
+  }
+
+  async keys(pattern: string) {
+    try {
+      return await this.r.keys(pattern)
+    } catch (err) {
+      this.logger.error(err)
+      return []
+    }
   }
 }
