@@ -38,7 +38,7 @@ function Widgets() {
     }
   }, [socket])
 
-  const { isLoading, isError, data } = useQuery("me", async () => {
+  const { isLoading, isError, data, refetch } = useQuery("me", async () => {
     const res = await api.get("/users/me")
     return res.data
   })
@@ -54,7 +54,7 @@ function Widgets() {
           ) : isError ? (
             <Error text="Could not load widgets" />
           ) : (
-            <Tabs data={data.tabs as TabData[]} />
+            <Tabs data={data.tabs as TabData[]} onTabCreate={() => refetch()} />
           )
         }
       </ValueBridgeContext.Consumer>

@@ -13,12 +13,36 @@ import { useUser } from "src/contexts/user"
 
 import Translatable from "src/components/Translatable/Translatable"
 import Tab from "src/components/Tab/Tab"
+import AddTab from "src/components/AddTab/AddTab"
 
-function Tabs({ data }: { data: TabData[] }) {
+export interface TabsProps {
+  data: TabData[]
+  onTabCreate?: (tabName: string) => any
+}
+
+function Tabs({ data, onTabCreate }: TabsProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
   const { user } = useUser()
+
+  const renderTabs = () => {
+    let tabs = data.map((tab, i) => (
+      <PaperTabScreen key={i} label={tab.name}>
+        <Tab widgets={tab.widgets} />
+      </PaperTabScreen>
+    ))
+
+    if (user?.isAdmin) {
+      tabs = tabs.concat(
+        <PaperTabScreen key={data.length} label="" icon="plus">
+          <AddTab onTabCreate={onTabCreate} />
+        </PaperTabScreen>
+      )
+    }
+
+    return tabs
+  }
 
   return !data.length ? (
     <Translatable>
@@ -39,16 +63,10 @@ function Tabs({ data }: { data: TabData[] }) {
         </Text>
       </View>
     </Translatable>
-  ) : data.length === 1 ? (
+  ) : data.length === 1 && !user?.isAdmin ? (
     <Tab widgets={data[0].widgets} />
   ) : (
-    <PaperTabs mode="scrollable">
-      {data.map((tab, i) => (
-        <PaperTabScreen key={i} label={tab.name}>
-          <Tab widgets={tab.widgets} />
-        </PaperTabScreen>
-      ))}
-    </PaperTabs>
+    <PaperTabs mode="scrollable">{renderTabs()}</PaperTabs>
   )
 }
 

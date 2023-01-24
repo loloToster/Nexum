@@ -9,4 +9,15 @@ export class TabService {
   async getTabs() {
     return await this.db.tab.findMany()
   }
+
+  async createTab(name: string, creatorId: string) {
+    return await this.db.tab.create({
+      data: {
+        name,
+        users: {
+          connect: { id: creatorId }
+        }
+      }
+    })
+  }
 }
