@@ -14,7 +14,13 @@ export class RedisService {
 
     this.r.on("error", this.logger.error)
 
-    this.r.connect()
+    this.connect()
+  }
+
+  async connect() {
+    await this.r.connect()
+    await this.r.configSet("appendonly", "yes")
+    await this.r.configSet("save", "")
   }
 
   async set(key: string, value: string) {
@@ -29,6 +35,8 @@ export class RedisService {
   async get(keys: string[]): Promise<(string | null)[]>
   async get(keyOrKeys: string | string[]) {
     if (Array.isArray(keyOrKeys)) {
+      if (!keyOrKeys.length) return []
+
       try {
         return await this.r.mGet(keyOrKeys)
       } catch (err) {
