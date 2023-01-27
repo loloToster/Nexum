@@ -13,6 +13,8 @@ model User {
   name    String
   isAdmin Boolean @map("is_admin")
   tabs    Tab[]
+
+  @@map("users")
 }
 
 model Tab {
@@ -20,6 +22,8 @@ model Tab {
   name    String
   users   User[]
   widgets Widget[]
+
+  @@map("tabs")
 }
 
 model Widget {
@@ -37,6 +41,7 @@ model Widget {
   properties WidgetProperties?
 
   @@unique([x, y, tabId]) // no widgets can have the same coordinates on the same tab
+  @@map("widgets")
 }
 
 model WidgetProperties {
@@ -48,13 +53,14 @@ model WidgetProperties {
   text       String?
   onText     String?  @map("on_text")
   offText    String?  @map("off_text")
-  isSwitch   Boolean?
-  isVertical Boolean?
+  isSwitch   Boolean? @map("is_switch")
+  isVertical Boolean? @map("is_vertical")
   step       Float?
   min        Float?
   max        Float?
 
   @@unique([widgetId])
+  @@map("widget_properties")
 }
 
 model Device {
@@ -64,13 +70,15 @@ model Device {
   widgets Widget[]
 
   @@unique([token])
+  @@map("device")
 }
 
-// TODO: add relations to widgets and devices
+// TODO: remove in favor of redis
 model Value {
   deviceId Int    @map("device_id")
   customId String @map("custom_id")
   value    String
 
   @@id([deviceId, customId])
+  @@map("values")
 }
