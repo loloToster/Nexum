@@ -3,7 +3,7 @@
     category: "config",
     defaults: {
       name: { default: "" },
-      url: { value: "http://localhost:3000", required: true },
+      server: { value: "", type: "nexum-server" },
       token: { value: "", required: true }
     },
     label: function () {
@@ -14,13 +14,15 @@
 
 <script type="text/html" data-template-name="nexum-client">
   <div class="form-row">
-    <label for="node-config-input-url"><i class="fa fa-globe"></i> URL</label>
-    <input type="text" id="node-config-input-url" />
+    <label for="node-config-input-server">
+      <i class="fa fa-globe"></i> Server
+    </label>
+    <input type="text" id="node-config-input-server" placeholder="Server" />
   </div>
   <div class="form-row">
-    <label for="node-config-input-token"
-      ><i class="fa fa-lock"></i> Token</label
-    >
+    <label for="node-config-input-token">
+      <i class="fa fa-lock"></i> Token
+    </label>
     <input type="text" id="node-config-input-token" />
   </div>
   <div class="form-row">

@@ -1,7 +1,12 @@
 import * as nodered from "node-red"
 import { NexumClient } from "nexum-client"
 
+export interface ServerConfigNode extends nodered.Node {
+  url: string
+}
+
 export interface DeviceConfigNode extends nodered.Node {
+  server: ServerConfigNode | null
   client: NexumClient
 }
 

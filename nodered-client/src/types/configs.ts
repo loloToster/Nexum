@@ -1,7 +1,11 @@
 import * as nodered from "node-red"
 
-export interface DeviceConfig extends nodered.NodeDef {
+export interface ServerConfig extends nodered.NodeDef {
   url: string
+}
+
+export interface DeviceConfig extends nodered.NodeDef {
+  server: string
   token: string
 }
 
