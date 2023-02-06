@@ -26,6 +26,8 @@ import useDebounce from "src/hooks/useDebounce"
 import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 import useObjectState from "src/hooks/useObjectState"
 
+import { useUser } from "src/contexts/user"
+
 import { User as UserI, Tab as TabI } from "src/types"
 
 import RUSure from "src/components/RUSure/RUSure"
@@ -40,15 +42,23 @@ export interface UserProps {
 function User(props: UserProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
+  const { user: loggedInUser } = useUser()
 
   const { user: initialUser, tabs, deleteUser } = props
 
   const [user, setUser] = useObjectState(initialUser)
   const [qrActive, setQrActive] = useState(false)
+  const [administratorModalActive, setAdministratorModalActive] =
+    useState(false)
   const [tabsModalActive, setTabsModalActive] = useState(false)
   const [deleteActive, setDeleteActive] = useState(false)
 
   const nameInput = useRef<TextInput>(null)
+
+  const handleAdministratorChange = (val: boolean) => {
+    setAdministratorModalActive(false)
+    setUser("isAdmin", val)
+  }
 
   const deleteMutation = useMutation(
     "delete-user",
@@ -144,6 +154,13 @@ function User(props: UserProps) {
         </Modal>
       </Portal>
       <RUSure
+        open={administratorModalActive}
+        onConfirm={() => handleAdministratorChange(false)}
+        onDismiss={() => setAdministratorModalActive(false)}
+      >
+        Are you sure you want to revoke administrator privileges for yourself?
+      </RUSure>
+      <RUSure
         open={deleteActive}
         onConfirm={handleDelete}
         onDismiss={() => setDeleteActive(false)}
@@ -183,10 +200,14 @@ function User(props: UserProps) {
       </View>
       <Divider />
       <View style={styles.row}>
-        <Text>Administrator privilages:</Text>
+        <Text>Administrator privileges:</Text>
         <Switch
           value={user.isAdmin}
-          onValueChange={v => setUser("isAdmin", v)}
+          onValueChange={v =>
+            loggedInUser?.id === user.id
+              ? setAdministratorModalActive(true)
+              : handleAdministratorChange(v)
+          }
         />
       </View>
       <Divider />
