@@ -52,9 +52,9 @@ export class DeviceService {
 
     return devices.map(device => ({
       ...device,
-      active: connectedDevices.some(
+      active: connectedDevices.filter(
         connectedDevice => device.id === connectedDevice.data.id
-      )
+      ).length
     }))
   }
 

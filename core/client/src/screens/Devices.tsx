@@ -36,19 +36,23 @@ function Devices() {
 
   const renderTitle = (device: DeviceI) => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={styles.row}>
         <Text>{device.name}</Text>
-        <View
-          style={{
-            marginLeft: 7,
-            width: 8,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: device.active
-              ? Colors.lightGreenA700
-              : Colors.grey800
-          }}
-        ></View>
+        <View style={[styles.activityWrapper, styles.row]}>
+          {(device.active || 0) > 1 && (
+            <Text style={styles.activityNumber}>{device.active}</Text>
+          )}
+          <View
+            style={[
+              styles.activityDot,
+              {
+                backgroundColor: device.active
+                  ? Colors.lightGreenA700
+                  : Colors.grey800
+              }
+            ]}
+          ></View>
+        </View>
       </View>
     )
   }
@@ -92,6 +96,24 @@ export default Devices
 
 const getStyles = () => {
   return StyleSheet.create({
+    row: {
+      flexDirection: "row",
+      alignItems: "center"
+    },
+    activityWrapper: {
+      marginLeft: 7
+    },
+    activityNumber: {
+      marginRight: 3,
+      color: Colors.lightGreenA700,
+      fontSize: 12,
+      fontWeight: "800"
+    },
+    activityDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4
+    },
     fab: {
       position: "absolute",
       margin: 24,
