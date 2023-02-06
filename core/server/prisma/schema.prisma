@@ -70,7 +70,7 @@ model Device {
   widgets Widget[]
 
   @@unique([token])
-  @@map("device")
+  @@map("devices")
 }
 
 // TODO: remove in favor of redis
