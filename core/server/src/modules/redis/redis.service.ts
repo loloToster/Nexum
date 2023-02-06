@@ -12,7 +12,15 @@ export class RedisService {
       url: process.env.REDIS_URL
     })
 
-    this.r.on("error", this.logger.error)
+    this.r.on("connect", () =>
+      this.logger.log("Initiating a connection to the server")
+    )
+    this.r.on("ready", () => this.logger.log("Client is ready to use"))
+    this.r.on("reconnecting", () =>
+      this.logger.log("Client is trying to reconnect to the server")
+    )
+    this.r.on("end", () => this.logger.warn("Connection has been closed"))
+    this.r.on("error", (err: Error) => this.logger.error(err.message))
 
     this.connect()
   }

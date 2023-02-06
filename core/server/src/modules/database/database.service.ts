@@ -1,12 +1,35 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { PrismaClient } from "@prisma/client"
+import { PrismaClientOptions } from "@prisma/client/runtime"
 
 @Injectable()
-export class DatabaseService extends PrismaClient {
+export class DatabaseService extends PrismaClient<
+  PrismaClientOptions,
+  "info" | "warn" | "error"
+> {
   private readonly logger = new Logger(DatabaseService.name)
 
   constructor() {
-    super()
+    super({
+      log: [
+        {
+          emit: "event",
+          level: "info"
+        },
+        {
+          emit: "event",
+          level: "warn"
+        },
+        {
+          emit: "event",
+          level: "error"
+        }
+      ]
+    })
+
+    this.$on("info", e => this.logger.log(e.message))
+    this.$on("warn", e => this.logger.warn(e.message))
+    this.$on("error", e => this.logger.error(e.message))
 
     this.createInitialAdmin("admin", "admin")
   }
