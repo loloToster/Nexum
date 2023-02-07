@@ -5,6 +5,7 @@ import { AuthMiddleware } from "src/middleware/auth.middleware"
 
 import { DatabaseModule } from "./database/database.module"
 import { RedisModule } from "./redis/redis.module"
+import { MqttModule } from "./mqtt/mqtt.module"
 import { AuthModule } from "./auth/auth.module"
 import { UserModule } from "./user/user.module"
 import { TabModule } from "./tab/tab.module"
@@ -18,6 +19,7 @@ import { ValueModule } from "./value/value.module"
     }),
     DatabaseModule,
     RedisModule,
+    MqttModule,
     AuthModule,
     UserModule,
     TabModule,

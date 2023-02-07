@@ -8,13 +8,22 @@ services:
       - .env
     environment:
       - PORT=3000
-      - DB_URL=postgres://postgres:${PG_PASS}@postgres:5432/
+      - MQTT_URL=mqtt://mqtt:1883
+      - DB_URL=postgres://postgres:${PG_PASS}@postgres:5432
       - REDIS_URL=redis://redis:6379
     ports:
       - ${PORT}:3000
     depends_on:
+      - mqtt
       - postgres
       - redis
+  mqtt:
+    restart: always
+    build: ./core/mqtt
+    ports:
+      - 1883:1883
+    depends_on:
+      - postgres
   postgres:
     restart: always
     image: postgres
