@@ -8,13 +8,11 @@ import { IconSource } from "react-native-paper/lib/typescript/components/Icon"
 
 import { useUser } from "src/contexts/user"
 
+import Translatable from "src/components/Translatable/Translatable"
 import RUSure from "src/components/RUSure/RUSure"
 
-// @ts-ignore
 import microcontrollerIcon from "assets/microcontroller.png"
-// @ts-ignore
 import microcontrollerActiveIcon from "assets/microcontroller-active.png"
-import Translatable from "../Translatable/Translatable"
 
 function capitalizeFirstLetter(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)

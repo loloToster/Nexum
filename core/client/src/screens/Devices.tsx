@@ -12,7 +12,6 @@ import SearchableList from "src/components/SearchableList/SearchableList"
 import Device from "src/components/Device/Device"
 import AddDeviceModal from "src/components/AddDeviceModal/AddDeviceModal"
 
-// @ts-ignore
 import microcontrollerPlusIcon from "assets/microcontroller-plus.png"
 
 function Devices() {

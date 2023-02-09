@@ -89,8 +89,7 @@ function Widget(props: WidgetData) {
     ) => {
       if (typeof value === "function") {
         setWidgetValue(prev => {
-          // @ts-ignore
-          const newVal = value(prev)
+          const newVal = (value as any)(prev)
           emit(newVal, target)
           return newVal
         })
