@@ -1,0 +1,127 @@
+import React, { useState } from "react"
+import { Image, View, StyleSheet } from "react-native"
+
+import { DrawerContentComponentProps } from "@react-navigation/drawer"
+
+import { useTheme, Theme, Drawer, Avatar, Text } from "react-native-paper"
+import { IconSource } from "react-native-paper/lib/typescript/components/Icon"
+
+import { useUser } from "src/contexts/user"
+
+import RUSure from "src/components/RUSure/RUSure"
+
+// @ts-ignore
+import microcontrollerIcon from "assets/microcontroller.png"
+// @ts-ignore
+import microcontrollerActiveIcon from "assets/microcontroller-active.png"
+import Translatable from "../Translatable/Translatable"
+
+function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+const icons: Record<string, IconSource | undefined> = {
+  widgets: "home",
+  devices: ({ size, color }: { size: number; color: string }) => (
+    <Image
+      source={
+        color.startsWith("#") // the active color is in hex and the inactive is in rgba
+          ? microcontrollerActiveIcon
+          : microcontrollerIcon
+      }
+      style={{ width: size, height: size }}
+    />
+  ),
+  users: "account-multiple"
+}
+
+function DrawerContent({
+  descriptors,
+  navigation,
+  state
+}: DrawerContentComponentProps) {
+  const theme = useTheme()
+  const styles = getStyles(theme)
+
+  const { user, setUser } = useUser()
+  const [logoutActive, setLogoutActive] = useState(false)
+
+  const screens = Object.values(descriptors)
+  const activeRouteName = state.routeNames[state.index]
+
+  return (
+    <View>
+      <RUSure
+        open={logoutActive}
+        onDismiss={() => setLogoutActive(false)}
+        onConfirm={() => setUser(null)}
+      >
+        Are you sure you want to log out?
+      </RUSure>
+      <Drawer.Section>
+        <View style={styles.profile}>
+          <Avatar.Icon style={styles.avatar} size={54} icon="account" />
+          <View>
+            <Translatable>
+              <View>
+                <Text style={styles.loggedInAs}>Logged in as</Text>
+              </View>
+            </Translatable>
+            <Text style={styles.username}>{user?.name}</Text>
+          </View>
+        </View>
+      </Drawer.Section>
+      {user?.isAdmin && (
+        <Drawer.Section>
+          {screens.map(s => (
+            <Drawer.Item
+              label={
+                s.route.name === "widgets"
+                  ? "Home"
+                  : capitalizeFirstLetter(s.route.name)
+              }
+              icon={icons[s.route.name]}
+              onPress={() => navigation.navigate(s.route.name)}
+              active={activeRouteName === s.route.name}
+              key={s.route.key}
+            />
+          ))}
+        </Drawer.Section>
+      )}
+      <Drawer.Section>
+        <Drawer.Item
+          label="Log out"
+          icon="logout"
+          theme={{
+            ...theme,
+            colors: { ...theme.colors, text: "#e62e4f" }
+          }}
+          onPress={() => setLogoutActive(true)}
+        />
+      </Drawer.Section>
+    </View>
+  )
+}
+
+export default DrawerContent
+
+const getStyles = (theme: Theme) => {
+  return StyleSheet.create({
+    profile: {
+      paddingHorizontal: 10,
+      paddingVertical: 24,
+      flexDirection: "row",
+      alignItems: "center"
+    },
+    avatar: {
+      marginRight: 10
+    },
+    loggedInAs: {
+      fontSize: 12,
+      color: theme.colors.placeholder
+    },
+    username: {
+      fontSize: 24
+    }
+  })
+}

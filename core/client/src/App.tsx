@@ -1,3 +1,5 @@
+import "react-native-gesture-handler"
+
 import React, { lazy, Suspense, useEffect } from "react"
 import { Platform } from "react-native"
 import { registerRootComponent } from "expo"
@@ -6,7 +8,7 @@ import { StatusBar } from "expo-status-bar"
 import { QueryClient, QueryClientProvider } from "react-query"
 
 import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import { createDrawerNavigator } from "@react-navigation/drawer"
 
 import { io } from "socket.io-client"
 
@@ -26,6 +28,7 @@ import {
 import { SocketContext } from "./contexts/socket"
 
 import Header from "./components/Header/Header"
+import DrawerContent from "./components/Drawer/Drawer"
 import Loader from "./components/Loader/Loader"
 
 const Login = lazy(() => import("./screens/Login"))
@@ -39,7 +42,7 @@ DarkTheme.colors.primary = Colors.teal300
 DarkTheme.colors.accent = Colors.cyan400
 
 const queryClient = new QueryClient()
-const Stack = createStackNavigator()
+const Drawer = createDrawerNavigator()
 
 const socket = io(getBaseUrl(), {
   autoConnect: false,
@@ -73,25 +76,34 @@ function App() {
                       documentTitle={{ enabled: false }}
                       linking={{ prefixes: [] }}
                     >
-                      <Stack.Navigator
+                      <Drawer.Navigator
                         initialRouteName="widgets"
+                        backBehavior="initialRoute"
+                        drawerContent={DrawerContent}
                         screenOptions={{
                           header: props => <Header {...props} />,
-                          headerMode: "float"
+                          drawerPosition: "right",
+                          drawerStyle: {
+                            backgroundColor: DarkTheme.colors.background
+                          }
                         }}
                       >
-                        <Stack.Screen name="widgets" component={Widgets} />
-                        <Stack.Screen
+                        <Drawer.Screen
+                          name="widgets"
+                          component={Widgets}
+                          options={{ headerTitle: "Nexum" }}
+                        />
+                        <Drawer.Screen
                           name="devices"
                           component={Devices}
                           options={{ headerTitle: "Devices" }}
                         />
-                        <Stack.Screen
+                        <Drawer.Screen
                           name="users"
                           component={Users}
                           options={{ headerTitle: "Users" }}
                         />
-                      </Stack.Navigator>
+                      </Drawer.Navigator>
                     </NavigationContainer>
                   </SocketContext.Provider>
                 ) : (
