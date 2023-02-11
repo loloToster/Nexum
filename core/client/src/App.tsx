@@ -53,14 +53,20 @@ const socket = io(getBaseUrl(), {
 })
 
 function App() {
-  /**
-   * disable translation of entire document.
-   * can be overridden by `Translatable` component
-   */
   if (Platform.OS === "web")
     useEffect(() => {
+      /**
+       * disable translation of entire document.
+       * can be overridden by `Translatable` component
+       */
       const html = document.querySelector("html")
       if (html) html.translate = false
+
+      /**
+       * hotfix for drawer nav causing overflow
+       */
+      const root = document.getElementById("root")
+      if (root) root.style.overflowX = "hidden"
     })
 
   return (
