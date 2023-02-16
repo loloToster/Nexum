@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { View, StyleSheet } from "react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
 import { ActivityIndicator, Theme, useTheme } from "react-native-paper"
 import { useQuery } from "react-query"
 
@@ -43,18 +45,31 @@ function Widgets() {
     return res.data
   })
 
+  const [selectedTab, setSelectedTab] = useState<string | null>()
+
+  useEffect(() => {
+    AsyncStorage.getItem("tab", (err, tab) => {
+      tab = tab || null
+      setSelectedTab(tab)
+    })
+  }, [])
+
   return (
     <ValueBridgeProvider>
       <ValueBridgeContext.Consumer>
         {({ synced }) =>
-          isLoading || !connected || !synced ? (
+          isLoading || !connected || !synced || selectedTab === undefined ? (
             <View style={styles.loading}>
               <ActivityIndicator size="large" />
             </View>
           ) : isError ? (
             <Error text="Could not load widgets" />
           ) : (
-            <Tabs data={data.tabs as TabData[]} onTabCreate={() => refetch()} />
+            <Tabs
+              data={data.tabs as TabData[]}
+              selectedTab={selectedTab}
+              onTabCreate={() => refetch()}
+            />
           )
         }
       </ValueBridgeContext.Consumer>

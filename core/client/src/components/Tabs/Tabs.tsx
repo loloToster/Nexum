@@ -17,10 +17,11 @@ import AddTab from "src/components/AddTab/AddTab"
 
 export interface TabsProps {
   data: TabData[]
+  selectedTab?: string | null
   onTabCreate?: (tabName: string) => any
 }
 
-function Tabs({ data, onTabCreate = () => null }: TabsProps) {
+function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
@@ -31,7 +32,7 @@ function Tabs({ data, onTabCreate = () => null }: TabsProps) {
   const renderTabs = () => {
     let tabs = data.map((tab, i) => (
       <PaperTabScreen key={i} label={tab.name}>
-        <Tab widgets={tab.widgets} />
+        <Tab name={tab.name} widgets={tab.widgets} />
       </PaperTabScreen>
     ))
 
@@ -45,6 +46,12 @@ function Tabs({ data, onTabCreate = () => null }: TabsProps) {
 
     return tabs
   }
+
+  let defaultIndex: number | undefined = data.findIndex(
+    t => t.name === selectedTab
+  )
+
+  if (defaultIndex < 0) defaultIndex = undefined
 
   return addTabActive ? (
     <AddTab
@@ -80,9 +87,11 @@ function Tabs({ data, onTabCreate = () => null }: TabsProps) {
       </View>
     </Translatable>
   ) : data.length === 1 && !user?.isAdmin ? (
-    <Tab widgets={data[0].widgets} />
+    <Tab name={data[0].name} widgets={data[0].widgets} />
   ) : (
-    <PaperTabs mode="scrollable">{renderTabs()}</PaperTabs>
+    <PaperTabs defaultIndex={defaultIndex} mode="scrollable">
+      {renderTabs()}
+    </PaperTabs>
   )
 }
 

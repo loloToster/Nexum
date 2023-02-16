@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from "react"
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
 import { useTheme, Theme } from "react-native-paper"
 
 import { WidgetData } from "src/types"
 import Widget from "src/components/Widget/Widget"
 
-function Tab({ widgets }: { widgets: WidgetData[] }) {
+export interface TabProps {
+  name: string
+  widgets: WidgetData[]
+}
+
+function Tab({ name, widgets }: TabProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
@@ -18,6 +25,8 @@ function Tab({ widgets }: { widgets: WidgetData[] }) {
   const [cellHeight, setCellHeight] = useState(0)
 
   useEffect(() => {
+    AsyncStorage.setItem("tab", name)
+
     const listener = Dimensions.addEventListener(
       "change",
       ({ window: { width } }) => {
@@ -37,7 +46,11 @@ function Tab({ widgets }: { widgets: WidgetData[] }) {
 
   return (
     <ScrollView style={styles.tab}>
-      <View style={{ minHeight: isFinite(viewHeight) ? (viewHeight * cellHeight) : 0 }}>
+      <View
+        style={{
+          minHeight: isFinite(viewHeight) ? viewHeight * cellHeight : 0
+        }}
+      >
         {widgets.map((widgetData, i) => (
           <View
             key={i}
