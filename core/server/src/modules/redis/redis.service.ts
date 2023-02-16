@@ -26,9 +26,7 @@ export class RedisService {
   }
 
   async connect() {
-    await this.r.connect()
-    await this.r.configSet("appendonly", "yes")
-    await this.r.configSet("save", "")
+    return await this.r.connect()
   }
 
   async set(key: string, value: string) {
