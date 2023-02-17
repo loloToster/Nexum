@@ -24,6 +24,7 @@ function Devices() {
   const {
     isLoading,
     isError,
+    isRefetching,
     data,
     refetch: refetchDevices
   } = useQuery(["devices", debouncedSearchValue], async ({ queryKey }) => {
@@ -72,9 +73,11 @@ function Devices() {
         renderTitle={renderTitle}
         renderContent={renderDevice}
         loading={isLoading}
+        refreshing={isRefetching}
         error={isError ? "Could not load devices" : ""}
         notFound="No devices were found"
         onSearch={setSearchValue}
+        onRefresh={refetchDevices}
       />
       <FAB
         style={styles.fab}

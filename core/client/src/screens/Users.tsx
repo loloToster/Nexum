@@ -21,6 +21,7 @@ function Users() {
 
   const {
     isLoading: usersLoading,
+    isRefetching: usersRefetching,
     isError: usersError,
     data: users,
     refetch: refetchUsers
@@ -33,8 +34,10 @@ function Users() {
 
   const {
     isLoading: tabsLoading,
+    isRefetching: tabsRefetching,
     isError: tabsError,
-    data: tabs
+    data: tabs,
+    refetch: refetchTabs
   } = useQuery(["tabs"], async () => {
     const res = await api.get("/tabs")
     return res.data
@@ -62,9 +65,14 @@ function Users() {
         renderTitle={i => i.name}
         renderContent={renderUser}
         loading={usersLoading || tabsLoading}
+        refreshing={usersRefetching || tabsRefetching}
         error={error}
         notFound="No users where found"
         onSearch={setSearchValue}
+        onRefresh={() => {
+          refetchUsers()
+          refetchTabs()
+        }}
       />
       <FAB
         style={styles.fab}

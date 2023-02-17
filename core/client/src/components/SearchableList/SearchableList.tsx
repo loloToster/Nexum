@@ -8,6 +8,7 @@ import {
   List,
   Text
 } from "react-native-paper"
+import { RefreshControl } from "react-native-web-refresh-control"
 
 import Error from "src/components/Error/Error"
 import Translatable from "src/components/Translatable/Translatable"
@@ -15,23 +16,27 @@ import Translatable from "src/components/Translatable/Translatable"
 export interface SearchableListProps<T> {
   searchBarPlaceHolder?: string
   loading?: boolean
+  refreshing?: boolean
   error?: string
   notFound?: string
   data: T[]
   renderTitle: (itemData: T) => React.ReactNode
   renderContent: (itemData: T) => JSX.Element
   onSearch?: (q: string) => void
+  onRefresh?: () => void
 }
 
 function SearchableList<T>({
   searchBarPlaceHolder = "Search",
   loading = false,
+  refreshing = false,
   error,
   notFound = "",
   data,
   renderTitle,
   renderContent,
-  onSearch = () => null
+  onSearch = () => null,
+  onRefresh = () => null
 }: SearchableListProps<T>) {
   const theme = useTheme()
   const styles = getStyles(theme)
@@ -71,7 +76,17 @@ function SearchableList<T>({
           </View>
         </Translatable>
       ) : (
-        <FlatList data={data} renderItem={renderItem} />
+        <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.colors.primary}
+            />
+          }
+          data={data}
+          renderItem={renderItem}
+        />
       )}
     </View>
   )
