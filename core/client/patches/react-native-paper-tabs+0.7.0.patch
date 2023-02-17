@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-paper-tabs/lib/module/TabsHeaderItem.js b/node_modules/react-native-paper-tabs/lib/module/TabsHeaderItem.js
+index 5eb30a4..200304f 100644
+--- a/node_modules/react-native-paper-tabs/lib/module/TabsHeaderItem.js
++++ b/node_modules/react-native-paper-tabs/lib/module/TabsHeaderItem.js
+@@ -62,7 +62,7 @@ export default function TabsHeaderItem({
+   }, /*#__PURE__*/React.createElement(View, {
+     style: [styles.touchableRippleInner, iconPosition === 'top' && styles.touchableRippleInnerTop]
+   }, tab.props.icon ? /*#__PURE__*/React.createElement(View, {
+-    style: [styles.iconContainer, iconPosition !== 'top' && styles.marginRight]
++    style: [styles.iconContainer, iconPosition !== 'top' && tab.props.label && styles.marginRight]
+   }, /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
+     selectable: false,
+     accessibilityElementsHidden: true,

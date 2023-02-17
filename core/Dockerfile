@@ -9,6 +9,9 @@ COPY ./client/package*.json ./client/
 # generate correct prisma client
 COPY ./server/prisma/ ./server/prisma/
 
+# apply patch-package patches
+COPY ./client/patches/ ./client/patches/
+
 RUN npm run install:all
 
 COPY . .
