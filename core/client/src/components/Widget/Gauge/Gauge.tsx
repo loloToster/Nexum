@@ -5,9 +5,9 @@ import { AnimatedCircularProgress } from "react-native-circular-progress"
 
 import { map, roundBadFloat, roundByStep } from "src/utils"
 
-import { WidgetProps } from "../Widget"
+import { ChoosenWidgetProps } from "../Widget"
 
-function Gauge(props: WidgetProps) {
+function Gauge(props: ChoosenWidgetProps) {
   const { color, text, min, max, step } = props.properties
 
   const theme = useTheme()

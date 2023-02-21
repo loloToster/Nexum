@@ -16,6 +16,12 @@ function Tab({ name, widgets }: TabProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
+  const [tabData, setTabData] = useState(widgets)
+
+  useEffect(() => {
+    setTabData(widgets)
+  }, [widgets])
+
   const COLS = 8
   const CELL_ASPECT_RATIO = [4, 5]
 
@@ -42,7 +48,7 @@ function Tab({ name, widgets }: TabProps) {
   }, [cellWidth])
 
   // neccessary because all widgets are positioned absolutely
-  const viewHeight = Math.max(...widgets.map(w => w.height + w.y))
+  const viewHeight = Math.max(...tabData.map(w => w.height + w.y))
 
   return (
     <ScrollView style={styles.tab}>
@@ -51,19 +57,15 @@ function Tab({ name, widgets }: TabProps) {
           minHeight: isFinite(viewHeight) ? viewHeight * cellHeight : 0
         }}
       >
-        {widgets.map((widgetData, i) => (
-          <View
+        {tabData.map((widgetData, i) => (
+          <Widget
             key={i}
-            style={{
-              position: "absolute",
-              width: cellWidth * widgetData.width,
-              height: cellHeight * widgetData.height,
-              left: cellWidth * widgetData.x,
-              top: cellHeight * widgetData.y
-            }}
-          >
-            <Widget {...widgetData} />
-          </View>
+            data={widgetData}
+            width={cellWidth * widgetData.width}
+            height={cellHeight * widgetData.height}
+            top={cellHeight * widgetData.y}
+            left={cellWidth * widgetData.x}
+          />
         ))}
       </View>
     </ScrollView>

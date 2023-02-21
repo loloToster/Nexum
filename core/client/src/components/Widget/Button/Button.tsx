@@ -8,9 +8,9 @@ import {
 } from "react-native"
 import { Text, useTheme } from "react-native-paper"
 
-import { WidgetProps } from "../Widget"
+import { ChoosenWidgetProps } from "../Widget"
 
-function Button(props: WidgetProps) {
+function Button(props: ChoosenWidgetProps) {
   const { color, text, onText, offText, isSwitch } = props.properties
 
   const theme = useTheme()
@@ -36,9 +36,7 @@ function Button(props: WidgetProps) {
   renderedText = renderedText || text
 
   return (
-    <TouchableWithoutFeedback
-      onPress={pressHandler}
-    >
+    <TouchableWithoutFeedback onPress={pressHandler}>
       <View
         onTouchStart={pressInHandler}
         onTouchEnd={pressOutHandler}

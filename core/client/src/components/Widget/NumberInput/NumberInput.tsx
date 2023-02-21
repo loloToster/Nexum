@@ -2,9 +2,9 @@ import React, { useState } from "react"
 import { View, StyleSheet, TextInput } from "react-native"
 import { Theme, useTheme } from "react-native-paper"
 
-import { WidgetProps } from "../Widget"
+import { ChoosenWidgetProps } from "../Widget"
 
-function NumberInputWidget(props: WidgetProps) {
+function NumberInputWidget(props: ChoosenWidgetProps) {
   const { color, min, max } = props.properties
 
   const theme = useTheme()

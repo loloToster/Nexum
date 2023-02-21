@@ -2,9 +2,9 @@ import React from "react"
 import { View, StyleSheet, Platform } from "react-native"
 import Slider from "src/components/Slider/Slider"
 
-import { EmitTarget, WidgetProps } from "../Widget"
+import { EmitTarget, ChoosenWidgetProps } from "../Widget"
 
-function SliderWidget(props: WidgetProps) {
+function SliderWidget(props: ChoosenWidgetProps) {
   const { color, isVertical, min, max, step } = props.properties
 
   const styles = getStyles()

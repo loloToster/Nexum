@@ -2,11 +2,11 @@ import React from "react"
 import { View, StyleSheet } from "react-native"
 import { Text, List, useTheme, Theme } from "react-native-paper"
 
-import { WidgetProps } from "../Widget"
+import { ChoosenWidgetProps } from "../Widget"
 
 import Translatable from "src/components/Translatable/Translatable"
 
-function Unknown({ type }: WidgetProps) {
+function Unknown({ type }: ChoosenWidgetProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 

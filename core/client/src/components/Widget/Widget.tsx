@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { View, StyleSheet } from "react-native"
+import React, { useEffect, useRef, useState } from "react"
+import { View, StyleSheet, PanResponder, Animated } from "react-native"
 import { Text, useTheme, Colors } from "react-native-paper"
 
 import { WidgetProperties, WidgetData, WidgetValue } from "src/types"
@@ -31,7 +31,7 @@ export type WidgetValueHook = <T = WidgetValue>(
   initialValue: T
 ) => [T, SetWidgetValueAction<T>]
 
-export interface WidgetProps extends Omit<WidgetData, "properties"> {
+export interface ChoosenWidgetProps extends Omit<WidgetData, "properties"> {
   properties: WidgetProperties
   useWidgetValue: WidgetValueHook
 }
@@ -39,7 +39,7 @@ export interface WidgetProps extends Omit<WidgetData, "properties"> {
 // maps string type prop to component
 const map: Record<
   string,
-  ((props: WidgetProps) => JSX.Element) | (() => JSX.Element)
+  ((props: ChoosenWidgetProps) => JSX.Element) | (() => JSX.Element)
 > = {
   btn: Button,
   sldr: SliderWidget,
@@ -48,29 +48,40 @@ const map: Record<
   number: NumberInput
 }
 
-function Widget(props: WidgetData) {
+export interface WidgetProps {
+  data: WidgetData
+  width: number
+  height: number
+  left: number
+  top: number
+}
+
+function Widget({ data, width, height, left, top }: WidgetProps) {
   const theme = useTheme()
   const styles = getStyles()
-  const ChoosenWidget = map[props.type] || Unknown
+
+  const [dragging, setDragging] = useState(false)
+
+  const ChoosenWidget = map[data.type] || Unknown
 
   const useWidgetValue: WidgetValueHook = initialValue => {
     const { bridge, values, emit: rawEmit } = useValueBridge()
     const emit = (val: WidgetValue, target: EmitTarget) =>
-      rawEmit(props, val, target)
+      rawEmit(data, val, target)
 
-    if (values[props.target] !== undefined)
-      initialValue = values[props.target] as typeof initialValue
-    else if (props.value !== null && typeof initialValue == typeof props.value)
-      initialValue = props.value as typeof initialValue
+    if (values[data.target] !== undefined)
+      initialValue = values[data.target] as typeof initialValue
+    else if (data.value !== null && typeof initialValue == typeof data.value)
+      initialValue = data.value as typeof initialValue
 
     const [widgetValue, setWidgetValue] = useState(initialValue)
 
     useEffect(() => {
       const listener = (obj: LocalValueUpdateObj) => {
         if (
-          obj.target === props.target &&
+          obj.target === data.target &&
           typeof obj.value === typeof initialValue &&
-          obj.widgetId !== props.id
+          obj.widgetId !== data.id
         ) {
           setWidgetValue(obj.value as typeof initialValue)
         }
@@ -117,25 +128,59 @@ function Widget(props: WidgetData) {
   }
 
   // assign all defined properties
-  for (const [key, val] of Object.entries(props.properties || {})) {
+  for (const [key, val] of Object.entries(data.properties || {})) {
     if (val !== null && val !== undefined)
       (widgetProperties as Record<string, any>)[key] = val
   }
 
-  const choosenWidgetProps: WidgetProps = {
-    ...{ ...props, properties: widgetProperties },
+  const choosenWidgetProps: ChoosenWidgetProps = {
+    ...{ ...data, properties: widgetProperties },
     useWidgetValue
   }
 
+  const pan = useRef(new Animated.ValueXY()).current
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        setDragging(true)
+      },
+      onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
+        useNativeDriver: false
+      }),
+      onPanResponderRelease: () => {
+        pan.extractOffset()
+        setDragging(false)
+      }
+    })
+  ).current
+
   return (
-    <View style={styles.wrapper}>
-      {Boolean(widgetProperties.title) && (
-        <Text selectable={false} style={styles.title}>
-          {widgetProperties.title}
-        </Text>
-      )}
-      <ChoosenWidget {...choosenWidgetProps} />
-    </View>
+    <Animated.View
+      style={{
+        position: "absolute",
+        width,
+        height,
+        top: top,
+        left: left,
+        zIndex: dragging ? 1 : 0,
+        transform: [{ translateX: pan.x }, { translateY: pan.y }]
+      }}
+    >
+      <View style={styles.wrapper}>
+        {Boolean(widgetProperties.title) && (
+          <Text selectable={false} style={styles.title}>
+            {widgetProperties.title}
+          </Text>
+        )}
+        <ChoosenWidget {...choosenWidgetProps} />
+      </View>
+      <View
+        {...panResponder.panHandlers}
+        style={[styles.edit, { width, height }]}
+      ></View>
+    </Animated.View>
   )
 }
 
@@ -153,6 +198,15 @@ const getStyles = () => {
       padding: 5,
       paddingBottom: 0,
       color: Colors.grey500
+    },
+    edit: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      backgroundColor: "#12121299",
+      borderColor: "gray",
+      borderWidth: 3,
+      borderStyle: "dashed"
     }
   })
 }

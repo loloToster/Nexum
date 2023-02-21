@@ -40,10 +40,20 @@ function Widgets() {
     }
   }, [socket])
 
-  const { isLoading, isError, data, refetch } = useQuery("me", async () => {
-    const res = await api.get("/users/me")
-    return res.data
-  })
+  const { isLoading, isError, data } = useQuery(
+    "me",
+    async () => {
+      const res = await api.get("/users/me")
+      return res.data
+    },
+    { staleTime: Infinity, cacheTime: Infinity }
+  )
+
+  const [tabs, setTabs] = useState<TabData[]>([])
+
+  useEffect(() => {
+    if (data) setTabs(data.tabs)
+  }, [data])
 
   const [selectedTab, setSelectedTab] = useState<string | null>()
 
@@ -66,9 +76,11 @@ function Widgets() {
             <Error text="Could not load widgets" />
           ) : (
             <Tabs
-              data={data.tabs as TabData[]}
+              data={tabs}
               selectedTab={selectedTab}
-              onTabCreate={() => refetch()}
+              onTabCreate={name =>
+                setTabs(prev => [...prev, { name, widgets: [] }])
+              }
             />
           )
         }

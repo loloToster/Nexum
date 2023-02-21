@@ -4,9 +4,9 @@ import { Text } from "react-native-paper"
 
 import { roundBadFloat, roundByStep } from "src/utils"
 
-import { WidgetProps } from "../Widget"
+import { ChoosenWidgetProps } from "../Widget"
 
-function Label(props: WidgetProps) {
+function Label(props: ChoosenWidgetProps) {
   const { color, text, step } = props.properties
 
   const styles = getStyles(color)
