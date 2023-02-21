@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { View, StyleSheet, PanResponder, Animated } from "react-native"
-import { Text, useTheme, Colors } from "react-native-paper"
+import { Text, useTheme, Colors, Theme } from "react-native-paper"
 
 import { WidgetProperties, WidgetData, WidgetValue } from "src/types"
 
@@ -54,11 +54,12 @@ export interface WidgetProps {
   height: number
   left: number
   top: number
+  onDragEnd: (widget: WidgetData, x: number, y: number) => any
 }
 
-function Widget({ data, width, height, left, top }: WidgetProps) {
+function Widget({ data, width, height, left, top, onDragEnd }: WidgetProps) {
   const theme = useTheme()
-  const styles = getStyles()
+  const styles = getStyles(theme)
 
   const [dragging, setDragging] = useState(false)
 
@@ -138,7 +139,38 @@ function Widget({ data, width, height, left, top }: WidgetProps) {
     useWidgetValue
   }
 
-  const pan = useRef(new Animated.ValueXY()).current
+  const pan = useRef(
+    new Animated.ValueXY({
+      x: left,
+      y: top
+    })
+  ).current
+
+  useEffect(() => {
+    pan.setValue({
+      x: left,
+      y: top
+    })
+  }, [top, left])
+
+  const panOffset = useRef(
+    new Animated.ValueXY({
+      x: 0,
+      y: 0
+    })
+  ).current
+
+  const dragEndData = useRef({
+    panX: 0,
+    panY: 0,
+    panOffsetX: 0,
+    panOffsetY: 0
+  }).current
+
+  pan.x.addListener(({ value }) => (dragEndData.panX = value))
+  pan.y.addListener(({ value }) => (dragEndData.panY = value))
+  panOffset.x.addListener(({ value }) => (dragEndData.panOffsetX = value))
+  panOffset.y.addListener(({ value }) => (dragEndData.panOffsetY = value))
 
   const panResponder = useRef(
     PanResponder.create({
@@ -146,11 +178,21 @@ function Widget({ data, width, height, left, top }: WidgetProps) {
       onPanResponderGrant: () => {
         setDragging(true)
       },
-      onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
-        useNativeDriver: false
-      }),
+      onPanResponderMove: Animated.event(
+        [null, { dx: panOffset.x, dy: panOffset.y }],
+        {
+          useNativeDriver: false
+        }
+      ),
       onPanResponderRelease: () => {
-        pan.extractOffset()
+        onDragEnd(
+          data,
+          dragEndData.panX + dragEndData.panOffsetX,
+          dragEndData.panY + dragEndData.panOffsetY
+        )
+
+        panOffset.x.setValue(0)
+        panOffset.y.setValue(0)
         setDragging(false)
       }
     })
@@ -162,10 +204,9 @@ function Widget({ data, width, height, left, top }: WidgetProps) {
         position: "absolute",
         width,
         height,
-        top: top,
-        left: left,
-        zIndex: dragging ? 1 : 0,
-        transform: [{ translateX: pan.x }, { translateY: pan.y }]
+        top: Animated.add(pan.y, panOffset.y),
+        left: Animated.add(pan.x, panOffset.x),
+        zIndex: dragging ? 1 : 0
       }}
     >
       <View style={styles.wrapper}>
@@ -186,7 +227,7 @@ function Widget({ data, width, height, left, top }: WidgetProps) {
 
 export default Widget
 
-const getStyles = () => {
+const getStyles = (theme: Theme) => {
   return StyleSheet.create({
     wrapper: {
       flex: 1,
@@ -203,10 +244,11 @@ const getStyles = () => {
       position: "absolute",
       top: 0,
       left: 0,
-      backgroundColor: "#12121299",
-      borderColor: "gray",
+      backgroundColor: theme.colors.background + "99",
+      borderColor: theme.colors.accent,
       borderWidth: 3,
-      borderStyle: "dashed"
+      borderStyle: "dashed",
+      borderRadius: 10
     }
   })
 }
