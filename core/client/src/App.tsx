@@ -1,7 +1,7 @@
 import "react-native-gesture-handler"
 
 import React, { lazy, Suspense, useEffect } from "react"
-import { Platform } from "react-native"
+import { Dimensions, Platform } from "react-native"
 import { registerRootComponent } from "expo"
 import { StatusBar } from "expo-status-bar"
 
@@ -13,8 +13,11 @@ import { createDrawerNavigator } from "@react-navigation/drawer"
 import { io } from "socket.io-client"
 
 import {
+  ActivityIndicator,
   Colors,
   DarkTheme,
+  Modal,
+  Portal,
   Provider as PaperProvider
 } from "react-native-paper"
 
@@ -25,6 +28,7 @@ import {
   UserProvider,
   UserContextConsumer
 } from "./contexts/user"
+import { EditingContext, EditingContextProvider } from "./contexts/editing"
 import { SocketContext } from "./contexts/socket"
 
 import Header from "./components/Header/Header"
@@ -77,41 +81,57 @@ function App() {
             <UserContextConsumer>
               {({ user }) =>
                 user ? (
-                  <SocketContext.Provider value={{ socket }}>
-                    <NavigationContainer
-                      documentTitle={{ enabled: false }}
-                      linking={{ prefixes: [] }}
-                    >
-                      <Drawer.Navigator
-                        initialRouteName="widgets"
-                        backBehavior="initialRoute"
-                        drawerContent={DrawerContent}
-                        screenOptions={{
-                          header: props => <Header {...props} />,
-                          drawerPosition: "right",
-                          drawerStyle: {
-                            backgroundColor: DarkTheme.colors.background
-                          }
-                        }}
-                      >
-                        <Drawer.Screen
-                          name="widgets"
-                          component={Widgets}
-                          options={{ headerTitle: "Nexum" }}
-                        />
-                        <Drawer.Screen
-                          name="devices"
-                          component={Devices}
-                          options={{ headerTitle: "Devices" }}
-                        />
-                        <Drawer.Screen
-                          name="users"
-                          component={Users}
-                          options={{ headerTitle: "Users" }}
-                        />
-                      </Drawer.Navigator>
-                    </NavigationContainer>
-                  </SocketContext.Provider>
+                  <EditingContextProvider>
+                    <EditingContext.Consumer>
+                      {({ saving }) => (
+                        <SocketContext.Provider value={{ socket }}>
+                          <Portal>
+                            <Modal visible={saving} dismissable={false}>
+                              <ActivityIndicator
+                                size="large"
+                                style={{
+                                  height: Dimensions.get("screen").height
+                                }}
+                              />
+                            </Modal>
+                          </Portal>
+                          <NavigationContainer
+                            documentTitle={{ enabled: false }}
+                            linking={{ prefixes: [] }}
+                          >
+                            <Drawer.Navigator
+                              initialRouteName="widgets"
+                              backBehavior="initialRoute"
+                              drawerContent={DrawerContent}
+                              screenOptions={{
+                                header: props => <Header {...props} />,
+                                drawerPosition: "right",
+                                drawerStyle: {
+                                  backgroundColor: DarkTheme.colors.background
+                                }
+                              }}
+                            >
+                              <Drawer.Screen
+                                name="widgets"
+                                component={Widgets}
+                                options={{ headerTitle: "Nexum" }}
+                              />
+                              <Drawer.Screen
+                                name="devices"
+                                component={Devices}
+                                options={{ headerTitle: "Devices" }}
+                              />
+                              <Drawer.Screen
+                                name="users"
+                                component={Users}
+                                options={{ headerTitle: "Users" }}
+                              />
+                            </Drawer.Navigator>
+                          </NavigationContainer>
+                        </SocketContext.Provider>
+                      )}
+                    </EditingContext.Consumer>
+                  </EditingContextProvider>
                 ) : (
                   <Login />
                 )

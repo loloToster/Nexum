@@ -9,6 +9,7 @@ import {
   LocalValueUpdateObj,
   useValueBridge
 } from "src/contexts/valueBridge"
+import { useEditing } from "src/contexts/editing"
 
 // special component returned if provided type does not match any component in map
 import Unknown from "./Unknown/Unknown"
@@ -145,6 +146,10 @@ function Widget({
     ...{ ...data, properties: widgetProperties },
     useWidgetValue
   }
+
+  // handle editing
+
+  const { editing } = useEditing()
 
   const [dragging, setDragging] = useState(false)
   const [resizing, setResizing] = useState(false)
@@ -292,18 +297,20 @@ function Widget({
         )}
         <ChoosenWidget {...choosenWidgetProps} />
       </View>
-      <Animated.View
-        {...posPanResponder.panHandlers}
-        style={[
-          styles.edit,
-          {
-            width: Animated.add(sizePan.x, sizePanOffset.x),
-            height: Animated.add(sizePan.y, sizePanOffset.y)
-          }
-        ]}
-      >
-        <View {...sizePanResponder.panHandlers} style={styles.resize}></View>
-      </Animated.View>
+      {editing && (
+        <Animated.View
+          {...posPanResponder.panHandlers}
+          style={[
+            styles.edit,
+            {
+              width: Animated.add(sizePan.x, sizePanOffset.x),
+              height: Animated.add(sizePan.y, sizePanOffset.y)
+            }
+          ]}
+        >
+          <View {...sizePanResponder.panHandlers} style={styles.resize}></View>
+        </Animated.View>
+      )}
     </Animated.View>
   )
 }

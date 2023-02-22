@@ -7,6 +7,7 @@ import { useTheme, Theme, Drawer, Avatar, Text } from "react-native-paper"
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon"
 
 import { useUser } from "src/contexts/user"
+import { useEditing } from "src/contexts/editing"
 
 import Translatable from "src/components/Translatable/Translatable"
 import RUSure from "src/components/RUSure/RUSure"
@@ -44,6 +45,8 @@ function DrawerContent({
   const { user, setUser } = useUser()
   const [logoutActive, setLogoutActive] = useState(false)
 
+  const { setEditing } = useEditing()
+
   const screens = Object.values(descriptors)
   const activeRouteName = state.routeNames[state.index]
 
@@ -70,21 +73,33 @@ function DrawerContent({
         </View>
       </Drawer.Section>
       {user?.isAdmin && (
-        <Drawer.Section>
-          {screens.map(s => (
+        <>
+          <Drawer.Section>
+            {screens.map(s => (
+              <Drawer.Item
+                label={
+                  s.route.name === "widgets"
+                    ? "Home"
+                    : capitalizeFirstLetter(s.route.name)
+                }
+                icon={icons[s.route.name]}
+                onPress={() => navigation.navigate(s.route.name)}
+                active={activeRouteName === s.route.name}
+                key={s.route.key}
+              />
+            ))}
+          </Drawer.Section>
+          <Drawer.Section>
             <Drawer.Item
-              label={
-                s.route.name === "widgets"
-                  ? "Home"
-                  : capitalizeFirstLetter(s.route.name)
-              }
-              icon={icons[s.route.name]}
-              onPress={() => navigation.navigate(s.route.name)}
-              active={activeRouteName === s.route.name}
-              key={s.route.key}
+              label="Edit widgets"
+              icon="view-dashboard-edit"
+              onPress={() => {
+                setEditing(true)
+                navigation.closeDrawer()
+              }}
             />
-          ))}
-        </Drawer.Section>
+          </Drawer.Section>
+        </>
       )}
       <Drawer.Section>
         <Drawer.Item
