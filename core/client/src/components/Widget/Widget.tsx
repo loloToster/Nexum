@@ -54,14 +54,21 @@ export interface WidgetProps {
   height: number
   left: number
   top: number
-  onDragEnd: (widget: WidgetData, x: number, y: number) => any
+  onChangePos: (widget: WidgetData, x: number, y: number) => any
+  onChangeSize: (widget: WidgetData, w: number, h: number) => any
 }
 
-function Widget({ data, width, height, left, top, onDragEnd }: WidgetProps) {
+function Widget({
+  data,
+  width,
+  height,
+  left,
+  top,
+  onChangePos,
+  onChangeSize
+}: WidgetProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
-
-  const [dragging, setDragging] = useState(false)
 
   const ChoosenWidget = map[data.type] || Unknown
 
@@ -139,7 +146,10 @@ function Widget({ data, width, height, left, top, onDragEnd }: WidgetProps) {
     useWidgetValue
   }
 
-  const pan = useRef(
+  const [dragging, setDragging] = useState(false)
+  const [resizing, setResizing] = useState(false)
+
+  const posPan = useRef(
     new Animated.ValueXY({
       x: left,
       y: top
@@ -147,53 +157,118 @@ function Widget({ data, width, height, left, top, onDragEnd }: WidgetProps) {
   ).current
 
   useEffect(() => {
-    pan.setValue({
+    posPan.setValue({
       x: left,
       y: top
     })
   }, [top, left])
 
-  const panOffset = useRef(
+  const posPanOffset = useRef(
     new Animated.ValueXY({
       x: 0,
       y: 0
     })
   ).current
 
-  const dragEndData = useRef({
+  const posChangeData = useRef({
     panX: 0,
     panY: 0,
     panOffsetX: 0,
     panOffsetY: 0
   }).current
 
-  pan.x.addListener(({ value }) => (dragEndData.panX = value))
-  pan.y.addListener(({ value }) => (dragEndData.panY = value))
-  panOffset.x.addListener(({ value }) => (dragEndData.panOffsetX = value))
-  panOffset.y.addListener(({ value }) => (dragEndData.panOffsetY = value))
+  posPan.x.addListener(({ value }) => (posChangeData.panX = value))
+  posPan.y.addListener(({ value }) => (posChangeData.panY = value))
+  posPanOffset.x.addListener(({ value }) => (posChangeData.panOffsetX = value))
+  posPanOffset.y.addListener(({ value }) => (posChangeData.panOffsetY = value))
 
-  const panResponder = useRef(
+  const posPanResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         setDragging(true)
       },
       onPanResponderMove: Animated.event(
-        [null, { dx: panOffset.x, dy: panOffset.y }],
+        [null, { dx: posPanOffset.x, dy: posPanOffset.y }],
         {
           useNativeDriver: false
         }
       ),
       onPanResponderRelease: () => {
-        onDragEnd(
+        onChangePos(
           data,
-          dragEndData.panX + dragEndData.panOffsetX,
-          dragEndData.panY + dragEndData.panOffsetY
+          posChangeData.panX + posChangeData.panOffsetX,
+          posChangeData.panY + posChangeData.panOffsetY
         )
 
-        panOffset.x.setValue(0)
-        panOffset.y.setValue(0)
+        posPanOffset.x.setValue(0)
+        posPanOffset.y.setValue(0)
         setDragging(false)
+      }
+    })
+  ).current
+
+  const sizePan = useRef(
+    new Animated.ValueXY({
+      x: width,
+      y: height
+    })
+  ).current
+
+  useEffect(() => {
+    sizePan.setValue({
+      x: width,
+      y: height
+    })
+  }, [width, height])
+
+  const sizePanOffset = useRef(
+    new Animated.ValueXY({
+      x: 0,
+      y: 0
+    })
+  ).current
+
+  const sizeChangeData = useRef({
+    panW: 0,
+    panH: 0,
+    panOffsetW: 0,
+    panOffsetH: 0
+  }).current
+
+  sizePan.x.addListener(({ value }) => (sizeChangeData.panW = value))
+  sizePan.y.addListener(({ value }) => (sizeChangeData.panH = value))
+  sizePanOffset.x.addListener(
+    ({ value }) => (sizeChangeData.panOffsetW = value)
+  )
+  sizePanOffset.y.addListener(
+    ({ value }) => (sizeChangeData.panOffsetH = value)
+  )
+
+  const sizePanResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: () => {
+        setResizing(true)
+      },
+      onPanResponderMove: Animated.event(
+        [null, { dx: sizePanOffset.x, dy: sizePanOffset.y }],
+        {
+          useNativeDriver: false
+        }
+      ),
+      onPanResponderRelease: () => {
+        onChangeSize(
+          data,
+          sizeChangeData.panW + sizeChangeData.panOffsetW,
+          sizeChangeData.panH + sizeChangeData.panOffsetH
+        )
+
+        sizePanOffset.x.setValue(0)
+        sizePanOffset.y.setValue(0)
+        setResizing(false)
       }
     })
   ).current
@@ -202,11 +277,11 @@ function Widget({ data, width, height, left, top, onDragEnd }: WidgetProps) {
     <Animated.View
       style={{
         position: "absolute",
-        width,
-        height,
-        top: Animated.add(pan.y, panOffset.y),
-        left: Animated.add(pan.x, panOffset.x),
-        zIndex: dragging ? 1 : 0
+        width: Animated.add(sizePan.x, sizePanOffset.x),
+        height: Animated.add(sizePan.y, sizePanOffset.y),
+        top: Animated.add(posPan.y, posPanOffset.y),
+        left: Animated.add(posPan.x, posPanOffset.x),
+        zIndex: dragging || resizing ? 1 : 0
       }}
     >
       <View style={styles.wrapper}>
@@ -217,10 +292,18 @@ function Widget({ data, width, height, left, top, onDragEnd }: WidgetProps) {
         )}
         <ChoosenWidget {...choosenWidgetProps} />
       </View>
-      <View
-        {...panResponder.panHandlers}
-        style={[styles.edit, { width, height }]}
-      ></View>
+      <Animated.View
+        {...posPanResponder.panHandlers}
+        style={[
+          styles.edit,
+          {
+            width: Animated.add(sizePan.x, sizePanOffset.x),
+            height: Animated.add(sizePan.y, sizePanOffset.y)
+          }
+        ]}
+      >
+        <View {...sizePanResponder.panHandlers} style={styles.resize}></View>
+      </Animated.View>
     </Animated.View>
   )
 }
@@ -228,6 +311,8 @@ function Widget({ data, width, height, left, top, onDragEnd }: WidgetProps) {
 export default Widget
 
 const getStyles = (theme: Theme) => {
+  const resizeHandleSize = 30
+
   return StyleSheet.create({
     wrapper: {
       flex: 1,
@@ -248,7 +333,16 @@ const getStyles = (theme: Theme) => {
       borderColor: theme.colors.accent,
       borderWidth: 3,
       borderStyle: "dashed",
-      borderRadius: 10
+      borderRadius: resizeHandleSize / 2
+    },
+    resize: {
+      position: "absolute",
+      bottom: -3,
+      right: -3,
+      width: resizeHandleSize,
+      height: resizeHandleSize,
+      backgroundColor: theme.colors.accent,
+      borderRadius: resizeHandleSize / 2
     }
   })
 }

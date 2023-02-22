@@ -82,11 +82,30 @@ function Tab({ name, widgets }: TabProps) {
   // neccessary because all widgets are positioned absolutely
   const viewHeight = Math.max(...tabData.map(w => w.height + w.y))
 
-  const onDragEnd = (widget: WidgetData, x: number, y: number) => {
-    const mappedX =
-      (x % cellSizeRef.w) / cellSizeRef.w + Math.floor(x / cellSizeRef.w)
-    const mappedY =
-      (y % cellSizeRef.h) / cellSizeRef.w + Math.floor(y / cellSizeRef.h)
+  // Handle pos & size changes
+
+  const editWidget = (
+    widgetData: WidgetData,
+    newWidgetData: Partial<WidgetData>
+  ) => {
+    setTabData(prev => {
+      const targetWidget = prev.find(w => w.id === widgetData.id)
+
+      if (targetWidget) {
+        for (const [key, val] of Object.entries(newWidgetData)) {
+          ;(targetWidget as Record<string, any>)[key] = val
+        }
+      } else {
+        console.warn("no target widget found")
+      }
+
+      return [...prev]
+    })
+  }
+
+  const changePos = (widget: WidgetData, x: number, y: number) => {
+    const mappedX = x / cellSizeRef.w
+    const mappedY = y / cellSizeRef.h
 
     const availableCoordinates: Point[] = []
 
@@ -130,17 +149,42 @@ function Tab({ name, widgets }: TabProps) {
         : prev
     })
 
-    setTabData(prev => {
-      const targetWidget = prev.find(w => w.id === widget.id)
+    editWidget(widget, { ...bestCoordinates })
+  }
 
-      if (targetWidget) {
-        targetWidget.x = bestCoordinates.x
-        targetWidget.y = bestCoordinates.y
+  const changeSize = (widget: WidgetData, w: number, h: number) => {
+    let width = Math.max(Math.round(w / cellSizeRef.w), 1)
+    let height = Math.max(Math.round(h / cellSizeRef.h), 1)
+
+    const verticalOverflow = widget.x + width - COLS
+    const horizontalOverflow = widget.y + height - MAX_ROWS
+
+    if (verticalOverflow > 0) width -= verticalOverflow
+    if (horizontalOverflow > 0) height -= horizontalOverflow
+
+    for (const w of tabData) {
+      if (w.id === widget.id || !collides({ ...widget, width, height }, w))
+        continue
+
+      const widthDiff = widget.x + width - w.x
+      const heightDiff = widget.y + height - w.y
+
+      if (widget.x < w.x && widget.y < w.y) {
+        if (widthDiff < heightDiff) {
+          width -= widthDiff
+        } else {
+          height -= heightDiff
+        }
+      } else if (widget.x < w.x) {
+        width -= widthDiff
+      } else if (widget.y < w.y) {
+        height -= heightDiff
       } else {
-        console.warn("no target widget found")
+        console.warn("impossible coordinates when resizing")
       }
-      return [...prev]
-    })
+    }
+
+    editWidget(widget, { width: width, height: height })
   }
 
   return (
@@ -158,7 +202,8 @@ function Tab({ name, widgets }: TabProps) {
             height={cellHeight * widgetData.height}
             top={cellHeight * widgetData.y}
             left={cellWidth * widgetData.x}
-            onDragEnd={onDragEnd}
+            onChangePos={changePos}
+            onChangeSize={changeSize}
           />
         ))}
       </View>
