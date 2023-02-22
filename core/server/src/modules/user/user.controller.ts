@@ -66,7 +66,8 @@ export class UserController {
   }
 
   @Patch("/:id")
-  async editDevice(@Param("id") id: string, @Body() { key, value }: EditDto) {
+  @UseGuards(IsAdminGuard)
+  async editUser(@Param("id") id: string, @Body() { key, value }: EditDto) {
     return this.userService.editUser(id, key as keyof UserWithTabs, value)
   }
 
