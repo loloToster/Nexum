@@ -9,6 +9,7 @@ import { MqttModule } from "./mqtt/mqtt.module"
 import { AuthModule } from "./auth/auth.module"
 import { UserModule } from "./user/user.module"
 import { TabModule } from "./tab/tab.module"
+import { WidgetModule } from "./widget/widget.module"
 import { DeviceModule } from "./device/device.module"
 import { ValueModule } from "./value/value.module"
 
@@ -23,6 +24,7 @@ import { ValueModule } from "./value/value.module"
     AuthModule,
     UserModule,
     TabModule,
+    WidgetModule,
     DeviceModule,
     ValueModule
   ]

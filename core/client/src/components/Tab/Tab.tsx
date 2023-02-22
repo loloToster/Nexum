@@ -5,6 +5,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useTheme, Theme } from "react-native-paper"
 
 import { WidgetData } from "src/types"
+
+import { useEditing } from "src/contexts/editing"
+
 import Widget from "src/components/Widget/Widget"
 
 export interface TabProps {
@@ -84,10 +87,14 @@ function Tab({ name, widgets }: TabProps) {
 
   // Handle pos & size changes
 
+  const { registerEdit } = useEditing()
+
   const editWidget = (
     widgetData: WidgetData,
     newWidgetData: Partial<WidgetData>
   ) => {
+    registerEdit({ widgetId: widgetData.id, ...newWidgetData })
+
     setTabData(prev => {
       const targetWidget = prev.find(w => w.id === widgetData.id)
 
