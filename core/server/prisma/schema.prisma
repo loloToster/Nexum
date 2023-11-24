@@ -9,12 +9,26 @@ datasource db {
 }
 
 model User {
-  id      String  @id @default(uuid())
-  name    String
-  isAdmin Boolean @map("is_admin")
-  tabs    Tab[]
+  id                      String                      @id @default(uuid())
+  name                    String
+  isAdmin                 Boolean                     @map("is_admin")
+  tabs                    Tab[]
+  gglSmarthomeIntegration GoogleSmartHomeIntegration?
 
   @@map("users")
+}
+
+model GoogleSmartHomeIntegration {
+  id                 Int       @id @default(autoincrement())
+  userId             String    @unique @map("user_id")
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code               String?   @unique
+  codeExpires        DateTime? @map("code_expires")
+  accessToken        String?   @unique @map("access_token")
+  refreshToken       String?   @unique @map("refresh_token")
+  accessTokenExpires DateTime? @map("access_token_expires")
+
+  @@map("ggl_smarthome_integrations")
 }
 
 model Tab {

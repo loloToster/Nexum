@@ -12,6 +12,7 @@ import { TabModule } from "./tab/tab.module"
 import { WidgetModule } from "./widget/widget.module"
 import { DeviceModule } from "./device/device.module"
 import { ValueModule } from "./value/value.module"
+import { GoogleSmarthomeModule } from "./gglsmarthome/gglsmarthome.module"
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { ValueModule } from "./value/value.module"
     TabModule,
     WidgetModule,
     DeviceModule,
-    ValueModule
+    ValueModule,
+    GoogleSmarthomeModule
   ]
 })
 export class AppModule implements NestModule {
