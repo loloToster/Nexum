@@ -18,6 +18,12 @@ import {
 } from "src/dtos/googleSmarthomeConnect.dto"
 import GoogleSmarthomeTokenReqDto from "src/dtos/googleSmarthomeTokenReq.dto"
 
+const {
+  GOOGLE_SMARTHOME_CLIENT_ID,
+  GOOGLE_SMARTHOME_CLIENT_SECRET,
+  GOOGLE_SMARTHOME_PROJECT_ID
+} = process.env
+
 @Controller("/api/gglsmarthome")
 export class GoogleSmarthomeController {
   constructor(
@@ -54,6 +60,15 @@ export class GoogleSmarthomeController {
     @Query() query: GoogleSmarthomeConnectQueryDto,
     @Body() body: GoogleSmarthomeConnectBodyDto
   ) {
+    if (
+      query.client_id !== GOOGLE_SMARTHOME_CLIENT_ID ||
+      ![
+        `https://oauth-redirect.googleusercontent.com/r/${GOOGLE_SMARTHOME_PROJECT_ID}`,
+        `https://oauth-redirect-sandbox.googleusercontent.com/r/${GOOGLE_SMARTHOME_PROJECT_ID}`
+      ].includes(query.redirect_uri)
+    )
+      throw new BadRequestException()
+
     const user = await this.userService.getUserById(body.token)
 
     if (!user) throw new BadRequestException()
@@ -70,6 +85,12 @@ export class GoogleSmarthomeController {
 
   @Post("/token")
   async getToken(@Body() body: GoogleSmarthomeTokenReqDto) {
+    if (
+      body.client_id !== GOOGLE_SMARTHOME_CLIENT_ID ||
+      body.client_secret !== GOOGLE_SMARTHOME_CLIENT_SECRET
+    )
+      throw new BadRequestException()
+
     if (body.grant_type === "authorization_code") {
       if (!body.code) throw new BadRequestException()
 

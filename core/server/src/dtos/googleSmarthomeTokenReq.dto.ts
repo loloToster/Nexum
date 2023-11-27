@@ -1,15 +1,14 @@
-import { Equals, IsIn, IsOptional, IsString } from "class-validator"
-
-const { GOOGLE_SMARTHOME_CLIENT_ID, GOOGLE_SMARTHOME_CLIENT_SECRET } =
-  process.env
+import { IsIn, IsNotEmpty, IsOptional, IsString } from "class-validator"
 
 const grantTypes = ["authorization_code", "refresh_token"] as const
 
 export default class GoogleSmarthomeTokenReqDto {
-  @Equals(GOOGLE_SMARTHOME_CLIENT_ID)
+  @IsString()
+  @IsNotEmpty()
   client_id: string
 
-  @Equals(GOOGLE_SMARTHOME_CLIENT_SECRET)
+  @IsString()
+  @IsNotEmpty()
   client_secret: string
 
   @IsIn(grantTypes)
