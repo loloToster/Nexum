@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Nexum to Google</title>
+  <style>
+    :root {
+      color-scheme: dark;
+
+      --bg: #121212;
+      --surface: #2a2a2a;
+      --primary: #4db6ac;
+      --roundness: 6px;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      padding: 0 20vw;
+      padding-bottom: 20vh;
+      max-width: 800px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    input {
+      background-color: var(--surface);
+      outline: none;
+      border: 1px #565656 solid;
+      font-size: 1.2rem;
+      padding: 6px;
+      border-radius: var(--roundness);
+    }
+
+    input:focus {
+      outline-color: var(--primary);
+    }
+
+    button {
+      margin-top: 2vh;
+      background-color: var(--primary);
+      font-size: 1.2rem;
+      color: var(--bg);
+      border: none;
+      outline: none;
+      padding: 6px 24px;
+      border-radius: var(--roundness);
+    }
+  </style>
+</head>
+
+<body>
+  <form action="connect?${querystring}" method="post">
+    <h1>Connect Nexum to Google</h1>
+    <input type="text" name="token" placeholder="Insert your code" />
+    <button type="submit">Connect</button>
+  </form>
+</body>
+
+</html>

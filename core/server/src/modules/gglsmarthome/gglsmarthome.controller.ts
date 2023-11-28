@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   Post,
   Query,
   Res
@@ -17,6 +18,8 @@ import {
   GoogleSmarthomeConnectBodyDto
 } from "src/dtos/googleSmarthomeConnect.dto"
 import GoogleSmarthomeTokenReqDto from "src/dtos/googleSmarthomeTokenReq.dto"
+import { readFileSync } from "fs"
+import { join as pathJoin } from "path"
 
 const {
   GOOGLE_SMARTHOME_CLIENT_ID,
@@ -24,34 +27,27 @@ const {
   GOOGLE_SMARTHOME_PROJECT_ID
 } = process.env
 
+const AUTH_PAGE_FILE_NAME = "gglsmarthome-connect.html"
+
 @Controller("/api/gglsmarthome")
 export class GoogleSmarthomeController {
+  authPage: string
+
   constructor(
     private gglSmarthomeService: GoogleSmarthomeService,
     private userService: UserService
-  ) {}
+  ) {
+    this.authPage = readFileSync(
+      pathJoin(__dirname, AUTH_PAGE_FILE_NAME)
+    ).toString()
+  }
 
   @Get("/auth")
+  @Header("Content-type", "text/html")
   authorize(@Query() query: Record<string, string>) {
     const querystring = new URLSearchParams(query).toString()
 
-    // TODO: make prettier
-    return `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body>
-        <form action="connect?${querystring}" method="post">
-          <h1>Connect Google</h1>
-          <input type="text" name="token">
-          <button type="submit">OK</button>
-        </form>
-      </body>
-      </html>
-    `
+    return this.authPage.replace("${querystring}", querystring)
   }
 
   @Post("/connect")
