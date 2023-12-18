@@ -45,7 +45,7 @@ function DrawerContent({
   const { user, setUser } = useUser()
   const [logoutActive, setLogoutActive] = useState(false)
 
-  const { setEditing } = useEditing()
+  const { setMoving, setEditing } = useEditing()
 
   const screens = Object.values(descriptors)
   const activeRouteName = state.routeNames[state.index]
@@ -91,10 +91,18 @@ function DrawerContent({
           </Drawer.Section>
           <Drawer.Section>
             <Drawer.Item
-              label="Edit widgets"
+              label="Edit Widgets"
               icon="view-dashboard-edit"
               onPress={() => {
                 setEditing(true)
+                navigation.closeDrawer()
+              }}
+            />
+            <Drawer.Item
+              label="Move Widgets"
+              icon="move-resize"
+              onPress={() => {
+                setMoving(true)
                 navigation.closeDrawer()
               }}
             />

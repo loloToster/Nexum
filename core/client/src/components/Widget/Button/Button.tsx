@@ -8,9 +8,9 @@ import {
 } from "react-native"
 import { Text, useTheme } from "react-native-paper"
 
-import { ChoosenWidgetProps } from "../Widget"
+import { ChoosenWidgetProps, WidgetComponent } from "../Widget"
 
-function Button(props: ChoosenWidgetProps) {
+function ButtonComponent(props: ChoosenWidgetProps) {
   const { color, text, onText, offText, isSwitch } = props.properties
 
   const theme = useTheme()
@@ -54,6 +54,13 @@ function Button(props: ChoosenWidgetProps) {
       </View>
     </TouchableWithoutFeedback>
   )
+}
+
+const Button: WidgetComponent = {
+  component: ButtonComponent,
+  id: "btn",
+  name: "Button",
+  icon: "gesture-tap-button"
 }
 
 export default Button

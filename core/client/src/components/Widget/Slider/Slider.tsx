@@ -2,9 +2,9 @@ import React from "react"
 import { View, StyleSheet, Platform } from "react-native"
 import Slider from "src/components/Slider/Slider"
 
-import { EmitTarget, ChoosenWidgetProps } from "../Widget"
+import { EmitTarget, ChoosenWidgetProps, WidgetComponent } from "../Widget"
 
-function SliderWidget(props: ChoosenWidgetProps) {
+function SliderWidgetComponent(props: ChoosenWidgetProps) {
   const { color, isVertical, min, max, step } = props.properties
 
   const styles = getStyles()
@@ -28,6 +28,13 @@ function SliderWidget(props: ChoosenWidgetProps) {
       />
     </View>
   )
+}
+
+const SliderWidget: WidgetComponent = {
+  component: SliderWidgetComponent,
+  id: "sldr",
+  name: "Slider",
+  icon: "arrow-left-right"
 }
 
 export default SliderWidget

@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
-import { View, StyleSheet, PanResponder, Animated } from "react-native"
-import { Text, useTheme, Colors, Theme } from "react-native-paper"
+import {
+  View,
+  StyleSheet,
+  PanResponder,
+  Animated,
+  TouchableWithoutFeedback
+} from "react-native"
+import { Text, useTheme, Colors, Theme, List } from "react-native-paper"
 
 import { WidgetProperties, WidgetData, WidgetValue } from "src/types"
 
@@ -37,17 +43,20 @@ export interface ChoosenWidgetProps extends Omit<WidgetData, "properties"> {
   useWidgetValue: WidgetValueHook
 }
 
-// maps string type prop to component
-const map: Record<
-  string,
-  ((props: ChoosenWidgetProps) => JSX.Element) | (() => JSX.Element)
-> = {
-  btn: Button,
-  sldr: SliderWidget,
-  gauge: Gauge,
-  lbl: Label,
-  number: NumberInput
+export interface WidgetComponent {
+  component: ((props: ChoosenWidgetProps) => JSX.Element) | (() => JSX.Element)
+  id: string
+  name: string
+  icon?: string
 }
+
+export const widgetComponents: WidgetComponent[] = [
+  Button,
+  SliderWidget,
+  Gauge,
+  Label,
+  NumberInput
+]
 
 export interface WidgetProps {
   data: WidgetData
@@ -71,7 +80,8 @@ function Widget({
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const ChoosenWidget = map[data.type] || Unknown
+  const ChoosenWidget =
+    widgetComponents.find(c => c.id === data.type)?.component || Unknown
 
   const useWidgetValue: WidgetValueHook = initialValue => {
     const { bridge, values, emit: rawEmit } = useValueBridge()
@@ -149,7 +159,7 @@ function Widget({
 
   // handle editing
 
-  const { editing } = useEditing()
+  const { moving, editing } = useEditing()
 
   const [dragging, setDragging] = useState(false)
   const [resizing, setResizing] = useState(false)
@@ -298,17 +308,28 @@ function Widget({
         <ChoosenWidget {...choosenWidgetProps} />
       </View>
       {editing && (
+        <TouchableWithoutFeedback onPress={() => console.log("xd")}>
+          <View style={[styles.changeCoverBase, styles.editCover]}>
+            <List.Icon icon="pencil" color={Colors.amber500} />
+          </View>
+        </TouchableWithoutFeedback>
+      )}
+      {moving && (
         <Animated.View
           {...posPanResponder.panHandlers}
           style={[
-            styles.edit,
+            styles.changeCoverBase,
+            styles.moveCover,
             {
               width: Animated.add(sizePan.x, sizePanOffset.x),
               height: Animated.add(sizePan.y, sizePanOffset.y)
             }
           ]}
         >
-          <View {...sizePanResponder.panHandlers} style={styles.resize}></View>
+          <View
+            {...sizePanResponder.panHandlers}
+            style={styles.resizeHandle}
+          ></View>
         </Animated.View>
       )}
     </Animated.View>
@@ -332,17 +353,26 @@ const getStyles = (theme: Theme) => {
       paddingBottom: 0,
       color: Colors.grey500
     },
-    edit: {
+    changeCoverBase: {
       position: "absolute",
       top: 0,
       left: 0,
       backgroundColor: theme.colors.background + "99",
-      borderColor: theme.colors.accent,
       borderWidth: 3,
       borderStyle: "dashed",
       borderRadius: resizeHandleSize / 2
     },
-    resize: {
+    editCover: {
+      borderColor: Colors.amber400,
+      right: 0,
+      bottom: 0,
+      justifyContent: "center",
+      alignItems: "center"
+    },
+    moveCover: {
+      borderColor: theme.colors.accent
+    },
+    resizeHandle: {
       position: "absolute",
       bottom: -3,
       right: -3,

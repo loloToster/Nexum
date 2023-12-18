@@ -3,7 +3,7 @@ import React, { createContext, useContext, useRef, useState } from "react"
 import { useMutation } from "react-query"
 import api from "src/api"
 
-interface Edit {
+interface PosEdit {
   widgetId: number
   x?: number
   y?: number
@@ -12,32 +12,37 @@ interface Edit {
 }
 
 interface EditingContextI {
+  moving: boolean
   editing: boolean
   saving: boolean
+  setMoving: (moving: boolean) => void
   setEditing: (editing: boolean) => void
   setSaving: (saving: boolean) => void
-  registerEdit: (edit: Edit) => void
+  registerPosEdit: (edit: PosEdit) => void
   save: () => void
 }
 
 export const EditingContext = createContext<EditingContextI>({
+  moving: false,
   editing: false,
   saving: false,
+  setMoving: () => null,
   setEditing: () => null,
   setSaving: () => null,
-  registerEdit: () => null,
+  registerPosEdit: () => null,
   save: () => null
 })
 
 export const EditingContextProvider = (props: {
   children: React.ReactNode
 }) => {
+  const [moving, setMoving] = useState(false)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  const registeredEdits = useRef<Edit[]>([]).current
+  const registeredEdits = useRef<PosEdit[]>([]).current
 
-  const registerEdit = (edit: Edit) => {
+  const registerPosEdit = (edit: PosEdit) => {
     const exisitingEdit = registeredEdits.find(
       e => e.widgetId === edit.widgetId
     )
@@ -55,7 +60,7 @@ export const EditingContextProvider = (props: {
 
   const editMutation = useMutation(
     "edit-widgets",
-    async (edits: Edit[]) => {
+    async (edits: PosEdit[]) => {
       if (!edits.length) return
       await api.patch("/widgets/pos", { edits })
     },
@@ -69,6 +74,7 @@ export const EditingContextProvider = (props: {
   )
 
   const save = () => {
+    setMoving(false)
     setEditing(false)
     setSaving(true)
     editMutation.mutate(registeredEdits)
@@ -76,7 +82,16 @@ export const EditingContextProvider = (props: {
 
   return (
     <EditingContext.Provider
-      value={{ editing, saving, setEditing, setSaving, registerEdit, save }}
+      value={{
+        moving,
+        editing,
+        saving,
+        setMoving,
+        setEditing,
+        setSaving,
+        registerPosEdit,
+        save
+      }}
     >
       {props.children}
     </EditingContext.Provider>

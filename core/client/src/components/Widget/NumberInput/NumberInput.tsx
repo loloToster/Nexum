@@ -2,9 +2,9 @@ import React, { useState } from "react"
 import { View, StyleSheet, TextInput } from "react-native"
 import { Theme, useTheme } from "react-native-paper"
 
-import { ChoosenWidgetProps } from "../Widget"
+import { ChoosenWidgetProps, WidgetComponent } from "../Widget"
 
-function NumberInputWidget(props: ChoosenWidgetProps) {
+function NumberInputWidgetComponent(props: ChoosenWidgetProps) {
   const { color, min, max } = props.properties
 
   const theme = useTheme()
@@ -44,6 +44,13 @@ function NumberInputWidget(props: ChoosenWidgetProps) {
       />
     </View>
   )
+}
+
+const NumberInputWidget: WidgetComponent = {
+  component: NumberInputWidgetComponent,
+  id: "num",
+  name: "Number Input",
+  icon: "sort-numeric-variant"
 }
 
 export default NumberInputWidget

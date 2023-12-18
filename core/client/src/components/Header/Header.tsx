@@ -8,7 +8,7 @@ import { Appbar } from "react-native-paper"
 import { useEditing } from "src/contexts/editing"
 
 function Header({ options, navigation, route }: DrawerHeaderProps) {
-  const { editing, save } = useEditing()
+  const { moving, editing, save } = useEditing()
 
   return (
     <Appbar.Header style={{ elevation: 0 }}>
@@ -16,8 +16,11 @@ function Header({ options, navigation, route }: DrawerHeaderProps) {
         <Appbar.BackAction onPress={() => navigation.goBack()} />
       )}
       <Appbar.Content title={getHeaderTitle(options, route.name)} />
-      {editing && <Appbar.Action icon="check" onPress={save} />}
-      <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
+      {moving || editing ? (
+        <Appbar.Action icon="check" onPress={save} />
+      ) : (
+        <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
+      )}
     </Appbar.Header>
   )
 }

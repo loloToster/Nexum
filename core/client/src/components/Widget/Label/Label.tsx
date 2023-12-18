@@ -4,10 +4,12 @@ import { Text } from "react-native-paper"
 
 import { roundBadFloat, roundByStep } from "src/utils"
 
-import { ChoosenWidgetProps } from "../Widget"
+import { ChoosenWidgetProps, WidgetComponent } from "../Widget"
 
-function Label(props: ChoosenWidgetProps) {
-  const { color, text, step } = props.properties
+function LabelComponent(props: ChoosenWidgetProps) {
+  let { color, text, step } = props.properties
+
+  text = text || "/val/"
 
   const styles = getStyles(color)
 
@@ -24,6 +26,13 @@ function Label(props: ChoosenWidgetProps) {
       </Text>
     </View>
   )
+}
+
+const Label: WidgetComponent = {
+  component: LabelComponent,
+  id: "lbl",
+  name: "Label",
+  icon: "label"
 }
 
 export default Label

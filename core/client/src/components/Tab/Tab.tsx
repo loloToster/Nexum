@@ -87,13 +87,13 @@ function Tab({ name, widgets }: TabProps) {
 
   // Handle pos & size changes
 
-  const { registerEdit } = useEditing()
+  const { registerPosEdit } = useEditing()
 
   const editWidget = (
     widgetData: WidgetData,
     newWidgetData: Partial<WidgetData>
   ) => {
-    registerEdit({ widgetId: widgetData.id, ...newWidgetData })
+    registerPosEdit({ widgetId: widgetData.id, ...newWidgetData })
 
     setTabData(prev => {
       const targetWidget = prev.find(w => w.id === widgetData.id)

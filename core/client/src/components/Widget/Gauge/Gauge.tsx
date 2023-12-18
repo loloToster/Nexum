@@ -5,9 +5,9 @@ import { AnimatedCircularProgress } from "react-native-circular-progress"
 
 import { map, roundBadFloat, roundByStep } from "src/utils"
 
-import { ChoosenWidgetProps } from "../Widget"
+import { ChoosenWidgetProps, WidgetComponent } from "../Widget"
 
-function Gauge(props: ChoosenWidgetProps) {
+function GaugeComponent(props: ChoosenWidgetProps) {
   const { color, text, min, max, step } = props.properties
 
   const theme = useTheme()
@@ -46,6 +46,13 @@ function Gauge(props: ChoosenWidgetProps) {
       </AnimatedCircularProgress>
     </View>
   )
+}
+
+const Gauge: WidgetComponent = {
+  component: GaugeComponent,
+  id: "gauge",
+  name: "Gauge",
+  icon: "gauge-low"
 }
 
 export default Gauge
