@@ -33,6 +33,9 @@ export interface WidgetProperties {
   step: number
 }
 
+export type WidgetProperty = keyof WidgetProperties
+export type WidgetPropertyValue = WidgetProperties[WidgetProperty]
+
 export interface WidgetData {
   id: number
   type: string

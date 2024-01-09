@@ -50,6 +50,7 @@ const NumberInputWidget: WidgetComponent = {
   component: NumberInputWidgetComponent,
   id: "num",
   name: "Number Input",
+  editableProperties: ["color", "min", "max", "step"],
   icon: "sort-numeric-variant"
 }
 

@@ -34,6 +34,7 @@ const SliderWidget: WidgetComponent = {
   component: SliderWidgetComponent,
   id: "sldr",
   name: "Slider",
+  editableProperties: ["color", "isVertical", "min", "max", "step"],
   icon: "arrow-left-right"
 }
 

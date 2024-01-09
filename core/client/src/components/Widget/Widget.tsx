@@ -8,7 +8,12 @@ import {
 } from "react-native"
 import { Text, useTheme, Colors, Theme, List } from "react-native-paper"
 
-import { WidgetProperties, WidgetData, WidgetValue } from "src/types"
+import {
+  WidgetProperties,
+  WidgetData,
+  WidgetValue,
+  WidgetProperty
+} from "src/types"
 
 import {
   EmitTarget,
@@ -47,6 +52,7 @@ export interface WidgetComponent {
   component: ((props: ChoosenWidgetProps) => JSX.Element) | (() => JSX.Element)
   id: string
   name: string
+  editableProperties: WidgetProperty[]
   icon?: string
 }
 

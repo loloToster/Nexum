@@ -52,6 +52,7 @@ const Gauge: WidgetComponent = {
   component: GaugeComponent,
   id: "gauge",
   name: "Gauge",
+  editableProperties: ["color", "step", "text"],
   icon: "gauge-low"
 }
 

@@ -60,6 +60,7 @@ const Button: WidgetComponent = {
   component: ButtonComponent,
   id: "btn",
   name: "Button",
+  editableProperties: ["color", "isSwitch", "onText", "offText"],
   icon: "gesture-tap-button"
 }
 

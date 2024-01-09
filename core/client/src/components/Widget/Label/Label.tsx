@@ -32,6 +32,7 @@ const Label: WidgetComponent = {
   component: LabelComponent,
   id: "lbl",
   name: "Label",
+  editableProperties: ["color", "step", "text"],
   icon: "label"
 }
 
