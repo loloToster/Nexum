@@ -61,7 +61,11 @@ const Button: WidgetComponent = {
   id: "btn",
   name: "Button",
   editableProperties: ["color", "isSwitch", "onText", "offText"],
-  icon: "gesture-tap-button"
+  icon: "gesture-tap-button",
+  defaultSize: {
+    height: 2,
+    width: 3
+  }
 }
 
 export default Button

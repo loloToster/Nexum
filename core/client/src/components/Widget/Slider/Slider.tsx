@@ -35,7 +35,11 @@ const SliderWidget: WidgetComponent = {
   id: "sldr",
   name: "Slider",
   editableProperties: ["color", "isVertical", "min", "max", "step"],
-  icon: "arrow-left-right"
+  icon: "arrow-left-right",
+  defaultSize: {
+    height: 1,
+    width: 6
+  }
 }
 
 export default SliderWidget

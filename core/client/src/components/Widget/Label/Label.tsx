@@ -33,7 +33,11 @@ const Label: WidgetComponent = {
   id: "lbl",
   name: "Label",
   editableProperties: ["color", "step", "text"],
-  icon: "label"
+  icon: "label",
+  defaultSize: {
+    height: 1,
+    width: 2
+  }
 }
 
 export default Label

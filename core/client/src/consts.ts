@@ -17,3 +17,6 @@ export const DEF_WIDGET_PROPS: WidgetProperties = {
   max: 10,
   step: 1
 }
+
+export const defaultComponentWidth = 3
+export const defaultComponentHeight = 2

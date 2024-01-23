@@ -42,3 +42,14 @@ export function fillWithValues<T extends Record<string, any>>(
 
   return values
 }
+
+let negativeId = -1
+
+export function getTempNegativeId() {
+  return --negativeId
+}
+
+// ! keep in sync with backend
+export function createTarget(deviceId: number | string, customId: string) {
+  return `${deviceId}-${customId}`
+}

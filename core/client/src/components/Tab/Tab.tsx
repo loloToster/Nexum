@@ -5,6 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useTheme, Theme, FAB } from "react-native-paper"
 
 import { WidgetData } from "src/types"
+import { createTarget, getTempNegativeId } from "src/utils"
+import { defaultComponentHeight, defaultComponentWidth } from "src/consts"
 
 import { useEditing } from "src/contexts/editing"
 
@@ -93,14 +95,12 @@ function Tab({ name, widgets }: TabProps) {
 
   const { registerPosEdit } = useEditing()
 
-  const editWidget = (
-    widgetData: WidgetData,
-    newWidgetData: Partial<WidgetData>
-  ) => {
-    registerPosEdit({ widgetId: widgetData.id, ...newWidgetData })
+  const editWidget = (widgetId: number, newWidgetData: Partial<WidgetData>) => {
+    registerPosEdit({ widgetId, ...newWidgetData })
+    // todo: register prop edit
 
     setTabData(prev => {
-      const targetWidget = prev.find(w => w.id === widgetData.id)
+      const targetWidget = prev.find(w => w.id === widgetId)
 
       if (targetWidget) {
         for (const [key, val] of Object.entries(newWidgetData)) {
@@ -160,7 +160,7 @@ function Tab({ name, widgets }: TabProps) {
         : prev
     })
 
-    editWidget(widget, { ...bestCoordinates })
+    editWidget(widget.id, { ...bestCoordinates })
   }
 
   const changeSize = (widget: WidgetData, w: number, h: number) => {
@@ -195,7 +195,7 @@ function Tab({ name, widgets }: TabProps) {
       }
     }
 
-    editWidget(widget, { width: width, height: height })
+    editWidget(widget.id, { width: width, height: height })
   }
 
   // editing props
@@ -207,24 +207,34 @@ function Tab({ name, widgets }: TabProps) {
   const [newWidgetPropsModalOpen, setNewWidgetPropsModalOpen] = useState(false)
 
   const handleNewWidget = (data: SubmitData) => {
-    setNewWidgetPropsModalOpen(false)
+    const deviceId = -1 // todo: choose device
+    const y = Math.max(...tabData.map(w => w.y + w.height))
 
     const newWidget: WidgetData = {
-      id: -1,
+      id: getTempNegativeId(),
       customId: data.customId,
-      deviceId: -1,
-      target: "",
+      deviceId,
+      target: createTarget(deviceId, data.customId),
       type: data.component.id,
-      tabId: -1,
-      y: 0,
+      tabId: -1, // todo
       x: 0,
-      height: 2,
-      width: 2,
+      y,
+      width: data.component.defaultSize?.width || defaultComponentWidth,
+      height: data.component.defaultSize?.height || defaultComponentHeight,
       value: null,
-      properties: data
+      properties: data.properties
     }
 
     setTabData(prev => [...prev, newWidget])
+    setNewWidgetPropsModalOpen(false)
+  }
+
+  const handleWidgetEdit = (editedWidget: WidgetData) => {
+    editWidget(editedWidget.id, editedWidget)
+  }
+
+  const handleWidgetDelete = (deletedWidget: WidgetData) => {
+    setTabData(prev => prev.filter(w => w.id !== deletedWidget.id))
   }
 
   return (
@@ -260,6 +270,8 @@ function Tab({ name, widgets }: TabProps) {
               left={cellWidth * widgetData.x}
               onChangePos={changePos}
               onChangeSize={changeSize}
+              onEdit={handleWidgetEdit}
+              onDelete={handleWidgetDelete}
             />
           ))}
         </View>

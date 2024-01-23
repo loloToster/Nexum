@@ -53,7 +53,11 @@ const Gauge: WidgetComponent = {
   id: "gauge",
   name: "Gauge",
   editableProperties: ["color", "step", "text"],
-  icon: "gauge-low"
+  icon: "gauge-low",
+  defaultSize: {
+    height: 3,
+    width: 4
+  }
 }
 
 export default Gauge

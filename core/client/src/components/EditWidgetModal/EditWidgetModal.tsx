@@ -23,10 +23,12 @@ import {
 } from "react-native-paper"
 
 import { DEF_WIDGET_PROPS } from "src/consts"
+import { fillWithValues } from "src/utils"
 import type { WidgetData, WidgetProperties, WidgetProperty } from "src/types"
+
 import { WidgetComponent, widgetComponents } from "src/components/Widget/Widget"
 import Error from "src/components/Error/Error"
-import { fillWithValues } from "src/utils"
+import RUSure from "src/components/RUSure/RUSure"
 
 function Row({
   children,
@@ -131,7 +133,8 @@ const inputs: Inputs = {
 export type SubmitData = {
   component: WidgetComponent
   customId: string
-} & WidgetProperties
+  properties: WidgetProperties
+}
 
 export type EditWidgetModalProps =
   | (
@@ -148,6 +151,7 @@ export type EditWidgetModalProps =
       onClose?: () => void
       onAdd?: (props: SubmitData) => void
       onEdit?: (props: SubmitData) => void
+      onDelete?: () => void
     }
 
 export default function EditWidgetModal({
@@ -156,7 +160,8 @@ export default function EditWidgetModal({
   open,
   onClose = () => null,
   onAdd = () => null,
-  onEdit = () => null
+  onEdit = () => null,
+  onDelete = () => null
 }: EditWidgetModalProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
@@ -198,19 +203,35 @@ export default function EditWidgetModal({
     }
 
     const data: SubmitData = {
-      ...widgetProperties,
-      title,
       customId,
-      component: widgetComponent
+      component: widgetComponent,
+      properties: {
+        ...widgetProperties,
+        title
+      }
     }
 
     newWidget ? onAdd(data) : onEdit(data)
+  }
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
+  const handleDelete = () => {
+    onDelete()
+    setDeleteModalOpen(false)
   }
 
   return (
     <Portal>
       {open && (
         <View style={styles.wrapper}>
+          <RUSure
+            open={deleteModalOpen}
+            onConfirm={handleDelete}
+            onDismiss={() => setDeleteModalOpen(false)}
+          >
+            Are you sure you want to delete this widget?
+          </RUSure>
           <Appbar style={styles.bar}>
             <Appbar.Action icon="close" onPress={handleClose} />
           </Appbar>
@@ -269,7 +290,7 @@ export default function EditWidgetModal({
               <Row>
                 {!newWidget && (
                   <Button
-                    onPress={() => null}
+                    onPress={() => setDeleteModalOpen(true)}
                     mode="contained"
                     icon="delete"
                     color={Colors.red500}

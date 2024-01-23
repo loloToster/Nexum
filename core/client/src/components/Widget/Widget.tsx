@@ -24,6 +24,10 @@ import {
 } from "src/contexts/valueBridge"
 import { useEditing } from "src/contexts/editing"
 
+import EditWidgetModal, {
+  SubmitData
+} from "src/components/EditWidgetModal/EditWidgetModal"
+
 // special component returned if provided type does not match any component in map
 import Unknown from "./Unknown/Unknown"
 
@@ -32,7 +36,6 @@ import SliderWidget from "./Slider/Slider"
 import Gauge from "./Gauge/Gauge"
 import Label from "./Label/Label"
 import NumberInput from "./NumberInput/NumberInput"
-import EditWidgetModal from "../EditWidgetModal/EditWidgetModal"
 
 export { EmitTarget } from "src/contexts/valueBridge"
 
@@ -57,6 +60,10 @@ export interface WidgetComponent {
   name: string
   editableProperties: WidgetProperty[]
   icon?: string
+  defaultSize?: {
+    width: number
+    height: number
+  }
 }
 
 export const widgetComponents: WidgetComponent[] = [
@@ -75,6 +82,8 @@ export interface WidgetProps {
   top: number
   onChangePos: (widget: WidgetData, x: number, y: number) => any
   onChangeSize: (widget: WidgetData, w: number, h: number) => any
+  onEdit: (widget: WidgetData) => void
+  onDelete: (widget: WidgetData) => void
 }
 
 function Widget({
@@ -84,7 +93,9 @@ function Widget({
   left,
   top,
   onChangePos,
-  onChangeSize
+  onChangeSize,
+  onEdit,
+  onDelete
 }: WidgetProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
@@ -287,6 +298,22 @@ function Widget({
 
   const [editWidgetModalOpen, setEditWidgetModalOpen] = useState(false)
 
+  const handleEdit = (submitData: SubmitData) => {
+    const widgetData: WidgetData = {
+      ...data,
+      customId: submitData.customId,
+      properties: submitData.properties
+    }
+
+    onEdit(widgetData)
+    setEditWidgetModalOpen(false)
+  }
+
+  const handleDelete = () => {
+    onDelete(data)
+    setEditWidgetModalOpen(false)
+  }
+
   return (
     <Animated.View
       style={{
@@ -301,6 +328,8 @@ function Widget({
       <EditWidgetModal
         widget={data}
         open={editWidgetModalOpen}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
         onClose={() => setEditWidgetModalOpen(false)}
       />
       <View style={styles.wrapper}>
