@@ -14,9 +14,10 @@ import { widgetComponents } from "src/components/Widget/Widget"
 export interface WidgetsModalProps {
   open: boolean
   onClose: () => void
+  onChoice: (id: string) => void
 }
 
-function WidgetsModal({ open, onClose }: WidgetsModalProps) {
+function WidgetsModal({ open, onClose, onChoice }: WidgetsModalProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
@@ -29,7 +30,7 @@ function WidgetsModal({ open, onClose }: WidgetsModalProps) {
             <List.Section>
               {widgetComponents.map(comp => (
                 <List.Item
-                  onPress={() => null}
+                  onPress={() => onChoice(comp.id)}
                   title={comp.name}
                   key={comp.id}
                   left={props => (

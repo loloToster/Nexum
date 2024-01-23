@@ -14,6 +14,8 @@ import {
   WidgetValue,
   WidgetProperty
 } from "src/types"
+import { DEF_WIDGET_PROPS } from "src/consts"
+import { fillWithValues } from "src/utils"
 
 import {
   EmitTarget,
@@ -30,6 +32,7 @@ import SliderWidget from "./Slider/Slider"
 import Gauge from "./Gauge/Gauge"
 import Label from "./Label/Label"
 import NumberInput from "./NumberInput/NumberInput"
+import EditWidgetModal from "../EditWidgetModal/EditWidgetModal"
 
 export { EmitTarget } from "src/contexts/valueBridge"
 
@@ -138,19 +141,7 @@ function Widget({
     return [widgetValue, setValue]
   }
 
-  const widgetProperties: WidgetProperties = {
-    // default values
-    title: "",
-    color: theme.colors.accent,
-    text: "",
-    onText: "",
-    offText: "",
-    isSwitch: true,
-    isVertical: false,
-    min: 0,
-    max: 10,
-    step: 1
-  }
+  const widgetProperties = fillWithValues(data.properties, DEF_WIDGET_PROPS)
 
   // assign all defined properties
   for (const [key, val] of Object.entries(data.properties || {})) {
@@ -294,6 +285,8 @@ function Widget({
     })
   ).current
 
+  const [editWidgetModalOpen, setEditWidgetModalOpen] = useState(false)
+
   return (
     <Animated.View
       style={{
@@ -305,6 +298,11 @@ function Widget({
         zIndex: dragging || resizing ? 1 : 0
       }}
     >
+      <EditWidgetModal
+        widget={data}
+        open={editWidgetModalOpen}
+        onClose={() => setEditWidgetModalOpen(false)}
+      />
       <View style={styles.wrapper}>
         {Boolean(widgetProperties.title) && (
           <Text selectable={false} style={styles.title}>
@@ -314,7 +312,7 @@ function Widget({
         <ChoosenWidget {...choosenWidgetProps} />
       </View>
       {editing && (
-        <TouchableWithoutFeedback onPress={() => console.log("xd")}>
+        <TouchableWithoutFeedback onPress={() => setEditWidgetModalOpen(true)}>
           <View style={[styles.changeCoverBase, styles.editCover]}>
             <List.Icon icon="pencil" color={Colors.amber500} />
           </View>

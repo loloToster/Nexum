@@ -14,7 +14,6 @@ import { io } from "socket.io-client"
 
 import {
   ActivityIndicator,
-  Colors,
   DarkTheme,
   Modal,
   Portal,
@@ -22,6 +21,7 @@ import {
 } from "react-native-paper"
 
 import { getBaseUrl } from "./config"
+import { ACCENT_COLOR, PRIMARY_COLOR, SURFACE_COLOR } from "./consts"
 
 import {
   getUserFromStorage,
@@ -35,15 +35,16 @@ import Header from "./components/Header/Header"
 import DrawerContent from "./components/Drawer/Drawer"
 import Loader from "./components/Loader/Loader"
 
+import Widgets from "./screens/Widgets"
+
 const Login = lazy(() => import("./screens/Login"))
-const Widgets = lazy(() => import("./screens/Widgets"))
 const Users = lazy(() => import("./screens/Users"))
 const Devices = lazy(() => import("./screens/Devices"))
 
 DarkTheme.mode = "exact"
-DarkTheme.colors.surface = "#565656"
-DarkTheme.colors.primary = Colors.teal300
-DarkTheme.colors.accent = Colors.cyan400
+DarkTheme.colors.surface = SURFACE_COLOR
+DarkTheme.colors.primary = PRIMARY_COLOR
+DarkTheme.colors.accent = ACCENT_COLOR
 
 const queryClient = new QueryClient()
 const Drawer = createDrawerNavigator()
@@ -108,7 +109,8 @@ function App() {
                                 drawerPosition: "right",
                                 drawerStyle: {
                                   backgroundColor: DarkTheme.colors.background
-                                }
+                                },
+                                lazy: true
                               }}
                             >
                               <Drawer.Screen

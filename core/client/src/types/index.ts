@@ -39,6 +39,9 @@ export type WidgetPropertyValue = WidgetProperties[WidgetProperty]
 export interface WidgetData {
   id: number
   type: string
+  customId: string
+  tabId: number
+  deviceId: number
   target: string
   value: WidgetValue | null
   x: number

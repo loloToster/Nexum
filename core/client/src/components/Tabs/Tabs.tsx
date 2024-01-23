@@ -15,7 +15,6 @@ import { useEditing } from "src/contexts/editing"
 import Translatable from "src/components/Translatable/Translatable"
 import Tab from "src/components/Tab/Tab"
 import AddTab from "src/components/AddTab/AddTab"
-import WidgetsModal from "src/components/WidgetsModal/WidgetsModal"
 
 export interface TabsProps {
   data: TabData[]
@@ -28,10 +27,8 @@ function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
   const styles = getStyles(theme)
 
   const { user } = useUser()
-  const { editing } = useEditing()
 
   const [addTabActive, setAddTabActive] = useState(false)
-  const [newWidgetModalOpen, setNewWidgetModalOpen] = useState(false)
 
   const renderTabs = () => {
     let tabs = data.map((tab, i) => (
@@ -92,23 +89,12 @@ function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
     </Translatable>
   ) : (
     <View style={{ flex: 1 }}>
-      <WidgetsModal
-        open={newWidgetModalOpen}
-        onClose={() => setNewWidgetModalOpen(false)}
-      />
       {data.length === 1 && !user?.isAdmin ? (
         <Tab name={data[0].name} widgets={data[0].widgets} />
       ) : (
         <PaperTabs defaultIndex={defaultIndex} mode="scrollable">
           {renderTabs()}
         </PaperTabs>
-      )}
-      {editing && (
-        <FAB
-          icon="view-grid-plus"
-          style={styles.fab}
-          onPress={() => setNewWidgetModalOpen(true)}
-        />
       )}
     </View>
   )
@@ -133,12 +119,6 @@ const getStyles = (theme: Theme) => {
       margin: 0,
       height: 30,
       width: 30
-    },
-    fab: {
-      position: "absolute",
-      margin: 24,
-      right: 0,
-      bottom: 0
     }
   })
 }

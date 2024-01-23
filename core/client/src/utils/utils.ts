@@ -28,3 +28,17 @@ export function roundBadFloat(n: number) {
 export function roundByStep(n: number, step: number) {
   return n - (n % step) + (n % step > step / 2 ? step : 0)
 }
+
+export function fillWithValues<T extends Record<string, any>>(
+  target: T | Partial<T> | undefined | null,
+  values: T
+) {
+  values = { ...values }
+
+  for (const [key, val] of Object.entries(target || {})) {
+    if (val !== null && val !== undefined)
+      (values as Record<string, any>)[key] = val
+  }
+
+  return values
+}
