@@ -2,13 +2,17 @@ import React, { useEffect, useRef, useState } from "react"
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-import { useTheme, Theme } from "react-native-paper"
+import { useTheme, Theme, FAB } from "react-native-paper"
 
 import { WidgetData } from "src/types"
 
 import { useEditing } from "src/contexts/editing"
 
-import Widget from "src/components/Widget/Widget"
+import Widget, { widgetComponents } from "src/components/Widget/Widget"
+import WidgetsModal from "src/components/WidgetsModal/WidgetsModal"
+import EditWidgetModal, {
+  SubmitData
+} from "src/components/EditWidgetModal/EditWidgetModal"
 
 export interface TabProps {
   name: string
@@ -194,27 +198,80 @@ function Tab({ name, widgets }: TabProps) {
     editWidget(widget, { width: width, height: height })
   }
 
+  // editing props
+
+  const { editing } = useEditing()
+
+  const [newWidgetModalOpen, setNewWidgetModalOpen] = useState(false)
+  const [newWidgetType, setNewWidgetType] = useState(widgetComponents[0].id)
+  const [newWidgetPropsModalOpen, setNewWidgetPropsModalOpen] = useState(false)
+
+  const handleNewWidget = (data: SubmitData) => {
+    setNewWidgetPropsModalOpen(false)
+
+    const newWidget: WidgetData = {
+      id: -1,
+      customId: data.customId,
+      deviceId: -1,
+      target: "",
+      type: data.component.id,
+      tabId: -1,
+      y: 0,
+      x: 0,
+      height: 2,
+      width: 2,
+      value: null,
+      properties: data
+    }
+
+    setTabData(prev => [...prev, newWidget])
+  }
+
   return (
-    <ScrollView style={styles.tab}>
-      <View
-        style={{
-          minHeight: isFinite(viewHeight) ? viewHeight * cellHeight : 0
-        }}
-      >
-        {tabData.map((widgetData, i) => (
-          <Widget
-            key={i}
-            data={widgetData}
-            width={cellWidth * widgetData.width}
-            height={cellHeight * widgetData.height}
-            top={cellHeight * widgetData.y}
-            left={cellWidth * widgetData.x}
-            onChangePos={changePos}
-            onChangeSize={changeSize}
-          />
-        ))}
-      </View>
-    </ScrollView>
+    <View style={styles.tab}>
+      <ScrollView>
+        <WidgetsModal
+          open={newWidgetModalOpen}
+          onClose={() => setNewWidgetModalOpen(false)}
+          onChoice={t => {
+            setNewWidgetType(t)
+            setNewWidgetModalOpen(false)
+            setNewWidgetPropsModalOpen(true)
+          }}
+        />
+        <EditWidgetModal
+          open={newWidgetPropsModalOpen}
+          newWidgetType={newWidgetType}
+          onClose={() => setNewWidgetPropsModalOpen(false)}
+          onAdd={handleNewWidget}
+        />
+        <View
+          style={{
+            minHeight: isFinite(viewHeight) ? viewHeight * cellHeight : 0
+          }}
+        >
+          {tabData.map((widgetData, i) => (
+            <Widget
+              key={i}
+              data={widgetData}
+              width={cellWidth * widgetData.width}
+              height={cellHeight * widgetData.height}
+              top={cellHeight * widgetData.y}
+              left={cellWidth * widgetData.x}
+              onChangePos={changePos}
+              onChangeSize={changeSize}
+            />
+          ))}
+        </View>
+      </ScrollView>
+      {editing && (
+        <FAB
+          icon="view-grid-plus"
+          style={styles.fab}
+          onPress={() => setNewWidgetModalOpen(true)}
+        />
+      )}
+    </View>
   )
 }
 
@@ -225,6 +282,12 @@ const getStyles = (theme: Theme) => {
     tab: {
       backgroundColor: theme.colors.background,
       flex: 1
+    },
+    fab: {
+      position: "absolute",
+      margin: 24,
+      right: 0,
+      bottom: 0
     }
   })
 }

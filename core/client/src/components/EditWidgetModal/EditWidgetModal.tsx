@@ -22,9 +22,11 @@ import {
   Subheading
 } from "react-native-paper"
 
+import { DEF_WIDGET_PROPS } from "src/consts"
 import type { WidgetData, WidgetProperties, WidgetProperty } from "src/types"
-import { widgetComponents } from "src/components/Widget/Widget"
+import { WidgetComponent, widgetComponents } from "src/components/Widget/Widget"
 import Error from "src/components/Error/Error"
+import { fillWithValues } from "src/utils"
 
 function Row({
   children,
@@ -126,42 +128,48 @@ const inputs: Inputs = {
   }
 }
 
+export type SubmitData = {
+  component: WidgetComponent
+  customId: string
+} & WidgetProperties
+
 export type EditWidgetModalProps =
-  | {
-      widget: WidgetData
-      newWidgetType?: undefined
-    }
-  | {
-      widget?: undefined
-      newWidgetType: string
+  | (
+      | {
+          widget: WidgetData
+          newWidgetType?: undefined
+        }
+      | {
+          widget?: undefined
+          newWidgetType: string
+        }
+    ) & {
+      open?: boolean
+      onClose?: () => void
+      onAdd?: (props: SubmitData) => void
+      onEdit?: (props: SubmitData) => void
     }
 
 export default function EditWidgetModal({
   widget,
-  newWidgetType
+  newWidgetType,
+  open,
+  onClose = () => null,
+  onAdd = () => null,
+  onEdit = () => null
 }: EditWidgetModalProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
   const newWidget = Boolean(newWidgetType)
-  const widgetComponentId = newWidget ? newWidgetType : widget?.type
+  const widgetComponentId = newWidget ? newWidgetType! : widget!.type
   const widgetComponent = widgetComponents.find(c => c.id === widgetComponentId)
 
-  const [customId, setCustomId] = useState("")
-  const [title, setTitle] = useState("")
-  const [widgetProperties, setWidgetProperties] = useState<WidgetProperties>({
-    // default values
-    title: "",
-    color: theme.colors.accent,
-    text: "",
-    onText: "",
-    offText: "",
-    isSwitch: true,
-    isVertical: false,
-    min: 0,
-    max: 10,
-    step: 1
-  })
+  const [customId, setCustomId] = useState(widget?.customId || "")
+  const [title, setTitle] = useState(widget?.properties?.title || "")
+  const [widgetProperties, setWidgetProperties] = useState<WidgetProperties>(
+    fillWithValues(widget?.properties, DEF_WIDGET_PROPS)
+  )
 
   function setWidgetProp<K extends WidgetProperty>(
     prop: K,
@@ -173,80 +181,112 @@ export default function EditWidgetModal({
     })
   }
 
+  const handleClose = () => {
+    if (newWidget) {
+      setCustomId("")
+      setTitle("")
+      fillWithValues(widget?.properties, DEF_WIDGET_PROPS)
+    }
+
+    onClose()
+  }
+
+  const onSubmit = () => {
+    if (!widgetComponent) {
+      // todo: will this ever happen?
+      return
+    }
+
+    const data: SubmitData = {
+      ...widgetProperties,
+      title,
+      customId,
+      component: widgetComponent
+    }
+
+    newWidget ? onAdd(data) : onEdit(data)
+  }
+
   return (
     <Portal>
-      <View style={styles.wrapper}>
-        <Appbar style={styles.bar}>
-          <Appbar.Action icon="close" onPress={() => null} />
-        </Appbar>
-        {widgetComponent ? (
-          <ScrollView style={styles.container}>
-            <Row>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Avatar.Icon size={64} icon="pencil" />
-                <View style={{ marginLeft: 12 }}>
-                  <Headline>
-                    {newWidget ? "Add" : "Editing"} {widgetComponent.name}
-                  </Headline>
-                  <Subheading style={{ color: theme.colors.placeholder }}>
-                    DB Id: {newWidget ? "autoincremented number" : 123}
-                  </Subheading>
+      {open && (
+        <View style={styles.wrapper}>
+          <Appbar style={styles.bar}>
+            <Appbar.Action icon="close" onPress={handleClose} />
+          </Appbar>
+          {widgetComponent ? (
+            <ScrollView style={styles.container}>
+              <Row>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Avatar.Icon size={64} icon="pencil" />
+                  <View style={{ marginLeft: 12 }}>
+                    <Headline>
+                      {newWidget ? "Add" : "Editing"} {widgetComponent.name}
+                    </Headline>
+                    <Subheading style={{ color: theme.colors.placeholder }}>
+                      DB Id: {newWidget ? "autoincremented number" : widget?.id}
+                    </Subheading>
+                  </View>
                 </View>
-              </View>
-            </Row>
-            <Row>
-              <TextInput
-                label="Custom Id"
-                value={customId}
-                onChangeText={setCustomId}
-              />
-            </Row>
-            <Row>
-              <TextInput label="Title" value={title} onChangeText={setTitle} />
-            </Row>
-            {widgetComponent.editableProperties
-              .filter(prop => Boolean(inputs[prop]))
-              .map(prop => {
-                const Component = inputs[prop] as any // todo: remove any
-                return (
-                  <Component
-                    value={widgetProperties[prop]}
-                    onChange={(v: any) => setWidgetProp(prop, v)}
-                    key={prop}
-                  />
-                )
-              })}
-            <Row>
-              {newWidget ? (
-                <Button onPress={() => null} mode="contained" icon="check">
-                  Add
-                </Button>
-              ) : (
-                <Button onPress={() => null} mode="contained" icon="check">
-                  Save
-                </Button>
-              )}
-            </Row>
-            <Row>
-              {!newWidget && (
-                <Button
-                  onPress={() => null}
-                  mode="contained"
-                  icon="delete"
-                  color={Colors.red500}
-                >
-                  Remove Widget
-                </Button>
-              )}
-            </Row>
-            <View
-              style={{ height: Dimensions.get("window").height / 2.5 }}
-            ></View>
-          </ScrollView>
-        ) : (
-          <Error text="Unknown widget type" />
-        )}
-      </View>
+              </Row>
+              <Row>
+                <TextInput
+                  label="Custom Id"
+                  value={customId}
+                  onChangeText={setCustomId}
+                />
+              </Row>
+              <Row>
+                <TextInput
+                  label="Title"
+                  value={title}
+                  onChangeText={setTitle}
+                />
+              </Row>
+              {widgetComponent.editableProperties
+                .filter(prop => Boolean(inputs[prop]))
+                .map(prop => {
+                  const Component = inputs[prop] as any // todo: remove any
+                  return (
+                    <Component
+                      value={widgetProperties[prop]}
+                      onChange={(v: any) => setWidgetProp(prop, v)}
+                      key={prop}
+                    />
+                  )
+                })}
+              <Row>
+                {newWidget ? (
+                  <Button onPress={onSubmit} mode="contained" icon="check">
+                    Add
+                  </Button>
+                ) : (
+                  <Button onPress={onSubmit} mode="contained" icon="check">
+                    Save
+                  </Button>
+                )}
+              </Row>
+              <Row>
+                {!newWidget && (
+                  <Button
+                    onPress={() => null}
+                    mode="contained"
+                    icon="delete"
+                    color={Colors.red500}
+                  >
+                    Remove Widget
+                  </Button>
+                )}
+              </Row>
+              <View
+                style={{ height: Dimensions.get("window").height / 2.5 }}
+              ></View>
+            </ScrollView>
+          ) : (
+            <Error text="Unknown widget type" />
+          )}
+        </View>
+      )}
     </Portal>
   )
 }
