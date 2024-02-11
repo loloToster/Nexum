@@ -4,11 +4,6 @@
   - You are about to drop the `device` table. If the table is not empty, all the data it contains will be lost.
 
 */
--- DropForeignKey
-ALTER TABLE "widgets" DROP CONSTRAINT "widgets_device_id_fkey";
-
--- DropTable
-DROP TABLE "device";
 
 -- CreateTable
 CREATE TABLE "devices" (
@@ -18,6 +13,15 @@ CREATE TABLE "devices" (
 
     CONSTRAINT "devices_pkey" PRIMARY KEY ("id")
 );
+
+-- CopyData
+INSERT INTO "devices" SELECT * FROM "device";
+
+-- DropForeignKey
+ALTER TABLE "widgets" DROP CONSTRAINT "widgets_device_id_fkey";
+
+-- DropTable
+DROP TABLE "device";
 
 -- CreateIndex
 CREATE UNIQUE INDEX "devices_token_key" ON "devices"("token");
