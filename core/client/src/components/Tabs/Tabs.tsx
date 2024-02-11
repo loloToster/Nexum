@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { View, StyleSheet } from "react-native"
 
-import { FAB, List, Text, Theme, useTheme } from "react-native-paper"
+import { List, Text, Theme, useTheme } from "react-native-paper"
 import {
   Tabs as PaperTabs,
   TabScreen as PaperTabScreen
@@ -10,7 +10,6 @@ import {
 import { TabData } from "src/types"
 
 import { useUser } from "src/contexts/user"
-import { useEditing } from "src/contexts/editing"
 
 import Translatable from "src/components/Translatable/Translatable"
 import Tab from "src/components/Tab/Tab"

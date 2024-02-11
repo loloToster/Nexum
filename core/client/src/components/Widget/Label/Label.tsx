@@ -7,7 +7,8 @@ import { roundBadFloat, roundByStep } from "src/utils"
 import { ChoosenWidgetProps, WidgetComponent } from "../Widget"
 
 function LabelComponent(props: ChoosenWidgetProps) {
-  let { color, text, step } = props.properties
+  const { color, step } = props.properties
+  let { text } = props.properties
 
   text = text || "/val/"
 

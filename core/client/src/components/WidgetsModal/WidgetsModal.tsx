@@ -1,3 +1,4 @@
+import React from "react"
 import { Dimensions, ScrollView, StyleSheet } from "react-native"
 import {
   Headline,

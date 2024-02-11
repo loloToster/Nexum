@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import {
   View,
   StyleSheet,
@@ -138,21 +138,21 @@ export type SubmitData = {
 
 export type EditWidgetModalProps =
   | (
-      | {
-          widget: WidgetData
-          newWidgetType?: undefined
-        }
-      | {
-          widget?: undefined
-          newWidgetType: string
-        }
-    ) & {
-      open?: boolean
-      onClose?: () => void
-      onAdd?: (props: SubmitData) => void
-      onEdit?: (props: SubmitData) => void
-      onDelete?: () => void
+    | {
+      widget: WidgetData
+      newWidgetType?: undefined
     }
+    | {
+      widget?: undefined
+      newWidgetType: string
+    }
+  ) & {
+    open?: boolean
+    onClose?: () => void
+    onAdd?: (props: SubmitData) => void
+    onEdit?: (props: SubmitData) => void
+    onDelete?: () => void
+  }
 
 export default function EditWidgetModal({
   widget,
