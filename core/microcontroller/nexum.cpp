@@ -186,6 +186,8 @@ void NexumClass::update(String customId, boolean value) {
 
 boolean NexumClass::isConnected() { return _connected; }
 
+boolean NexumClass::isWifiConnected() { return WiFi.status() == WL_CONNECTED; }
+
 void NexumClass::loop() { socketIO.loop(); }
 
 NexumClass Nexum;

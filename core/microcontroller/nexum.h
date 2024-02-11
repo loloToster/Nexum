@@ -31,6 +31,7 @@ class NexumClass {
   void update(String customId, boolean value);
 
   boolean isConnected();
+  boolean isWifiConnected();
 
   void loop();
 
