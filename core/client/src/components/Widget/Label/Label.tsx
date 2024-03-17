@@ -15,14 +15,16 @@ function LabelComponent(props: ChoosenWidgetProps) {
   const styles = getStyles(color)
 
   const { useWidgetValue } = props
-  const [value] = useWidgetValue(0)
+  const [value] = useWidgetValue<string | number>(0)
 
   return (
     <View style={styles.container}>
       <Text style={[styles.text, { fontSize: props.width === 1 ? 16 : 26 }]}>
         {text.replace(
           /\/val\//,
-          roundBadFloat(roundByStep(value, step)).toString()
+          typeof value === "string"
+            ? value
+            : roundBadFloat(roundByStep(value, step)).toString()
         )}
       </Text>
     </View>
