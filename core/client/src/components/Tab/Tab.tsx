@@ -248,14 +248,13 @@ function Tab({ tabId, name, widgets }: TabProps) {
   const [newWidgetPropsModalOpen, setNewWidgetPropsModalOpen] = useState(false)
 
   const handleNewWidget = (data: SubmitData) => {
-    const deviceId = 1 // todo: choose device
     const y = Math.max(...widgets.map(w => w.y + w.height))
 
     const newWidget: WidgetData = {
       id: getTempNegativeId(),
       customId: data.customId,
-      deviceId,
-      target: createTarget(deviceId, data.customId),
+      deviceId: data.deviceId,
+      target: createTarget(data.deviceId, data.customId),
       type: data.component.id,
       tabId,
       x: 0,

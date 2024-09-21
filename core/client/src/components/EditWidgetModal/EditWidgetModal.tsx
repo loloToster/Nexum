@@ -29,6 +29,7 @@ import type { WidgetData, WidgetProperties, WidgetProperty } from "src/types"
 import { WidgetComponent, widgetComponents } from "src/components/Widget/Widget"
 import Error from "src/components/Error/Error"
 import RUSure from "src/components/RUSure/RUSure"
+import DeviceChoiceBtn from "../DeviceChoiceBtn/DeviceChoiceBtn"
 
 function Row({
   children,
@@ -139,6 +140,7 @@ const inputs: Inputs = {
 
 export type SubmitData = {
   component: WidgetComponent
+  deviceId: number
   customId: string
   properties: WidgetProperties
 }
@@ -177,6 +179,7 @@ export default function EditWidgetModal({
   const widgetComponentId = newWidget ? newWidgetType! : widget!.type
   const widgetComponent = widgetComponents.find(c => c.id === widgetComponentId)
 
+  const [deviceId, setDeviceId] = useState(widget?.deviceId ?? -1)
   const [customId, setCustomId] = useState(widget?.customId || "")
   const [title, setTitle] = useState(widget?.properties?.title || "")
   const [widgetProperties, setWidgetProperties] = useState<WidgetProperties>(
@@ -195,6 +198,7 @@ export default function EditWidgetModal({
 
   const handleClose = () => {
     if (newWidget) {
+      setDeviceId(-1)
       setCustomId("")
       setTitle("")
       fillWithValues(widget?.properties, DEF_WIDGET_PROPS)
@@ -210,6 +214,7 @@ export default function EditWidgetModal({
     }
 
     const data: SubmitData = {
+      deviceId,
       customId,
       component: widgetComponent,
       properties: {
@@ -256,6 +261,12 @@ export default function EditWidgetModal({
                     </Subheading>
                   </View>
                 </View>
+              </Row>
+              <Row>
+                <DeviceChoiceBtn
+                  deviceId={deviceId}
+                  onChangeDevice={setDeviceId}
+                />
               </Row>
               <Row>
                 <TextInput

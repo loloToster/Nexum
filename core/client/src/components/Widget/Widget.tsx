@@ -109,6 +109,7 @@ function Widget({
   const ChoosenWidget =
     widgetComponents.find(c => c.id === data.type)?.component || Unknown
 
+  // TODO: handle edited widgets
   const useWidgetValue: WidgetValueHook = initialValue => {
     const { bridge, values, emit: rawEmit } = useValueBridge()
     const emit = (val: WidgetValue, target: EmitTarget) =>
@@ -307,6 +308,7 @@ function Widget({
   const handleEdit = (submitData: SubmitData) => {
     const widgetData: WidgetData = {
       ...data,
+      deviceId: submitData.deviceId,
       customId: submitData.customId,
       properties: submitData.properties
     }
