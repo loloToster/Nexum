@@ -30,6 +30,7 @@ import {
 } from "./contexts/user"
 import { EditingContext, EditingContextProvider } from "./contexts/editing"
 import { SocketContext } from "./contexts/socket"
+import { TabsProvider } from "./contexts/tabs"
 
 import Header from "./components/Header/Header"
 import DrawerContent from "./components/Drawer/Drawer"
@@ -82,58 +83,60 @@ function App() {
             <UserContextConsumer>
               {({ user }) =>
                 user ? (
-                  <EditingContextProvider>
-                    <EditingContext.Consumer>
-                      {({ saving }) => (
-                        <SocketContext.Provider value={{ socket }}>
-                          <Portal>
-                            <Modal visible={saving} dismissable={false}>
-                              <ActivityIndicator
-                                size="large"
-                                style={{
-                                  height: Dimensions.get("screen").height
-                                }}
-                              />
-                            </Modal>
-                          </Portal>
-                          <NavigationContainer
-                            documentTitle={{ enabled: false }}
-                            linking={{ prefixes: [] }}
-                          >
-                            <Drawer.Navigator
-                              initialRouteName="widgets"
-                              backBehavior="initialRoute"
-                              drawerContent={DrawerContent}
-                              screenOptions={{
-                                header: props => <Header {...props} />,
-                                drawerPosition: "right",
-                                drawerStyle: {
-                                  backgroundColor: DarkTheme.colors.background
-                                },
-                                lazy: true
-                              }}
+                  <TabsProvider>
+                    <EditingContextProvider>
+                      <EditingContext.Consumer>
+                        {({ saving }) => (
+                          <SocketContext.Provider value={{ socket }}>
+                            <Portal>
+                              <Modal visible={saving} dismissable={false}>
+                                <ActivityIndicator
+                                  size="large"
+                                  style={{
+                                    height: Dimensions.get("screen").height
+                                  }}
+                                />
+                              </Modal>
+                            </Portal>
+                            <NavigationContainer
+                              documentTitle={{ enabled: false }}
+                              linking={{ prefixes: [] }}
                             >
-                              <Drawer.Screen
-                                name="widgets"
-                                component={Widgets}
-                                options={{ headerTitle: "Nexum" }}
-                              />
-                              <Drawer.Screen
-                                name="devices"
-                                component={Devices}
-                                options={{ headerTitle: "Devices" }}
-                              />
-                              <Drawer.Screen
-                                name="users"
-                                component={Users}
-                                options={{ headerTitle: "Users" }}
-                              />
-                            </Drawer.Navigator>
-                          </NavigationContainer>
-                        </SocketContext.Provider>
-                      )}
-                    </EditingContext.Consumer>
-                  </EditingContextProvider>
+                              <Drawer.Navigator
+                                initialRouteName="widgets"
+                                backBehavior="initialRoute"
+                                drawerContent={DrawerContent}
+                                screenOptions={{
+                                  header: props => <Header {...props} />,
+                                  drawerPosition: "right",
+                                  drawerStyle: {
+                                    backgroundColor: DarkTheme.colors.background
+                                  },
+                                  lazy: true
+                                }}
+                              >
+                                <Drawer.Screen
+                                  name="widgets"
+                                  component={Widgets}
+                                  options={{ headerTitle: "Nexum" }}
+                                />
+                                <Drawer.Screen
+                                  name="devices"
+                                  component={Devices}
+                                  options={{ headerTitle: "Devices" }}
+                                />
+                                <Drawer.Screen
+                                  name="users"
+                                  component={Users}
+                                  options={{ headerTitle: "Users" }}
+                                />
+                              </Drawer.Navigator>
+                            </NavigationContainer>
+                          </SocketContext.Provider>
+                        )}
+                      </EditingContext.Consumer>
+                    </EditingContextProvider>
+                  </TabsProvider>
                 ) : (
                   <Login />
                 )

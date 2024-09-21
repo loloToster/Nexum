@@ -57,6 +57,7 @@ export interface Tab {
 }
 
 export interface TabData {
+  id: number
   name: string
   widgets: WidgetData[]
 }

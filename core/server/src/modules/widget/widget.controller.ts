@@ -5,6 +5,7 @@ import { WidgetService } from "./widget.service"
 import { IsAdminGuard } from "src/guards/isadmin.guard"
 
 import { WidgetsPosDto } from "src/dtos/widgetPos.dto"
+import { WidgetsEditDto } from "src/dtos/widgetsEdit.dto"
 
 @Controller("/api/widgets")
 @UseGuards(IsAdminGuard)
@@ -13,6 +14,15 @@ export class WidgetController {
 
   @Patch("/pos")
   async editWidgetsPos(@Body() { edits }: WidgetsPosDto) {
-    return this.widgetService.editPostions(edits)
+    return this.widgetService.editPositions(edits)
+  }
+
+  @Patch("/prop")
+  async editWidgetsProp(@Body() { edits, created, deleted }: WidgetsEditDto) {
+    return Promise.all([
+      this.widgetService.editProps(edits),
+      this.widgetService.createWidgets(created),
+      this.widgetService.deleteWidgets(deleted)
+    ])
   }
 }

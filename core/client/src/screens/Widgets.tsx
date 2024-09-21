@@ -7,13 +7,12 @@ import { useQuery } from "react-query"
 
 import api from "src/api"
 
-import { TabData } from "src/types"
-
 import { useSocket } from "src/contexts/socket"
 import {
   ValueBridgeProvider,
   ValueBridgeContext
 } from "src/contexts/valueBridge"
+import { useTabs } from "src/contexts/tabs"
 
 import Tabs from "src/components/Tabs/Tabs"
 import Error from "src/components/Error/Error"
@@ -49,7 +48,7 @@ function Widgets() {
     { staleTime: Infinity, cacheTime: Infinity }
   )
 
-  const [tabs, setTabs] = useState<TabData[]>([])
+  const { tabs, setTabs } = useTabs()
 
   useEffect(() => {
     if (data) setTabs(data.tabs)
@@ -78,8 +77,8 @@ function Widgets() {
             <Tabs
               data={tabs}
               selectedTab={selectedTab}
-              onTabCreate={name =>
-                setTabs(prev => [...prev, { name, widgets: [] }])
+              onTabCreate={(id, name) =>
+                setTabs(prev => [...prev, { id, name, widgets: [] }])
               }
             />
           )

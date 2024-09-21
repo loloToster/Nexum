@@ -55,6 +55,13 @@ type Inputs = {
 }
 
 const inputs: Inputs = {
+  color: function ({ value, onChange }) {
+    return (
+      <Row>
+        <TextInput label="Color" value={value} onChangeText={onChange} />
+      </Row>
+    )
+  },
   text: function ({ value, onChange }) {
     return (
       <Row>
@@ -138,21 +145,21 @@ export type SubmitData = {
 
 export type EditWidgetModalProps =
   | (
-    | {
-      widget: WidgetData
-      newWidgetType?: undefined
+      | {
+          widget: WidgetData
+          newWidgetType?: undefined
+        }
+      | {
+          widget?: undefined
+          newWidgetType: string
+        }
+    ) & {
+      open?: boolean
+      onClose?: () => void
+      onAdd?: (props: SubmitData) => void
+      onEdit?: (props: SubmitData) => void
+      onDelete?: () => void
     }
-    | {
-      widget?: undefined
-      newWidgetType: string
-    }
-  ) & {
-    open?: boolean
-    onClose?: () => void
-    onAdd?: (props: SubmitData) => void
-    onEdit?: (props: SubmitData) => void
-    onDelete?: () => void
-  }
 
 export default function EditWidgetModal({
   widget,

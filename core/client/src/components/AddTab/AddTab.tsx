@@ -12,7 +12,7 @@ import { useMutation } from "react-query"
 import api from "src/api"
 
 export interface AddTabProps {
-  onTabCreate?: (tabName: string) => any
+  onTabCreate?: (id: number, tabName: string) => any
 }
 
 // TODO: add error handling
@@ -25,12 +25,12 @@ function AddTab({ onTabCreate = () => null }: AddTabProps) {
   const addTabMutation = useMutation(
     "add-tab",
     async (tabName: string) => {
-      await api.post("/tabs", { name: tabName })
-      return tabName
+      const res = await api.post("/tabs", { name: tabName })
+      return res.data
     },
     {
-      onSuccess: (tabName: string) => {
-        onTabCreate(tabName)
+      onSuccess: ({ id, name }) => {
+        onTabCreate(id, name)
       }
     }
   )

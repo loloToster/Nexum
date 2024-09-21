@@ -18,7 +18,7 @@ import AddTab from "src/components/AddTab/AddTab"
 export interface TabsProps {
   data: TabData[]
   selectedTab?: string | null
-  onTabCreate?: (tabName: string) => any
+  onTabCreate?: (id: number, tabName: string) => any
 }
 
 function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
@@ -32,7 +32,7 @@ function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
   const renderTabs = () => {
     let tabs = data.map((tab, i) => (
       <PaperTabScreen key={i} label={tab.name}>
-        <Tab name={tab.name} widgets={tab.widgets} />
+        <Tab tabId={tab.id} name={tab.name} widgets={tab.widgets} />
       </PaperTabScreen>
     ))
 
@@ -55,9 +55,9 @@ function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
 
   return addTabActive ? (
     <AddTab
-      onTabCreate={n => {
+      onTabCreate={(id, n) => {
         setAddTabActive(false)
-        onTabCreate(n)
+        onTabCreate(id, n)
       }}
     />
   ) : !data.length ? (
@@ -89,7 +89,7 @@ function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
   ) : (
     <View style={{ flex: 1 }}>
       {data.length === 1 && !user?.isAdmin ? (
-        <Tab name={data[0].name} widgets={data[0].widgets} />
+        <Tab tabId={data[0].id} name={data[0].name} widgets={data[0].widgets} />
       ) : (
         <PaperTabs defaultIndex={defaultIndex} mode="scrollable">
           {renderTabs()}

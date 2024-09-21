@@ -97,6 +97,12 @@ function Widget({
   onEdit,
   onDelete
 }: WidgetProps) {
+  const dataRef = useRef<WidgetData>(data)
+
+  useEffect(() => {
+    dataRef.current = data
+  }, [data])
+
   const theme = useTheme()
   const styles = getStyles(theme)
 
@@ -219,7 +225,7 @@ function Widget({
       ),
       onPanResponderRelease: () => {
         onChangePos(
-          data,
+          dataRef.current,
           posChangeData.panX + posChangeData.panOffsetX,
           posChangeData.panY + posChangeData.panOffsetY
         )
@@ -284,7 +290,7 @@ function Widget({
       ),
       onPanResponderRelease: () => {
         onChangeSize(
-          data,
+          dataRef.current,
           sizeChangeData.panW + sizeChangeData.panOffsetW,
           sizeChangeData.panH + sizeChangeData.panOffsetH
         )

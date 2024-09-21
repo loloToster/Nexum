@@ -9,6 +9,7 @@ import { createTarget, getTempNegativeId } from "src/utils"
 import { defaultComponentHeight, defaultComponentWidth } from "src/consts"
 
 import { useEditing } from "src/contexts/editing"
+import { useTabs } from "src/contexts/tabs"
 
 import Widget, { widgetComponents } from "src/components/Widget/Widget"
 import WidgetsModal from "src/components/WidgetsModal/WidgetsModal"
@@ -17,6 +18,7 @@ import EditWidgetModal, {
 } from "src/components/EditWidgetModal/EditWidgetModal"
 
 export interface TabProps {
+  tabId: number
   name: string
   widgets: WidgetData[]
 }
@@ -49,15 +51,21 @@ const COLS = 8
 const MAX_ROWS = 50
 const CELL_ASPECT_RATIO = [4, 5]
 
-function Tab({ name, widgets }: TabProps) {
+function Tab({ tabId, name, widgets }: TabProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
-  const [tabData, setTabData] = useState(widgets)
+  const { setTabs } = useTabs()
 
-  useEffect(() => {
-    setTabData(widgets)
-  }, [widgets])
+  const setTabData = (s: React.SetStateAction<WidgetData[]>) => {
+    setTabs(prev =>
+      prev.map(tab =>
+        tab.id === tabId
+          ? { ...tab, widgets: Array.isArray(s) ? s : s(tab.widgets) }
+          : tab
+      )
+    )
+  }
 
   // neccessary because widgets dont receive state update and onDragEnd does not work
   const cellSizeRef = useRef({ w: 0, h: 0 }).current
@@ -89,15 +97,48 @@ function Tab({ name, widgets }: TabProps) {
   }, [cellWidth, cellHeight])
 
   // neccessary because all widgets are positioned absolutely
-  const viewHeight = Math.max(...tabData.map(w => w.height + w.y))
+  const viewHeight = Math.max(...widgets.map(w => w.height + w.y))
 
   // Handle pos & size changes
 
-  const { registerPosEdit } = useEditing()
+  const {
+    registerPosEdit,
+    registerPropEdit,
+    registerWidgetCreate,
+    registerWidgetDelete
+  } = useEditing()
 
-  const editWidget = (widgetId: number, newWidgetData: Partial<WidgetData>) => {
-    registerPosEdit({ widgetId, ...newWidgetData })
-    // todo: register prop edit
+  const editWidget = (
+    widgetId: number,
+    newWidgetData: Partial<WidgetData>,
+    action: "pos" | "prop"
+  ) => {
+    switch (action) {
+      case "pos": {
+        registerPosEdit({
+          widgetId,
+          x: newWidgetData.x,
+          y: newWidgetData.y,
+          height: newWidgetData.height,
+          width: newWidgetData.width
+        })
+        break
+      }
+
+      case "prop": {
+        registerPropEdit({
+          widgetId,
+          customId: newWidgetData.customId,
+          deviceId: newWidgetData.deviceId,
+          props: newWidgetData.properties ?? {}
+        })
+        break
+      }
+
+      default: {
+        console.warn(`Unknown editWidget type: ${action}`)
+      }
+    }
 
     setTabData(prev => {
       const targetWidget = prev.find(w => w.id === widgetId)
@@ -131,7 +172,7 @@ function Tab({ name, widgets }: TabProps) {
           continue
         // if overlays other widget (but not itself)
         if (
-          tabData.some(w => {
+          widgets.some(w => {
             if (w.id === widget.id) return false
 
             return collides(w, {
@@ -160,7 +201,7 @@ function Tab({ name, widgets }: TabProps) {
         : prev
     })
 
-    editWidget(widget.id, { ...bestCoordinates })
+    editWidget(widget.id, { ...bestCoordinates }, "pos")
   }
 
   const changeSize = (widget: WidgetData, w: number, h: number) => {
@@ -173,7 +214,7 @@ function Tab({ name, widgets }: TabProps) {
     if (verticalOverflow > 0) width -= verticalOverflow
     if (horizontalOverflow > 0) height -= horizontalOverflow
 
-    for (const w of tabData) {
+    for (const w of widgets) {
       if (w.id === widget.id || !collides({ ...widget, width, height }, w))
         continue
 
@@ -195,7 +236,7 @@ function Tab({ name, widgets }: TabProps) {
       }
     }
 
-    editWidget(widget.id, { width: width, height: height })
+    editWidget(widget.id, { width: width, height: height }, "pos")
   }
 
   // editing props
@@ -207,8 +248,8 @@ function Tab({ name, widgets }: TabProps) {
   const [newWidgetPropsModalOpen, setNewWidgetPropsModalOpen] = useState(false)
 
   const handleNewWidget = (data: SubmitData) => {
-    const deviceId = -1 // todo: choose device
-    const y = Math.max(...tabData.map(w => w.y + w.height))
+    const deviceId = 1 // todo: choose device
+    const y = Math.max(...widgets.map(w => w.y + w.height))
 
     const newWidget: WidgetData = {
       id: getTempNegativeId(),
@@ -216,7 +257,7 @@ function Tab({ name, widgets }: TabProps) {
       deviceId,
       target: createTarget(deviceId, data.customId),
       type: data.component.id,
-      tabId: -1, // todo
+      tabId,
       x: 0,
       y,
       width: data.component.defaultSize?.width || defaultComponentWidth,
@@ -227,13 +268,16 @@ function Tab({ name, widgets }: TabProps) {
 
     setTabData(prev => [...prev, newWidget])
     setNewWidgetPropsModalOpen(false)
+
+    registerWidgetCreate(newWidget)
   }
 
   const handleWidgetEdit = (editedWidget: WidgetData) => {
-    editWidget(editedWidget.id, editedWidget)
+    editWidget(editedWidget.id, editedWidget, "prop")
   }
 
   const handleWidgetDelete = (deletedWidget: WidgetData) => {
+    registerWidgetDelete(deletedWidget.id)
     setTabData(prev => prev.filter(w => w.id !== deletedWidget.id))
   }
 
@@ -260,7 +304,7 @@ function Tab({ name, widgets }: TabProps) {
             minHeight: isFinite(viewHeight) ? viewHeight * cellHeight : 0
           }}
         >
-          {tabData.map((widgetData, i) => (
+          {widgets.map((widgetData, i) => (
             <Widget
               key={i}
               data={widgetData}

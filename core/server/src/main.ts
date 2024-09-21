@@ -9,7 +9,7 @@ import { NotFoundInterceptor } from "./interceptors/notfound.interceptor"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true })
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }))
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
   app.useGlobalInterceptors(new NotFoundInterceptor())
 
   const port = process.env.PORT || 3000
