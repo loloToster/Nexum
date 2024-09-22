@@ -147,6 +147,11 @@ function Tab({ tabId, name, widgets }: TabProps) {
         for (const [key, val] of Object.entries(newWidgetData)) {
           ;(targetWidget as Record<string, any>)[key] = val
         }
+
+        targetWidget.target = createTarget(
+          targetWidget.deviceId,
+          targetWidget.customId
+        )
       } else {
         console.warn("no target widget found")
       }

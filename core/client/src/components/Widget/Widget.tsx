@@ -109,25 +109,28 @@ function Widget({
   const ChoosenWidget =
     widgetComponents.find(c => c.id === data.type)?.component || Unknown
 
-  // TODO: handle edited widgets
   const useWidgetValue: WidgetValueHook = initialValue => {
     const { bridge, values, emit: rawEmit } = useValueBridge()
-    const emit = (val: WidgetValue, target: EmitTarget) =>
-      rawEmit(data, val, target)
+    const emit = (val: WidgetValue, target: EmitTarget) => {
+      rawEmit(dataRef.current, val, target)
+    }
 
-    if (values[data.target] !== undefined)
-      initialValue = values[data.target] as typeof initialValue
-    else if (data.value !== null && typeof initialValue == typeof data.value)
-      initialValue = data.value as typeof initialValue
+    if (values[dataRef.current.target] !== undefined)
+      initialValue = values[dataRef.current.target] as typeof initialValue
+    else if (
+      dataRef.current.value !== null &&
+      typeof initialValue == typeof dataRef.current.value
+    )
+      initialValue = dataRef.current.value as typeof initialValue
 
     const [widgetValue, setWidgetValue] = useState(initialValue)
 
     useEffect(() => {
       const listener = (obj: LocalValueUpdateObj) => {
         if (
-          obj.target === data.target &&
+          obj.target === dataRef.current.target &&
           typeof obj.value === typeof initialValue &&
-          obj.widgetId !== data.id
+          obj.widgetId !== dataRef.current.id
         ) {
           setWidgetValue(obj.value as typeof initialValue)
         }

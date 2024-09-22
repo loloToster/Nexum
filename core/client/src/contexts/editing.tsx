@@ -163,7 +163,10 @@ export const EditingContextProvider = (props: {
         setSaving(false)
       },
       // replace fake ids with db ones
-      onSuccess: ([_, createRes, __], vars) => {
+      onSuccess: (res, vars) => {
+        if (!Array.isArray(res)) return
+        const [_, createRes, __] = res
+
         const placeholderIds = vars.newWidgets.map(w => w.id)
 
         setTabs(prev => {

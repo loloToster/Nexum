@@ -41,8 +41,11 @@ export class ValueGateway {
     @MessageBody("value") value: string | boolean | number
   ) {
     if (socket.rooms.has("users")) {
-      // user tried to update widget not available to him
-      if (!socket.rooms.has(target)) return
+      if (!socket.rooms.has("admins") && !socket.rooms.has(target)) {
+        return this.logger.warn(
+          "user tried to update widget not available to him"
+        )
+      }
     } else if (socket.rooms.has("devices")) {
       const deviceId = socket.data.id
       target = this.valueService.createTarget(deviceId, customId)
@@ -91,6 +94,8 @@ export class ValueGateway {
         ]
 
         socket.join(["users", ...availableTargets])
+
+        if (user.isAdmin) socket.join("admins")
 
         socket.data = user
 
