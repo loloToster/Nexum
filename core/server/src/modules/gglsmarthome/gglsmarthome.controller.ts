@@ -6,7 +6,9 @@ import {
   Header,
   Post,
   Query,
-  Res
+  Res,
+  Headers,
+  Logger
 } from "@nestjs/common"
 import { Response } from "express"
 
@@ -31,6 +33,8 @@ const AUTH_PAGE_FILE_NAME = "gglsmarthome-connect.html"
 
 @Controller("/api/gglsmarthome")
 export class GoogleSmarthomeController {
+  private readonly logger = new Logger(GoogleSmarthomeController.name)
+
   authPage: string
 
   constructor(
@@ -116,7 +120,38 @@ export class GoogleSmarthomeController {
   }
 
   @Post("/data")
-  async handleData() {
-    console.log("data")
+  async handleData(
+    @Body() body: any,
+    @Headers("authorization") authHeader: string
+  ) {
+    const [tokenType, token] = authHeader?.split(" ") ?? []
+
+    if (tokenType !== "Bearer" || !token) {
+      this.logger.warn("Bad auth in google integration")
+      return
+    }
+
+    const user = await this.userService.getUserByGoogleToken(token)
+
+    if (!user) {
+      this.logger.warn("No user found in google integration")
+      return
+    }
+
+    return {
+      requestId: body.requestId,
+      payload: {
+        agentUserId: user.id,
+        devices: [
+          {
+            id: "1",
+            type: "action.devices.types.LIGHT",
+            traits: ["action.devices.traits.OnOff"],
+            name: { name: "Test" },
+            willReportState: true
+          }
+        ]
+      }
+    }
   }
 }

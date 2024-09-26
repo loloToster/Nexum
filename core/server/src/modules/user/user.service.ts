@@ -91,4 +91,15 @@ export class UserService {
       }))
     }
   }
+
+  async getUserByGoogleToken(accessToken: string): Promise<User | null> {
+    const integration = await this.db.googleSmartHomeIntegration.findUnique({
+      where: { accessToken },
+      include: { user: true }
+    })
+
+    if (!integration?.user) return null
+
+    return integration.user
+  }
 }
