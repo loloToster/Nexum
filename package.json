@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start:client": "cd ./core/client && npm start",
+    "start:server": "cd ./core/server && npm run start:dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ignore-path ./.gitignore"
   },
@@ -20,9 +22,10 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
-    "eslint": "^8.27.0",
+    "eslint": "^8.57.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-react": "^7.31.10",
-    "prettier": "2.7.1"
+    "prettier": "^2.7.1",
+    "prettier-eslint": "^16.3.0"
   }
 }
