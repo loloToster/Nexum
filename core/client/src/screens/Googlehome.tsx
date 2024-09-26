@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import { useQuery } from "react-query"
 import {
   FlatList,
   StyleSheet,
@@ -16,6 +17,7 @@ import {
 } from "react-native-paper"
 import { RefreshControl } from "react-native-web-refresh-control"
 
+import api from "src/api"
 import { SUP_DEVICES } from "src/consts"
 import { capitalizeFirstLetter, getTempNegativeId } from "src/utils"
 import { GooglehomeDevice } from "src/types/ggl"
@@ -29,24 +31,19 @@ function Googlehome() {
 
   const [addModalOpen, setAddModalOpen] = useState(false)
 
-  const [refreshingGglDevices, setRefreshingGglDevies] = useState(false)
-  const [gglDevices, setGglDevies] = useState<GooglehomeDevice[]>([
-    {
-      id: 0,
-      name: "lamp",
-      type: "LIGHT",
-      traits: [
-        {
-          name: "OnOff",
-          targets: [{ name: "OnOff", customId: "test", deviceId: 2 }]
-        },
-        {
-          name: "Brightness",
-          targets: [{ name: "Brightness", customId: "test2", deviceId: 2 }]
-        }
-      ]
+  const [gglDevices, setGglDevices] = useState<GooglehomeDevice[]>([])
+
+  const { data, isRefetching, refetch } = useQuery(
+    "google-devices",
+    async () => {
+      const res = await api.get("/gglsmarthome/devices")
+      return res.data
     }
-  ])
+  )
+
+  useEffect(() => {
+    setGglDevices(data)
+  }, [data])
 
   const [newDeviceType, setNewDeviceType] = useState("")
   const [editedDevice, setEditedDevice] = useState<GooglehomeDevice | null>(
@@ -59,8 +56,8 @@ function Googlehome() {
       <FlatList
         refreshControl={
           <RefreshControl
-            refreshing={refreshingGglDevices}
-            onRefresh={() => null}
+            refreshing={isRefetching}
+            onRefresh={refetch}
             tintColor={theme.colors.primary}
           />
         }
@@ -114,11 +111,15 @@ function Googlehome() {
           newDeviceType={newDeviceType}
           googleDevice={editedDevice}
           onAdd={nd => {
-            setGglDevies(prev => [...prev, { ...nd, id: getTempNegativeId() }])
+            setGglDevices(prev => [...prev, { ...nd, id: getTempNegativeId() }])
+            setEditModalOpen(false)
+          }}
+          onDelete={id => {
+            setGglDevices(prev => prev.filter(d => d.id !== id))
             setEditModalOpen(false)
           }}
           onEdit={ed => {
-            setGglDevies(prev => [
+            setGglDevices(prev => [
               ...prev.filter(ggld => ggld.id !== ed.id),
               ed
             ])

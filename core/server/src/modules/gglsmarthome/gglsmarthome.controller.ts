@@ -8,20 +8,32 @@ import {
   Query,
   Res,
   Headers,
-  Logger
+  Logger,
+  UseGuards,
+  Delete,
+  Patch
 } from "@nestjs/common"
 import { Response } from "express"
+import { readFileSync } from "fs"
+import { join as pathJoin } from "path"
+
+import { User as UserI } from "@prisma/client"
 
 import { UserService } from "../user/user.service"
 import { GoogleSmarthomeService } from "./gglsmarthome.service"
+
+import { LoggedInGuard } from "src/guards/loggedin.guard"
+import { User } from "src/decorators/user.decorator"
 
 import {
   GoogleSmarthomeConnectQueryDto,
   GoogleSmarthomeConnectBodyDto
 } from "src/dtos/googleSmarthomeConnect.dto"
 import GoogleSmarthomeTokenReqDto from "src/dtos/googleSmarthomeTokenReq.dto"
-import { readFileSync } from "fs"
-import { join as pathJoin } from "path"
+import {
+  EditGoogleSmarthomeDeviceDto,
+  NewGoogleSmarthomeDeviceDto
+} from "src/dtos/googleSmarthomeDevice.dto"
 
 const {
   GOOGLE_SMARTHOME_CLIENT_ID,
@@ -153,5 +165,37 @@ export class GoogleSmarthomeController {
         ]
       }
     }
+  }
+
+  // FOR USER:
+
+  @Get("/devices")
+  @UseGuards(LoggedInGuard)
+  async getDevices(@User() user: UserI) {
+    return await this.gglSmarthomeService.getUserGoogleDevices(user.id)
+  }
+
+  @Post("/devices")
+  @UseGuards(LoggedInGuard)
+  async newDevice(
+    @User() user: UserI,
+    @Body() body: NewGoogleSmarthomeDeviceDto
+  ) {
+    return await this.gglSmarthomeService.createNewDevice(user.id, body)
+  }
+
+  @Delete("/devices")
+  @UseGuards(LoggedInGuard)
+  async deleteDevice(@User() user: UserI, @Query("id") deviceId: string) {
+    return this.gglSmarthomeService.removeDevice(user.id, parseInt(deviceId))
+  }
+
+  @Patch("/devices")
+  @UseGuards(LoggedInGuard)
+  async editDevice(
+    @User() user: UserI,
+    @Body() body: EditGoogleSmarthomeDeviceDto
+  ) {
+    return await this.gglSmarthomeService.editDevice(user.id, body)
   }
 }

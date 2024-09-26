@@ -1,6 +1,12 @@
 import { randomBytes } from "crypto"
 import { BadRequestException, Injectable } from "@nestjs/common"
+
 import { DatabaseService } from "src/modules/database/database.service"
+
+import {
+  EditGoogleSmarthomeDeviceDto,
+  NewGoogleSmarthomeDeviceDto
+} from "src/dtos/googleSmarthomeDevice.dto"
 
 function createCode(size = 64) {
   return randomBytes(size).toString("hex")
@@ -82,5 +88,41 @@ export class GoogleSmarthomeService {
       accessToken: integration.accessToken,
       expiresIn: parseExpiryDate(integration.accessTokenExpires)
     }
+  }
+
+  async getUserGoogleDevices(userId: string) {
+    const devices = await this.db.googlehomeDevice.findMany({
+      where: { integration: { userId } },
+      include: { traits: { include: { targets: true } } }
+    })
+
+    return devices
+  }
+
+  async createNewDevice(userId: string, device: NewGoogleSmarthomeDeviceDto) {
+    return await this.db.googlehomeDevice.create({
+      data: {
+        integration: { connect: { userId } },
+        name: device.name,
+        type: device.type,
+        traits: {
+          create: device.traits.map(trait => ({
+            name: trait.name,
+            targets: { create: trait.targets }
+          }))
+        }
+      },
+      include: { traits: { include: { targets: true } } }
+    })
+  }
+
+  async removeDevice(userId: string, deviceId: number) {
+    await this.db.googlehomeDevice.deleteMany({
+      where: { AND: [{ id: deviceId }, { integration: { userId } }] }
+    })
+  }
+
+  async editDevice(userId: string, device: EditGoogleSmarthomeDeviceDto) {
+    // todo: add edit support
   }
 }

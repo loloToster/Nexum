@@ -20,16 +20,22 @@ import {
   Switch
 } from "react-native-paper"
 
+import api from "src/api"
 import { SUP_DEVICES } from "src/consts"
 import { capitalizeFirstLetter } from "src/utils"
 import { GooglehomeDevice, GooglehomeDeviceTarget } from "src/types/ggl"
 import DeviceChoiceBtn from "../DeviceChoiceBtn/DeviceChoiceBtn"
+import { useMutation } from "react-query"
+import RUSure from "../RUSure/RUSure"
+
+type NewGooglehomeDevice = Omit<GooglehomeDevice, "id">
 
 interface EditGoogleDeviceModalProps {
   onClose: () => void
   newDeviceType?: string
   googleDevice?: GooglehomeDevice | null
-  onAdd?: (newDevice: Omit<GooglehomeDevice, "id">) => void
+  onAdd?: (newDevice: GooglehomeDevice) => void
+  onDelete?: (id: number) => void
   onEdit?: (editedDevice: GooglehomeDevice) => void
 }
 
@@ -38,6 +44,7 @@ function EditGoogleDeviceModal({
   newDeviceType,
   googleDevice,
   onAdd = () => null,
+  onDelete = () => null,
   onEdit = () => null
 }: EditGoogleDeviceModalProps) {
   if (!newDeviceType && !googleDevice)
@@ -117,6 +124,32 @@ function EditGoogleDeviceModal({
     })
   }
 
+  const newDeviceMutation = useMutation(
+    "add-ggl-device",
+    async (nd: NewGooglehomeDevice) => {
+      const res = await api.post("/gglsmarthome/devices", nd)
+      return res.data
+    },
+    {
+      onSuccess: data => {
+        onAdd(data)
+      }
+    }
+  )
+
+  const deleteDeviceMutation = useMutation(
+    "delete-ggl-device",
+    async (id: number) => {
+      const res = await api.delete("/gglsmarthome/devices?id=" + id)
+      return res.data
+    },
+    {
+      onSuccess: (_, id) => {
+        onDelete(id)
+      }
+    }
+  )
+
   const onSubmit = () => {
     const submittedGoogleDevice: Omit<GooglehomeDevice, "id"> = {
       type: respectiveSupDevice.type,
@@ -134,13 +167,27 @@ function EditGoogleDeviceModal({
     }
 
     newDevice
-      ? onAdd(submittedGoogleDevice)
+      ? newDeviceMutation.mutate(submittedGoogleDevice)
       : onEdit({ ...submittedGoogleDevice, id: googleDevice!.id })
+  }
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
+  const handleDelete = () => {
+    deleteDeviceMutation.mutate(googleDevice!.id)
+    setDeleteModalOpen(false)
   }
 
   return (
     <Portal>
       <View style={styles.wrapper}>
+        <RUSure
+          open={deleteModalOpen}
+          onConfirm={handleDelete}
+          onDismiss={() => setDeleteModalOpen(false)}
+        >
+          Are you sure you want to delete this device?
+        </RUSure>
         <Appbar style={styles.bar}>
           <Appbar.Action icon="close" onPress={handleClose} />
         </Appbar>
@@ -204,12 +251,30 @@ function EditGoogleDeviceModal({
           ))}
           <View style={styles.row}>
             {newDevice ? (
-              <Button onPress={onSubmit} mode="contained" icon="check">
+              <Button
+                loading={newDeviceMutation.isLoading}
+                onPress={onSubmit}
+                mode="contained"
+                icon="check"
+              >
                 Add
               </Button>
             ) : (
               <Button onPress={onSubmit} mode="contained" icon="check">
                 Save
+              </Button>
+            )}
+          </View>
+          <View style={styles.row}>
+            {!newDevice && (
+              <Button
+                loading={deleteModalOpen}
+                onPress={() => setDeleteModalOpen(true)}
+                mode="contained"
+                icon="delete"
+                color={Colors.red500}
+              >
+                Remove Device
               </Button>
             )}
           </View>
