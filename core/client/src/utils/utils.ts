@@ -53,3 +53,8 @@ export function getTempNegativeId() {
 export function createTarget(deviceId: number | string, customId: string) {
   return `${deviceId}-${customId}`
 }
+
+export function capitalizeFirstLetter(str: string) {
+  str = str.toLowerCase()
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}

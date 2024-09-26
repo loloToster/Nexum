@@ -41,6 +41,7 @@ import Widgets from "./screens/Widgets"
 const Login = lazy(() => import("./screens/Login"))
 const Users = lazy(() => import("./screens/Users"))
 const Devices = lazy(() => import("./screens/Devices"))
+const Googlehome = lazy(() => import("./screens/Googlehome"))
 
 DarkTheme.mode = "exact"
 DarkTheme.colors.surface = SURFACE_COLOR
@@ -129,6 +130,11 @@ function App() {
                                   name="users"
                                   component={Users}
                                   options={{ headerTitle: "Users" }}
+                                />
+                                <Drawer.Screen
+                                  name="googlehome"
+                                  component={Googlehome}
+                                  options={{ headerTitle: "Google Devices" }}
                                 />
                               </Drawer.Navigator>
                             </NavigationContainer>

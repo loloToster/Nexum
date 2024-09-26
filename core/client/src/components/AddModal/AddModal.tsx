@@ -10,15 +10,19 @@ import {
   useTheme
 } from "react-native-paper"
 
-import { widgetComponents } from "src/components/Widget/Widget"
-
-export interface WidgetsModalProps {
+export interface AddModalProps {
+  title: string
+  items: Array<{
+    id: string
+    name: string
+    icon?: string
+  }>
   open: boolean
   onClose: () => void
   onChoice: (id: string) => void
 }
 
-function WidgetsModal({ open, onClose, onChoice }: WidgetsModalProps) {
+function AddModal({ title, items, open, onClose, onChoice }: AddModalProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
@@ -26,19 +30,19 @@ function WidgetsModal({ open, onClose, onChoice }: WidgetsModalProps) {
     <Portal>
       <Modal visible={open} onDismiss={onClose} style={styles.modal}>
         <Surface style={styles.modalContent}>
-          <Headline>Add Widget</Headline>
+          <Headline>{title}</Headline>
           <ScrollView>
             <List.Section>
-              {widgetComponents.map(comp => (
+              {items.map(item => (
                 <List.Item
-                  onPress={() => onChoice(comp.id)}
-                  title={comp.name}
-                  key={comp.id}
+                  onPress={() => onChoice(item.id)}
+                  title={item.name}
+                  key={item.id}
                   left={props => (
                     <List.Icon
                       {...props}
                       color={theme.colors.accent}
-                      icon={comp.icon || "square-rounded"}
+                      icon={item.icon || "square-rounded"}
                     />
                   )}
                 />
@@ -51,7 +55,7 @@ function WidgetsModal({ open, onClose, onChoice }: WidgetsModalProps) {
   )
 }
 
-export default WidgetsModal
+export default AddModal
 
 const getStyles = (theme: Theme) => {
   return StyleSheet.create({

@@ -12,7 +12,7 @@ import { useEditing } from "src/contexts/editing"
 import { useTabs } from "src/contexts/tabs"
 
 import Widget, { widgetComponents } from "src/components/Widget/Widget"
-import WidgetsModal from "src/components/WidgetsModal/WidgetsModal"
+import AddModal from "src/components/AddModal/AddModal"
 import EditWidgetModal, {
   SubmitData
 } from "src/components/EditWidgetModal/EditWidgetModal"
@@ -288,7 +288,9 @@ function Tab({ tabId, name, widgets }: TabProps) {
   return (
     <View style={styles.tab}>
       <ScrollView>
-        <WidgetsModal
+        <AddModal
+          title="Add Widget"
+          items={widgetComponents}
           open={newWidgetModalOpen}
           onClose={() => setNewWidgetModalOpen(false)}
           onChoice={t => {

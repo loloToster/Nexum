@@ -6,6 +6,8 @@ import { DrawerContentComponentProps } from "@react-navigation/drawer"
 import { useTheme, Theme, Drawer, Avatar, Text } from "react-native-paper"
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon"
 
+import { capitalizeFirstLetter } from "src/utils"
+
 import { useUser } from "src/contexts/user"
 import { useEditing } from "src/contexts/editing"
 
@@ -14,10 +16,6 @@ import RUSure from "src/components/RUSure/RUSure"
 
 import microcontrollerIcon from "assets/microcontroller.png"
 import microcontrollerActiveIcon from "assets/microcontroller-active.png"
-
-function capitalizeFirstLetter(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
 
 const icons: Record<string, IconSource | undefined> = {
   widgets: "home",
@@ -31,7 +29,8 @@ const icons: Record<string, IconSource | undefined> = {
       style={{ width: size, height: size }}
     />
   ),
-  users: "account-multiple"
+  users: "account-multiple",
+  googlehome: "lightbulb-group"
 }
 
 function DrawerContent({
@@ -49,6 +48,8 @@ function DrawerContent({
 
   const screens = Object.values(descriptors)
   const activeRouteName = state.routeNames[state.index]
+
+  const gglhomeScreen = screens.find(s => s.route.name === "googlehome")
 
   return (
     <View>
@@ -73,9 +74,10 @@ function DrawerContent({
         </View>
       </Drawer.Section>
       {user?.isAdmin && (
-        <>
-          <Drawer.Section>
-            {screens.map(s => (
+        <Drawer.Section>
+          {screens
+            .filter(s => s.route.name !== "googlehome")
+            .map(s => (
               <Drawer.Item
                 label={
                   s.route.name === "widgets"
@@ -88,26 +90,37 @@ function DrawerContent({
                 key={s.route.key}
               />
             ))}
-          </Drawer.Section>
-          <Drawer.Section>
-            <Drawer.Item
-              label="Edit Widgets"
-              icon="view-dashboard-edit"
-              onPress={() => {
-                setEditing(true)
-                navigation.closeDrawer()
-              }}
-            />
-            <Drawer.Item
-              label="Move Widgets"
-              icon="move-resize"
-              onPress={() => {
-                setMoving(true)
-                navigation.closeDrawer()
-              }}
-            />
-          </Drawer.Section>
-        </>
+        </Drawer.Section>
+      )}
+      {gglhomeScreen && (
+        <Drawer.Section>
+          <Drawer.Item
+            label="Google Devices"
+            icon={icons[gglhomeScreen.route.name]}
+            onPress={() => navigation.navigate(gglhomeScreen.route.name)}
+            active={activeRouteName === gglhomeScreen.route.name}
+          />
+        </Drawer.Section>
+      )}
+      {user?.isAdmin && (
+        <Drawer.Section>
+          <Drawer.Item
+            label="Edit Widgets"
+            icon="view-dashboard-edit"
+            onPress={() => {
+              setEditing(true)
+              navigation.closeDrawer()
+            }}
+          />
+          <Drawer.Item
+            label="Move Widgets"
+            icon="move-resize"
+            onPress={() => {
+              setMoving(true)
+              navigation.closeDrawer()
+            }}
+          />
+        </Drawer.Section>
       )}
       <Drawer.Section>
         <Drawer.Item

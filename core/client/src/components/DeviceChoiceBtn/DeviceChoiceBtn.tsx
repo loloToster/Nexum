@@ -1,6 +1,13 @@
 import React, { useState } from "react"
 import { useQuery } from "react-query"
-import { Dimensions, Image, ScrollView, StyleSheet } from "react-native"
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  ViewStyle
+} from "react-native"
 import {
   Button,
   Headline,
@@ -19,9 +26,14 @@ import microcontrollerIcon from "assets/microcontroller.png"
 export interface DeviceChoiceBtnProps {
   deviceId?: number
   onChangeDevice: (id: number) => void
+  style?: StyleProp<ViewStyle>
 }
 
-function DeviceChoiceBtn({ deviceId, onChangeDevice }: DeviceChoiceBtnProps) {
+function DeviceChoiceBtn({
+  deviceId,
+  onChangeDevice,
+  style
+}: DeviceChoiceBtnProps) {
   const theme = useTheme()
   const styles = getStyles(theme)
 
@@ -40,6 +52,7 @@ function DeviceChoiceBtn({ deviceId, onChangeDevice }: DeviceChoiceBtnProps) {
   return (
     <>
       <Button
+        style={style}
         loading={isLoading}
         mode="outlined"
         uppercase={false}
