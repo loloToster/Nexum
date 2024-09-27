@@ -143,6 +143,19 @@ function EditGoogleDeviceModal({
     }
   )
 
+  const editDeviceMutation = useMutation(
+    "edit-ggl-device",
+    async (ed: GooglehomeDevice) => {
+      const res = await api.patch("/gglsmarthome/devices", ed)
+      return res.data
+    },
+    {
+      onSuccess: (_, ed) => {
+        onEdit(ed)
+      }
+    }
+  )
+
   const deleteDeviceMutation = useMutation(
     "delete-ggl-device",
     async (id: number) => {
@@ -172,9 +185,14 @@ function EditGoogleDeviceModal({
         }))
     }
 
-    newDevice
-      ? newDeviceMutation.mutate(submittedGoogleDevice)
-      : onEdit({ ...submittedGoogleDevice, id: googleDevice!.id })
+    if (newDevice) {
+      newDeviceMutation.mutate(submittedGoogleDevice)
+    } else {
+      editDeviceMutation.mutate({
+        ...submittedGoogleDevice,
+        id: googleDevice!.id
+      })
+    }
   }
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -266,7 +284,12 @@ function EditGoogleDeviceModal({
                 Add
               </Button>
             ) : (
-              <Button onPress={onSubmit} mode="contained" icon="check">
+              <Button
+                loading={editDeviceMutation.isLoading}
+                onPress={onSubmit}
+                mode="contained"
+                icon="check"
+              >
                 Save
               </Button>
             )}

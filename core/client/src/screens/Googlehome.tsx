@@ -134,10 +134,10 @@ function Googlehome() {
             setEditModalOpen(false)
           }}
           onEdit={ed => {
-            setGglDevices(prev => [
-              ...prev.filter(ggld => ggld.id !== ed.id),
-              ed
-            ])
+            setGglDevices(prev => {
+              prev[prev.findIndex(ggld => ggld.id === ed.id)] = ed
+              return [...prev]
+            })
             setEditModalOpen(false)
           }}
         />

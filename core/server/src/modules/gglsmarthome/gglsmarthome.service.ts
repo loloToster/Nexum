@@ -1,5 +1,9 @@
 import { randomBytes } from "crypto"
-import { BadRequestException, Injectable } from "@nestjs/common"
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable
+} from "@nestjs/common"
 import { User } from "@prisma/client"
 
 import { FullGglDevice } from "src/types/types"
@@ -131,8 +135,31 @@ export class GoogleSmarthomeService {
     })
   }
 
-  async editDevice(userId: string, device: EditGoogleSmarthomeDeviceDto) {
-    // todo: add edit support
+  async editDevice(userId: string, editedDevice: EditGoogleSmarthomeDeviceDto) {
+    const devices = await this.db.googlehomeDevice.findMany({
+      where: { AND: [{ id: editedDevice.id }, { integration: { userId } }] }
+    })
+
+    if (devices.length !== 1) throw new ForbiddenException()
+
+    await this.db.$transaction([
+      this.db.googlehomeDeviceTrait.deleteMany({
+        where: { googleDeviceId: editedDevice.id }
+      }),
+      this.db.googlehomeDevice.update({
+        where: { id: editedDevice.id },
+        data: {
+          name: editedDevice.name,
+          type: editedDevice.type,
+          traits: {
+            create: editedDevice.traits.map(trait => ({
+              name: trait.name,
+              targets: { create: trait.targets }
+            }))
+          }
+        }
+      })
+    ])
   }
 
   // INTENTS
