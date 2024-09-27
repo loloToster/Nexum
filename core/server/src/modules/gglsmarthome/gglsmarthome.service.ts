@@ -2,6 +2,8 @@ import { randomBytes } from "crypto"
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   Logger
 } from "@nestjs/common"
@@ -11,7 +13,6 @@ import { User } from "@prisma/client"
 import { FullGglDevice } from "src/types/types"
 
 import { DatabaseService } from "src/modules/database/database.service"
-import { DeviceService } from "../device/device.service"
 
 import {
   EditGoogleSmarthomeDeviceDto,
@@ -63,7 +64,7 @@ export class GoogleSmarthomeService {
 
   constructor(
     private db: DatabaseService,
-    private deviceService: DeviceService,
+    @Inject(forwardRef(() => ValueService))
     private valueService: ValueService
   ) {}
 
@@ -348,5 +349,55 @@ export class GoogleSmarthomeService {
         await this.valueService.updateValue(null, customId, deviceId, val)
       }
     )
+  }
+
+  async reportStateToHomegraph(deviceId: number, customId: string) {
+    const affectedUsers = await this.db.user.findMany({
+      where: {
+        gglSmarthomeIntegration: {
+          devices: {
+            some: {
+              traits: { some: { targets: { some: { deviceId, customId } } } }
+            }
+          }
+        }
+      },
+      select: {
+        id: true,
+        gglSmarthomeIntegration: {
+          include: {
+            devices: { include: { traits: { include: { targets: true } } } }
+          }
+        }
+      }
+    })
+
+    const parsedUsers: Array<{ userId: string; devices: FullGglDevice[] }> =
+      affectedUsers.map(u => ({
+        userId: u.id,
+        devices: u.gglSmarthomeIntegration.devices.filter(d =>
+          d.traits.some(trait =>
+            trait.targets.some(
+              target =>
+                target.customId === customId && target.deviceId === deviceId
+            )
+          )
+        )
+      }))
+
+    for (const user of parsedUsers) {
+      const states: Record<string, any> = {}
+
+      for (const device of user.devices) {
+        states[device.id.toString()] = await this.getDeviceState(device)
+      }
+
+      await homegraphClient.devices.reportStateAndNotification({
+        requestBody: {
+          agentUserId: user.userId,
+          payload: { devices: { states } }
+        }
+      })
+    }
   }
 }

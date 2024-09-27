@@ -2,7 +2,9 @@ import { forwardRef, Inject, Injectable } from "@nestjs/common"
 import { Socket, Server } from "socket.io"
 
 import { RedisService } from "src/modules/redis/redis.service"
+import { GoogleSmarthomeService } from "../gglsmarthome/gglsmarthome.service"
 import { ValueGateway } from "./value.gateway"
+
 import { UserWithTabsAndWidgets, WidgetValue } from "src/types/types"
 
 @Injectable()
@@ -10,7 +12,9 @@ export class ValueService {
   constructor(
     private redis: RedisService,
     @Inject(forwardRef(() => ValueGateway))
-    private valueGateway: ValueGateway
+    private valueGateway: ValueGateway,
+    @Inject(forwardRef(() => GoogleSmarthomeService))
+    private gglSmarthomeService: GoogleSmarthomeService
   ) {}
 
   createTarget(deviceId: number | string, customId: string) {
@@ -27,24 +31,28 @@ export class ValueService {
   }
 
   async updateValue(
-    origin: Socket | Server | null,
+    origin: Socket | Server | "googlehome",
     target: string,
     value: WidgetValue
   )
   async updateValue(
-    origin: Socket | Server | null,
+    origin: Socket | Server | "googlehome",
     customId: string,
     deviceId: number,
     value: WidgetValue
   )
   async updateValue(
-    origin: Socket | Server | null,
+    origin: Socket | Server | "googlehome",
     targetOrCustomId: string,
     deviceIdOrValue: WidgetValue | number,
     valueOrUndefined?: WidgetValue
   ) {
-    origin = origin ?? this.valueGateway.server
-    const updater = origin instanceof Server ? origin : origin.broadcast
+    const updater =
+      origin === "googlehome"
+        ? this.valueGateway.server
+        : origin instanceof Server
+          ? origin
+          : origin.broadcast
 
     let value: WidgetValue, target: string, deviceId: number, customId: string
 
@@ -73,6 +81,9 @@ export class ValueService {
     const parsedValue = JSON.stringify(value)
 
     await this.redis.set(target, parsedValue)
+
+    if (origin !== "googlehome")
+      this.gglSmarthomeService.reportStateToHomegraph(deviceId, customId)
   }
 
   async getValue(deviceId: number, customId: string): Promise<WidgetValue> {
