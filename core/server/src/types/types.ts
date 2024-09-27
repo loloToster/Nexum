@@ -1,4 +1,11 @@
-import { Tab, User, Widget } from "@prisma/client"
+import {
+  GooglehomeDevice,
+  GooglehomeDeviceTrait,
+  GooglehomeTraitTarget,
+  Tab,
+  User,
+  Widget
+} from "@prisma/client"
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -26,3 +33,11 @@ export interface UserWithTabsAndWidgets extends User {
 }
 
 export type WidgetValue = string | boolean | number
+
+export type FullGglDeviceTrait = GooglehomeDeviceTrait & {
+  targets: GooglehomeTraitTarget[]
+}
+
+export type FullGglDevice = GooglehomeDevice & {
+  traits: FullGglDeviceTrait[]
+}

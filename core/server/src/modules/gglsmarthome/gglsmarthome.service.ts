@@ -1,12 +1,19 @@
 import { randomBytes } from "crypto"
 import { BadRequestException, Injectable } from "@nestjs/common"
+import { User } from "@prisma/client"
+
+import { FullGglDevice } from "src/types/types"
 
 import { DatabaseService } from "src/modules/database/database.service"
+import { DeviceService } from "../device/device.service"
 
 import {
   EditGoogleSmarthomeDeviceDto,
   NewGoogleSmarthomeDeviceDto
 } from "src/dtos/googleSmarthomeDevice.dto"
+import { ValueService } from "../value/value.service"
+
+import { valuesToGglMap, commandsToValuesMap } from "./ggl-value-maps"
 
 function createCode(size = 64) {
   return randomBytes(size).toString("hex")
@@ -22,11 +29,13 @@ function parseExpiryDate(expires: Date) {
 
 @Injectable()
 export class GoogleSmarthomeService {
-  constructor(private db: DatabaseService) {}
+  constructor(
+    private db: DatabaseService,
+    private deviceService: DeviceService,
+    private valueService: ValueService
+  ) {}
 
   async generateCodeForUser(id: string) {
-    console.log("generating code for", id)
-
     const codeData = {
       code: createCode(),
       codeExpires: getNowWithOffset(10 * 60 * 1000)
@@ -124,5 +133,125 @@ export class GoogleSmarthomeService {
 
   async editDevice(userId: string, device: EditGoogleSmarthomeDeviceDto) {
     // todo: add edit support
+  }
+
+  // INTENTS
+
+  async handleIntent(intent: string, payload: any, body: any, user: User) {
+    switch (intent) {
+      case "action.devices.SYNC": {
+        const devices = await this.getUserGoogleDevices(user.id)
+
+        return {
+          requestId: body.requestId,
+          payload: {
+            agentUserId: user.id,
+            devices: devices.map(device => ({
+              id: device.id.toString(),
+              type: `action.devices.types.${device.type}`,
+              traits: device.traits.map(
+                trait => `action.devices.traits.${trait.name}`
+              ),
+              name: { name: device.name },
+              willReportState: true
+            }))
+          }
+        }
+      }
+
+      case "action.devices.QUERY": {
+        const gglDevicesIds: number[] = payload.devices.map(d => parseInt(d.id))
+
+        let gglDevices = await this.getUserGoogleDevices(user.id)
+        gglDevices = gglDevices.filter(d => gglDevicesIds.includes(d.id))
+
+        const queryDevices: Record<string, any> = {}
+
+        for (const device of gglDevices) {
+          queryDevices[device.id.toString()] = {
+            online: true,
+            status: "SUCCESS",
+            ...(await this.getDeviceState(device))
+          }
+        }
+
+        return {
+          requestId: body.requestId,
+          payload: {
+            devices: queryDevices
+          }
+        }
+      }
+
+      case "action.devices.EXECUTE": {
+        const gglDevices = await this.getUserGoogleDevices(user.id)
+        const affectedDevices: string[] = []
+
+        for (const command of payload.commands) {
+          for (const device of command.devices) {
+            for (const exe of command.execution) {
+              const commandName = exe.command.split(".")[3]
+              const { commandToValue, trait } = commandsToValuesMap[commandName]
+
+              await commandToValue(
+                exe.params,
+                gglDevices
+                  .find(gd => gd.id.toString() === device.id)
+                  .traits.find(t => t.name === trait),
+                async (deviceId, customId, val) => {
+                  await this.valueService.updateValue(
+                    null,
+                    customId,
+                    deviceId,
+                    val
+                  )
+                }
+              )
+
+              affectedDevices.push(device.id)
+            }
+          }
+        }
+
+        return {
+          requestId: body.requestId,
+          payload: {
+            commands: [
+              {
+                ids: affectedDevices,
+                status: "SUCCESS"
+              }
+            ]
+          }
+        }
+      }
+
+      case "action.devices.DISCONNECT": {
+        return
+      }
+
+      default: {
+        throw new Error("Bad intent")
+      }
+    }
+  }
+
+  async getDeviceState(device: FullGglDevice): Promise<Record<string, any>> {
+    let state: Record<string, any> = {}
+
+    for (const trait of device.traits) {
+      const stateGetter = valuesToGglMap[trait.name].valueToGglState
+      const partialState = await stateGetter(
+        trait,
+        async (deviceId, customId) => {
+          return await this.valueService.getValue(deviceId, customId)
+        }
+      )
+      state = { ...state, ...partialState }
+    }
+
+    console.log(state)
+
+    return state
   }
 }

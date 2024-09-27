@@ -27,6 +27,7 @@ export class ValueGateway {
   private readonly logger = new Logger(ValueGateway.name)
 
   constructor(
+    @Inject(forwardRef(() => ValueService))
     private valueService: ValueService,
     private deviceService: DeviceService,
     @Inject(forwardRef(() => UserService))

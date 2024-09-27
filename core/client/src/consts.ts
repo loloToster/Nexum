@@ -54,7 +54,7 @@ export const SUP_DEVICES: SupportedGooglehomeDevice[] = [
       {
         name: "TemperatureSetting",
         required: true,
-        targets: ["TemperatureSetting"]
+        targets: ["ambient", "setpoint"]
       }
     ]
   }

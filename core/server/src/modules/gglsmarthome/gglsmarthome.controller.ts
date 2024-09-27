@@ -150,21 +150,18 @@ export class GoogleSmarthomeController {
       return
     }
 
-    return {
-      requestId: body.requestId,
-      payload: {
-        agentUserId: user.id,
-        devices: [
-          {
-            id: "1",
-            type: "action.devices.types.LIGHT",
-            traits: ["action.devices.traits.OnOff"],
-            name: { name: "Test" },
-            willReportState: true
-          }
-        ]
-      }
-    }
+    const { intent, payload } = body.inputs[0]
+
+    this.logger.log(`got ${intent}`)
+
+    const res = await this.gglSmarthomeService.handleIntent(
+      intent,
+      payload,
+      body,
+      user
+    )
+
+    return res
   }
 
   // FOR USER:

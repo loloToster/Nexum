@@ -1,12 +1,17 @@
-import { Injectable } from "@nestjs/common"
+import { forwardRef, Inject, Injectable } from "@nestjs/common"
 import { Socket, Server } from "socket.io"
 
 import { RedisService } from "src/modules/redis/redis.service"
+import { ValueGateway } from "./value.gateway"
 import { UserWithTabsAndWidgets, WidgetValue } from "src/types/types"
 
 @Injectable()
 export class ValueService {
-  constructor(private redis: RedisService) {}
+  constructor(
+    private redis: RedisService,
+    @Inject(forwardRef(() => ValueGateway))
+    private valueGateway: ValueGateway
+  ) {}
 
   createTarget(deviceId: number | string, customId: string) {
     return `${deviceId}-${customId}`
@@ -21,19 +26,24 @@ export class ValueService {
     }
   }
 
-  async updateValue(origin: Socket | Server, target: string, value: WidgetValue)
   async updateValue(
-    origin: Socket | Server,
+    origin: Socket | Server | null,
+    target: string,
+    value: WidgetValue
+  )
+  async updateValue(
+    origin: Socket | Server | null,
     customId: string,
     deviceId: number,
     value: WidgetValue
   )
   async updateValue(
-    origin: Socket | Server,
+    origin: Socket | Server | null,
     targetOrCustomId: string,
     deviceIdOrValue: WidgetValue | number,
     valueOrUndefined?: WidgetValue
   ) {
+    origin = origin ?? this.valueGateway.server
     const updater = origin instanceof Server ? origin : origin.broadcast
 
     let value: WidgetValue, target: string, deviceId: number, customId: string

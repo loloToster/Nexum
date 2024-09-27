@@ -46,15 +46,9 @@ export class DeviceService {
         : undefined
     })
 
-    const connectedDevices = await this.deviceGateway.server
-      .in("devices")
-      .fetchSockets()
-
     return devices.map(device => ({
       ...device,
-      active: connectedDevices.filter(
-        connectedDevice => device.id === connectedDevice.data.id
-      ).length
+      active: this.getNumberOfDeviceConnections(device.id)
     }))
   }
 
@@ -72,5 +66,15 @@ export class DeviceService {
     })
 
     return device
+  }
+
+  async getNumberOfDeviceConnections(deviceId: number) {
+    const connectedDevices = await this.deviceGateway.server
+      .in("devices")
+      .fetchSockets()
+
+    return connectedDevices.filter(
+      connectedDevice => deviceId === connectedDevice.data.id
+    ).length
   }
 }
