@@ -202,6 +202,11 @@ function EditGoogleDeviceModal({
     setDeleteModalOpen(false)
   }
 
+  const buttonsDisabled =
+    newDeviceMutation.isLoading ||
+    editDeviceMutation.isLoading ||
+    deleteDeviceMutation.isLoading
+
   return (
     <Portal>
       <View style={styles.wrapper}>
@@ -277,6 +282,7 @@ function EditGoogleDeviceModal({
             {newDevice ? (
               <Button
                 loading={newDeviceMutation.isLoading}
+                disabled={buttonsDisabled}
                 onPress={onSubmit}
                 mode="contained"
                 icon="check"
@@ -286,6 +292,7 @@ function EditGoogleDeviceModal({
             ) : (
               <Button
                 loading={editDeviceMutation.isLoading}
+                disabled={buttonsDisabled}
                 onPress={onSubmit}
                 mode="contained"
                 icon="check"
@@ -298,6 +305,7 @@ function EditGoogleDeviceModal({
             {!newDevice && (
               <Button
                 loading={deleteDeviceMutation.isLoading}
+                disabled={buttonsDisabled}
                 onPress={() => setDeleteModalOpen(true)}
                 mode="contained"
                 icon="delete"

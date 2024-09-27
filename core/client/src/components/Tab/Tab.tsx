@@ -253,7 +253,7 @@ function Tab({ tabId, name, widgets }: TabProps) {
   const [newWidgetPropsModalOpen, setNewWidgetPropsModalOpen] = useState(false)
 
   const handleNewWidget = (data: SubmitData) => {
-    const y = Math.max(...widgets.map(w => w.y + w.height))
+    const y = Math.max(...widgets.map(w => w.y + w.height), 0)
 
     const newWidget: WidgetData = {
       id: getTempNegativeId(),
