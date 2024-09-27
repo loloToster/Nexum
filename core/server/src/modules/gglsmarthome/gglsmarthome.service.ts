@@ -2,8 +2,10 @@ import { randomBytes } from "crypto"
 import {
   BadRequestException,
   ForbiddenException,
-  Injectable
+  Injectable,
+  Logger
 } from "@nestjs/common"
+import { google } from "googleapis"
 import { User } from "@prisma/client"
 
 import { FullGglDevice } from "src/types/types"
@@ -19,6 +21,30 @@ import { ValueService } from "../value/value.service"
 
 import { CmdToVal, supportedTraits } from "./ggl-value-maps"
 
+const {
+  GOOGLE_SMARTHOME_PROJECT_ID,
+  GOOGLE_HOPMEGRAPH_KEY_ID,
+  GOOGLE_HOPMEGRAPH_KEY,
+  GOOGLE_HOPMEGRAPH_CLIENT_EMAIL,
+  GOOGLE_HOPMEGRAPH_CLIENT_ID
+} = process.env
+
+const homegraphClient = google.homegraph({
+  version: "v1",
+  auth: new google.auth.GoogleAuth({
+    scopes: "https://www.googleapis.com/auth/homegraph",
+    credentials: {
+      type: "service_account",
+      universe_domain: "googleapis.com",
+      project_id: GOOGLE_SMARTHOME_PROJECT_ID,
+      private_key_id: GOOGLE_HOPMEGRAPH_KEY_ID,
+      private_key: GOOGLE_HOPMEGRAPH_KEY,
+      client_email: GOOGLE_HOPMEGRAPH_CLIENT_EMAIL,
+      client_id: GOOGLE_HOPMEGRAPH_CLIENT_ID
+    }
+  })
+})
+
 function createCode(size = 64) {
   return randomBytes(size).toString("hex")
 }
@@ -33,6 +59,8 @@ function parseExpiryDate(expires: Date) {
 
 @Injectable()
 export class GoogleSmarthomeService {
+  private readonly logger = new Logger(GoogleSmarthomeService.name)
+
   constructor(
     private db: DatabaseService,
     private deviceService: DeviceService,
@@ -112,8 +140,19 @@ export class GoogleSmarthomeService {
     return devices
   }
 
+  async requestSync(userId: string) {
+    try {
+      return await homegraphClient.devices.requestSync({
+        requestBody: { agentUserId: userId, async: false }
+      })
+    } catch (err) {
+      this.logger.error(err)
+      return err
+    }
+  }
+
   async createNewDevice(userId: string, device: NewGoogleSmarthomeDeviceDto) {
-    return await this.db.googlehomeDevice.create({
+    const newDevice = await this.db.googlehomeDevice.create({
       data: {
         integration: { connect: { userId } },
         name: device.name,
@@ -127,12 +166,18 @@ export class GoogleSmarthomeService {
       },
       include: { traits: { include: { targets: true } } }
     })
+
+    await this.requestSync(userId)
+
+    return newDevice
   }
 
   async removeDevice(userId: string, deviceId: number) {
     await this.db.googlehomeDevice.deleteMany({
       where: { AND: [{ id: deviceId }, { integration: { userId } }] }
     })
+
+    await this.requestSync(userId)
   }
 
   async editDevice(userId: string, editedDevice: EditGoogleSmarthomeDeviceDto) {
@@ -160,6 +205,8 @@ export class GoogleSmarthomeService {
         }
       })
     ])
+
+    await this.requestSync(userId)
   }
 
   // INTENTS
