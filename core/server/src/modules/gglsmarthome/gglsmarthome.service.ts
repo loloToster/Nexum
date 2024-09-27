@@ -221,15 +221,27 @@ export class GoogleSmarthomeService {
           requestId: body.requestId,
           payload: {
             agentUserId: user.id,
-            devices: devices.map(device => ({
-              id: device.id.toString(),
-              type: `action.devices.types.${device.type}`,
-              traits: device.traits.map(
-                trait => `action.devices.traits.${trait.name}`
-              ),
-              name: { name: device.name },
-              willReportState: true
-            }))
+            devices: devices.map(device => {
+              let attributes = {}
+
+              device.traits.forEach(trait => {
+                attributes = {
+                  attributes,
+                  ...supportedTraits[trait.name]?.attributes
+                }
+              })
+
+              return {
+                id: device.id.toString(),
+                type: `action.devices.types.${device.type}`,
+                traits: device.traits.map(
+                  trait => `action.devices.traits.${trait.name}`
+                ),
+                name: { name: device.name },
+                willReportState: true,
+                attributes
+              }
+            })
           }
         }
       }
@@ -346,7 +358,12 @@ export class GoogleSmarthomeService {
         .find(gd => gd.id.toString() === device.id)
         .traits.find(t => t.name === targetTrait),
       async (deviceId, customId, val) => {
-        await this.valueService.updateValue(null, customId, deviceId, val)
+        await this.valueService.updateValue(
+          "googlehome",
+          customId,
+          deviceId,
+          val
+        )
       }
     )
   }

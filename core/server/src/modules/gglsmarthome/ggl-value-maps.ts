@@ -1,12 +1,10 @@
 import { FullGglDeviceTrait, WidgetValue } from "src/types/types"
-
-function rgbToInteger(red: number, green: number, blue: number) {
-  red = Math.max(0, Math.min(255, red))
-  green = Math.max(0, Math.min(255, green))
-  blue = Math.max(0, Math.min(255, blue))
-
-  return (red << 16) | (green << 8) | blue
-}
+import {
+  hsvToRGB,
+  integerToRGB,
+  rgbToInteger,
+  temperatureToRGB
+} from "src/utils/color"
 
 type ValueGetter = (deviceId: number, customId: string) => Promise<WidgetValue>
 
@@ -18,7 +16,10 @@ async function getValueOfTargetWithName(
   const { customId, deviceId } = trait.targets.find(
     t => t.name === (name ?? trait.name)
   )
-  return await getValue(deviceId, customId)
+
+  const value = await getValue(deviceId, customId)
+
+  return value
 }
 
 type ValueSetter = (
@@ -51,6 +52,7 @@ export interface TraitCommand {
 }
 
 export interface SupportedTrait {
+  attributes?: Record<string, any>
   targets: string[]
   valueToGglState: (
     trait: FullGglDeviceTrait,
@@ -80,12 +82,13 @@ export const supportedTraits: SupportedTraits = {
     }
   },
   OpenClose: {
+    attributes: { discreteOnlyOpenClose: true },
     targets: ["OpenClose"],
     async valueToGglState(trait, getValue) {
       const value = (await getValueOfTargetWithName(getValue, trait)) ? 100 : 0
 
       return {
-        on: typeof value === "boolean" ? value : 0
+        openPercent: value
       }
     },
     commands: {
@@ -127,6 +130,7 @@ export const supportedTraits: SupportedTraits = {
     }
   },
   ColorSetting: {
+    attributes: { colorModel: "rgb" },
     targets: ["r", "g", "b"],
     async valueToGglState(trait, getValue) {
       const rValue = await getValueOfTargetWithName(getValue, trait, "r")
@@ -143,9 +147,49 @@ export const supportedTraits: SupportedTraits = {
         }
       }
     },
-    commands: {}
+    commands: {
+      ColorAbsolute: {
+        async commandToValue(params, trait, setValue) {
+          let [r, g, b] = [0, 0, 0]
+
+          if (params.color.temperature) {
+            const colors = temperatureToRGB(params.color.temperature)
+            r = colors.red
+            g = colors.green
+            b = colors.blue
+          } else if (params.color.spectrumRGB) {
+            const colors = integerToRGB(params.color.spectrumRGB)
+            r = colors.red
+            g = colors.green
+            b = colors.blue
+          } else if (params.color.spectrumHSV) {
+            const colors = hsvToRGB(
+              params.color.spectrumHSV.hue,
+              params.color.spectrumHSV.saturation,
+              params.color.spectrumHSV.value
+            )
+
+            r = colors.red
+            g = colors.green
+            b = colors.blue
+          }
+
+          await setValueOfTargetWithName(setValue, trait, r, "r")
+          await setValueOfTargetWithName(setValue, trait, g, "g")
+          await setValueOfTargetWithName(setValue, trait, b, "b")
+        }
+      }
+    }
   },
   TemperatureSetting: {
+    attributes: {
+      availableThermostatModes: ["heat"],
+      thermostatTemperatureRange: {
+        minThresholdCelsius: 9,
+        maxThresholdCelsius: 30
+      },
+      thermostatTemperatureUnit: "C"
+    },
     targets: ["ambient", "setpoint"],
     async valueToGglState(trait, getValue) {
       const ambientValue = await getValueOfTargetWithName(
@@ -167,7 +211,18 @@ export const supportedTraits: SupportedTraits = {
         thermostatTemperatureSetpoint: setpointValue
       }
     },
-    commands: {}
+    commands: {
+      ThermostatTemperatureSetpoint: {
+        async commandToValue(params, trait, setValue) {
+          await setValueOfTargetWithName(
+            setValue,
+            trait,
+            params.thermostatTemperatureSetpoint,
+            "setpoint"
+          )
+        }
+      }
+    }
   }
 }
 
