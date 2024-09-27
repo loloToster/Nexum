@@ -24,10 +24,10 @@ import { CmdToVal, supportedTraits } from "./ggl-value-maps"
 
 const {
   GOOGLE_SMARTHOME_PROJECT_ID,
-  GOOGLE_HOPMEGRAPH_KEY_ID,
-  GOOGLE_HOPMEGRAPH_KEY,
-  GOOGLE_HOPMEGRAPH_CLIENT_EMAIL,
-  GOOGLE_HOPMEGRAPH_CLIENT_ID
+  GOOGLE_HOMEGRAPH_KEY_ID,
+  GOOGLE_HOMEGRAPH_KEY,
+  GOOGLE_HOMEGRAPH_CLIENT_EMAIL,
+  GOOGLE_HOMEGRAPH_CLIENT_ID
 } = process.env
 
 const homegraphClient = google.homegraph({
@@ -38,10 +38,10 @@ const homegraphClient = google.homegraph({
       type: "service_account",
       universe_domain: "googleapis.com",
       project_id: GOOGLE_SMARTHOME_PROJECT_ID,
-      private_key_id: GOOGLE_HOPMEGRAPH_KEY_ID,
-      private_key: GOOGLE_HOPMEGRAPH_KEY,
-      client_email: GOOGLE_HOPMEGRAPH_CLIENT_EMAIL,
-      client_id: GOOGLE_HOPMEGRAPH_CLIENT_ID
+      private_key_id: GOOGLE_HOMEGRAPH_KEY_ID,
+      private_key: GOOGLE_HOMEGRAPH_KEY,
+      client_email: GOOGLE_HOMEGRAPH_CLIENT_EMAIL,
+      client_id: GOOGLE_HOMEGRAPH_CLIENT_ID
     }
   })
 })
