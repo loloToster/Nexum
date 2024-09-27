@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useMutation } from "react-query"
 import {
   Dimensions,
   ScrollView,
@@ -21,16 +22,20 @@ import {
 } from "react-native-paper"
 
 import api from "src/api"
-import { SUP_DEVICES } from "src/consts"
 import { capitalizeFirstLetter } from "src/utils"
-import { GooglehomeDevice, GooglehomeDeviceTarget } from "src/types/ggl"
+import {
+  GooglehomeDevice,
+  GooglehomeDeviceTarget,
+  SupportedGooglehomeDevice
+} from "src/types/ggl"
+
 import DeviceChoiceBtn from "../DeviceChoiceBtn/DeviceChoiceBtn"
-import { useMutation } from "react-query"
 import RUSure from "../RUSure/RUSure"
 
 type NewGooglehomeDevice = Omit<GooglehomeDevice, "id">
 
 interface EditGoogleDeviceModalProps {
+  supportedDevices: SupportedGooglehomeDevice[]
   onClose: () => void
   newDeviceType?: string
   googleDevice?: GooglehomeDevice | null
@@ -40,6 +45,7 @@ interface EditGoogleDeviceModalProps {
 }
 
 function EditGoogleDeviceModal({
+  supportedDevices,
   onClose,
   newDeviceType,
   googleDevice,
@@ -54,7 +60,7 @@ function EditGoogleDeviceModal({
   const styles = getStyles(theme)
 
   const newDevice = Boolean(newDeviceType)
-  const respectiveSupDevice = SUP_DEVICES.find(
+  const respectiveSupDevice = supportedDevices.find(
     sp => sp.type === (newDevice ? newDeviceType : googleDevice?.type)
   )
 
@@ -268,7 +274,7 @@ function EditGoogleDeviceModal({
           <View style={styles.row}>
             {!newDevice && (
               <Button
-                loading={deleteModalOpen}
+                loading={deleteDeviceMutation.isLoading}
                 onPress={() => setDeleteModalOpen(true)}
                 mode="contained"
                 icon="delete"

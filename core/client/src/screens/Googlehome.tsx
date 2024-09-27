@@ -18,22 +18,30 @@ import {
 import { RefreshControl } from "react-native-web-refresh-control"
 
 import api from "src/api"
-import { SUP_DEVICES } from "src/consts"
 import { capitalizeFirstLetter, getTempNegativeId } from "src/utils"
-import { GooglehomeDevice } from "src/types/ggl"
+import { GooglehomeDevice, SupportedGooglehomeDevice } from "src/types/ggl"
 
 import AddModal from "src/components/AddModal/AddModal"
 import EditGoogleDeviceModal from "src/components/EditGoogleDeviceModal/EditGoogleDeviceModal"
+import Loader from "src/components/Loader/Loader"
 
 function Googlehome() {
   const theme = useTheme()
   const styles = getStyles(theme)
 
+  const { data: supportedDevices } = useQuery(
+    "supported-google-devices",
+    async () => {
+      const res = await api.get("/gglsmarthome/supported-devices")
+      return res.data as SupportedGooglehomeDevice[]
+    }
+  )
+
   const [addModalOpen, setAddModalOpen] = useState(false)
 
   const [gglDevices, setGglDevices] = useState<GooglehomeDevice[]>([])
 
-  const { data, isRefetching, refetch } = useQuery(
+  const { data, isLoading, isRefetching, refetch } = useQuery(
     "google-devices",
     async () => {
       const res = await api.get("/gglsmarthome/devices")
@@ -51,7 +59,11 @@ function Googlehome() {
   )
   const [editModalOpen, setEditModalOpen] = useState(false)
 
-  return (
+  return isLoading || !supportedDevices ? (
+    <View style={styles.container}>
+      <Loader />
+    </View>
+  ) : (
     <View style={styles.container}>
       <FlatList
         refreshControl={
@@ -72,7 +84,9 @@ function Googlehome() {
           >
             <View style={styles.itemContainer}>
               <List.Icon
-                icon={SUP_DEVICES.find(sd => sd.type === item.type)?.icon ?? ""}
+                icon={
+                  supportedDevices.find(sd => sd.type === item.type)?.icon ?? ""
+                }
               />
               <View>
                 <Subheading>
@@ -91,7 +105,7 @@ function Googlehome() {
       />
       <AddModal
         title="Add Google Device"
-        items={SUP_DEVICES.map(d => ({
+        items={supportedDevices.map(d => ({
           id: d.type,
           name: capitalizeFirstLetter(d.type),
           icon: d.icon
@@ -107,6 +121,7 @@ function Googlehome() {
       />
       {editModalOpen && (
         <EditGoogleDeviceModal
+          supportedDevices={supportedDevices}
           onClose={() => setEditModalOpen(false)}
           newDeviceType={newDeviceType}
           googleDevice={editedDevice}

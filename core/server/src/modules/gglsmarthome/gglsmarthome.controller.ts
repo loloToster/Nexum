@@ -35,6 +35,8 @@ import {
   NewGoogleSmarthomeDeviceDto
 } from "src/dtos/googleSmarthomeDevice.dto"
 
+import { supportedDevices, supportedTraits } from "./ggl-value-maps"
+
 const {
   GOOGLE_SMARTHOME_CLIENT_ID,
   GOOGLE_SMARTHOME_CLIENT_SECRET,
@@ -165,6 +167,19 @@ export class GoogleSmarthomeController {
   }
 
   // FOR USER:
+
+  @Get("/supported-devices")
+  getSupportedDevices() {
+    return supportedDevices.map(sd => ({
+      type: sd.type,
+      icon: sd.icon,
+      traits: Object.keys(sd.traits).map(traitName => ({
+        name: traitName,
+        required: sd.traits[traitName],
+        targets: supportedTraits[traitName].targets
+      }))
+    }))
+  }
 
   @Get("/devices")
   @UseGuards(LoggedInGuard)

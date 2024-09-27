@@ -38,6 +38,7 @@ export class NewGoogleSmarthomeDeviceDto {
   type: string
 
   @IsString()
+  @IsNotEmpty()
   name: string
 
   @IsArray()

@@ -13,7 +13,7 @@ import {
 } from "src/dtos/googleSmarthomeDevice.dto"
 import { ValueService } from "../value/value.service"
 
-import { valuesToGglMap, commandsToValuesMap } from "./ggl-value-maps"
+import { CmdToVal, supportedTraits } from "./ggl-value-maps"
 
 function createCode(size = 64) {
   return randomBytes(size).toString("hex")
@@ -190,22 +190,11 @@ export class GoogleSmarthomeService {
         for (const command of payload.commands) {
           for (const device of command.devices) {
             for (const exe of command.execution) {
-              const commandName = exe.command.split(".")[3]
-              const { commandToValue, trait } = commandsToValuesMap[commandName]
-
-              await commandToValue(
+              await this.executeCommandOnDevice(
+                device,
+                exe.command,
                 exe.params,
                 gglDevices
-                  .find(gd => gd.id.toString() === device.id)
-                  .traits.find(t => t.name === trait),
-                async (deviceId, customId, val) => {
-                  await this.valueService.updateValue(
-                    null,
-                    customId,
-                    deviceId,
-                    val
-                  )
-                }
               )
 
               affectedDevices.push(device.id)
@@ -227,6 +216,7 @@ export class GoogleSmarthomeService {
       }
 
       case "action.devices.DISCONNECT": {
+        // TODO
         return
       }
 
@@ -240,7 +230,7 @@ export class GoogleSmarthomeService {
     let state: Record<string, any> = {}
 
     for (const trait of device.traits) {
-      const stateGetter = valuesToGglMap[trait.name].valueToGglState
+      const stateGetter = supportedTraits[trait.name].valueToGglState
       const partialState = await stateGetter(
         trait,
         async (deviceId, customId) => {
@@ -250,8 +240,39 @@ export class GoogleSmarthomeService {
       state = { ...state, ...partialState }
     }
 
-    console.log(state)
-
     return state
+  }
+
+  async executeCommandOnDevice(
+    device: any,
+    command: string,
+    params: any,
+    gglDevices: FullGglDevice[]
+  ) {
+    const commandName = command.split(".")[3]
+
+    let targetTrait: string
+    let commandToValue: CmdToVal
+
+    for (const traitName in supportedTraits) {
+      const trait = supportedTraits[traitName]
+
+      for (const cmd in trait.commands) {
+        if (cmd !== commandName) continue
+
+        targetTrait = traitName
+        commandToValue = trait.commands[cmd].commandToValue
+      }
+    }
+
+    await commandToValue(
+      params,
+      gglDevices
+        .find(gd => gd.id.toString() === device.id)
+        .traits.find(t => t.name === targetTrait),
+      async (deviceId, customId, val) => {
+        await this.valueService.updateValue(null, customId, deviceId, val)
+      }
+    )
   }
 }

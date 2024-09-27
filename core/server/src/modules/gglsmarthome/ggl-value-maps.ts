@@ -10,17 +10,6 @@ function rgbToInteger(red: number, green: number, blue: number) {
 
 type ValueGetter = (deviceId: number, customId: string) => Promise<WidgetValue>
 
-type ValuesToGglMap = Record<
-  string,
-  | {
-      valueToGglState: (
-        trait: FullGglDeviceTrait,
-        getValue: ValueGetter
-      ) => Promise<Record<string, any>>
-    }
-  | undefined
->
-
 async function getValueOfTargetWithName(
   getValue: ValueGetter,
   trait: FullGglDeviceTrait,
@@ -32,26 +21,88 @@ async function getValueOfTargetWithName(
   return await getValue(deviceId, customId)
 }
 
-export const valuesToGglMap: ValuesToGglMap = {
+type ValueSetter = (
+  deviceId: number,
+  customId: string,
+  val: WidgetValue
+) => Promise<void>
+
+async function setValueOfTargetWithName(
+  setValue: ValueSetter,
+  trait: FullGglDeviceTrait,
+  value: WidgetValue,
+  name?: string
+) {
+  const { customId, deviceId } = trait.targets.find(
+    t => t.name === (name ?? trait.name)
+  )
+
+  await setValue(deviceId, customId, value)
+}
+
+export type CmdToVal = (
+  params: Record<string, any>,
+  trait: FullGglDeviceTrait,
+  setValue: ValueSetter
+) => Promise<void>
+
+export interface TraitCommand {
+  commandToValue: CmdToVal
+}
+
+export interface SupportedTrait {
+  targets: string[]
+  valueToGglState: (
+    trait: FullGglDeviceTrait,
+    getValue: ValueGetter
+  ) => Promise<Record<string, any>>
+  commands: Record<string, TraitCommand | undefined>
+}
+
+export type SupportedTraits = Record<string, SupportedTrait | undefined>
+
+export const supportedTraits: SupportedTraits = {
   OnOff: {
+    targets: ["OnOff"],
     async valueToGglState(trait, getValue) {
       const value = await getValueOfTargetWithName(getValue, trait)
 
       return {
         on: typeof value === "boolean" ? value : true
       }
+    },
+    commands: {
+      OnOff: {
+        async commandToValue(params, trait, setValue) {
+          await setValueOfTargetWithName(setValue, trait, params.on, "OnOff")
+        }
+      }
     }
   },
   OpenClose: {
+    targets: ["OpenClose"],
     async valueToGglState(trait, getValue) {
       const value = (await getValueOfTargetWithName(getValue, trait)) ? 100 : 0
 
       return {
         on: typeof value === "boolean" ? value : 0
       }
+    },
+    commands: {
+      OpenClose: {
+        async commandToValue(params, trait, setValue) {
+          await setValueOfTargetWithName(
+            setValue,
+            trait,
+            Boolean(params.openPercent),
+            "OpenClose"
+          )
+        }
+      }
     }
   },
   Brightness: {
+    targets: ["Brightness"],
     async valueToGglState(trait, getValue) {
       const value = await getValueOfTargetWithName(getValue, trait)
 
@@ -61,9 +112,22 @@ export const valuesToGglMap: ValuesToGglMap = {
           0
         )
       }
+    },
+    commands: {
+      BrightnessAbsolute: {
+        async commandToValue(params, trait, setValue) {
+          await setValueOfTargetWithName(
+            setValue,
+            trait,
+            params.brightness,
+            "Brightness"
+          )
+        }
+      }
     }
   },
   ColorSetting: {
+    targets: ["r", "g", "b"],
     async valueToGglState(trait, getValue) {
       const rValue = await getValueOfTargetWithName(getValue, trait, "r")
       const gValue = await getValueOfTargetWithName(getValue, trait, "g")
@@ -78,9 +142,11 @@ export const valuesToGglMap: ValuesToGglMap = {
           )
         }
       }
-    }
+    },
+    commands: {}
   },
   TemperatureSetting: {
+    targets: ["ambient", "setpoint"],
     async valueToGglState(trait, getValue) {
       const ambientValue = await getValueOfTargetWithName(
         getValue,
@@ -100,69 +166,46 @@ export const valuesToGglMap: ValuesToGglMap = {
         thermostatTemperatureAmbient: ambientValue,
         thermostatTemperatureSetpoint: setpointValue
       }
-    }
+    },
+    commands: {}
   }
 }
 
-type ValueSetter = (
-  deviceId: number,
-  customId: string,
-  val: WidgetValue
-) => Promise<void>
-
-type CommandsToValuesMap = Record<
-  string,
-  | {
-      trait: string
-      commandToValue: (
-        params: Record<string, any>,
-        trait: FullGglDeviceTrait,
-        setValue: ValueSetter
-      ) => Promise<void>
-    }
-  | undefined
->
-
-async function setValueOfTargetWithName(
-  setValue: ValueSetter,
-  trait: FullGglDeviceTrait,
-  value: WidgetValue,
-  name?: string
-) {
-  const { customId, deviceId } = trait.targets.find(
-    t => t.name === (name ?? trait.name)
-  )
-
-  await setValue(deviceId, customId, value)
+export interface SupportedGooglehomeDevice {
+  type: string
+  icon: string
+  // boolean indicates whether the trait is required
+  traits: Record<string, boolean | undefined>
 }
 
-export const commandsToValuesMap: CommandsToValuesMap = {
-  OnOff: {
-    trait: "OnOff",
-    async commandToValue(params, trait, setValue) {
-      await setValueOfTargetWithName(setValue, trait, params.on, "OnOff")
+export const supportedDevices: SupportedGooglehomeDevice[] = [
+  {
+    type: "LIGHT",
+    icon: "lightbulb",
+    traits: {
+      OnOff: true,
+      Brightness: false,
+      ColorSetting: false
     }
   },
-  OpenClose: {
-    trait: "OpenClose",
-    async commandToValue(params, trait, setValue) {
-      await setValueOfTargetWithName(
-        setValue,
-        trait,
-        Boolean(params.openPercent),
-        "OpenClose"
-      )
-    }
+  {
+    type: "SWITCH",
+    icon: "light-switch",
+    traits: { OnOff: true }
   },
-  BrightnessAbsolute: {
-    trait: "Brightness",
-    async commandToValue(params, trait, setValue) {
-      await setValueOfTargetWithName(
-        setValue,
-        trait,
-        params.brightness,
-        "Brightness"
-      )
-    }
+  {
+    type: "GATE",
+    icon: "gate",
+    traits: { OpenClose: true }
+  },
+  {
+    type: "GARAGE",
+    icon: "garage",
+    traits: { OpenClose: true }
+  },
+  {
+    type: "THERMOSTAT",
+    icon: "thermostat",
+    traits: { TemperatureSetting: true }
   }
-}
+]
