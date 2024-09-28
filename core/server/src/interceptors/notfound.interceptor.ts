@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common"
 import { Observable, catchError } from "rxjs"
 
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 
 @Injectable()
 export class NotFoundInterceptor implements NestInterceptor {

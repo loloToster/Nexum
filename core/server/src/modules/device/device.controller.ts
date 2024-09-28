@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common"
 import { DeviceService } from "./device.service"
 
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 
 import { IsAdminGuard } from "src/guards/isadmin.guard"
 

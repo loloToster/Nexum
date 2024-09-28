@@ -1,10 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common"
-import { PrismaClient } from "@prisma/client"
-import { PrismaClientOptions } from "@prisma/client/runtime"
+import { Prisma, PrismaClient } from "@prisma/client"
 
 @Injectable()
 export class DatabaseService extends PrismaClient<
-  PrismaClientOptions,
+  Prisma.PrismaClientOptions,
   "info" | "warn" | "error"
 > {
   private readonly logger = new Logger(DatabaseService.name)

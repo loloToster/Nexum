@@ -14,7 +14,7 @@ import {
 import { UserService } from "./user.service"
 
 import { User as UserI } from "@prisma/client"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 
 import { IsAdminGuard } from "src/guards/isadmin.guard"
 import { LoggedInGuard } from "src/guards/loggedin.guard"
