@@ -1,11 +1,13 @@
 import React, { useState } from "react"
 import { Image, View, StyleSheet } from "react-native"
+import { useQuery } from "react-query"
 
 import { DrawerContentComponentProps } from "@react-navigation/drawer"
 
 import { useTheme, Theme, Drawer, Avatar, Text } from "react-native-paper"
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon"
 
+import api from "src/api"
 import { capitalizeFirstLetter } from "src/utils"
 
 import { useUser } from "src/contexts/user"
@@ -48,6 +50,14 @@ function DrawerContent({
 
   const screens = Object.values(descriptors)
   const activeRouteName = state.routeNames[state.index]
+
+  const { data: gglConnectionData } = useQuery(
+    "gglsmarthome-connected",
+    async () => {
+      const res = await api.get("/gglsmarthome/connected")
+      return res.data
+    }
+  )
 
   const gglhomeScreen = screens.find(s => s.route.name === "googlehome")
 
@@ -92,7 +102,7 @@ function DrawerContent({
             ))}
         </Drawer.Section>
       )}
-      {gglhomeScreen && (
+      {gglhomeScreen && gglConnectionData?.connected && (
         <Drawer.Section>
           <Drawer.Item
             label="Google Devices"

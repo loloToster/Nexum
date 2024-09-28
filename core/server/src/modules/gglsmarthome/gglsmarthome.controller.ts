@@ -181,6 +181,18 @@ export class GoogleSmarthomeController {
     }))
   }
 
+  @Get("/connected")
+  @UseGuards(LoggedInGuard)
+  async getConnected(@User() user: UserI) {
+    const integration = await this.gglSmarthomeService.getUserGoogleIntegration(
+      user.id
+    )
+
+    return {
+      connected: integration?.connected || false
+    }
+  }
+
   @Get("/devices")
   @UseGuards(LoggedInGuard)
   async getDevices(@User() user: UserI) {

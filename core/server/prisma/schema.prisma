@@ -89,6 +89,7 @@ model GoogleSmartHomeIntegration {
   id                 Int                @id @default(autoincrement())
   userId             String             @unique @map("user_id")
   user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connected          Boolean            @default(true)
   code               String?            @unique
   codeExpires        DateTime?          @map("code_expires")
   accessToken        String?            @unique @map("access_token")

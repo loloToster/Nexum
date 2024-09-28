@@ -71,7 +71,8 @@ export class GoogleSmarthomeService {
   async generateCodeForUser(id: string) {
     const codeData = {
       code: createCode(),
-      codeExpires: getNowWithOffset(10 * 60 * 1000)
+      codeExpires: getNowWithOffset(10 * 60 * 1000),
+      connected: true
     }
 
     const gglSmarthomeIntegration =
@@ -141,7 +142,20 @@ export class GoogleSmarthomeService {
     return devices
   }
 
+  async getUserGoogleIntegration(userId: string) {
+    return await this.db.googleSmartHomeIntegration.findUnique({
+      where: { userId }
+    })
+  }
+
   async requestSync(userId: string) {
+    const { connected } = await this.db.googleSmartHomeIntegration.findUnique({
+      where: { userId },
+      select: { connected: true }
+    })
+
+    if (!connected) return
+
     try {
       return await homegraphClient.devices.requestSync({
         requestBody: { agentUserId: userId, async: false }
@@ -303,7 +317,11 @@ export class GoogleSmarthomeService {
       }
 
       case "action.devices.DISCONNECT": {
-        // TODO
+        await this.db.googleSmartHomeIntegration.update({
+          where: { userId: user.id },
+          data: { connected: false }
+        })
+
         return
       }
 
@@ -376,7 +394,8 @@ export class GoogleSmarthomeService {
             some: {
               traits: { some: { targets: { some: { deviceId, customId } } } }
             }
-          }
+          },
+          connected: true
         }
       },
       select: {
@@ -388,6 +407,8 @@ export class GoogleSmarthomeService {
         }
       }
     })
+
+    if (!affectedUsers.length) return
 
     const parsedUsers: Array<{ userId: string; devices: FullGglDevice[] }> =
       affectedUsers.map(u => ({
