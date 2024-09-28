@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-import { useTheme, Theme, FAB } from "react-native-paper"
+import { useTheme, MD2Theme, FAB } from "react-native-paper"
 
 import { WidgetData } from "src/types"
 import { createTarget, getTempNegativeId } from "src/utils"
@@ -52,7 +52,7 @@ const MAX_ROWS = 50
 const CELL_ASPECT_RATIO = [4, 5]
 
 function Tab({ tabId, name, widgets }: TabProps) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const { setTabs } = useTabs()
@@ -339,7 +339,7 @@ function Tab({ tabId, name, widgets }: TabProps) {
 
 export default Tab
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     tab: {
       backgroundColor: theme.colors.background,

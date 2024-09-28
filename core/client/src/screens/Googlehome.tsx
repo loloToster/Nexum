@@ -9,9 +9,9 @@ import {
 import {
   FAB,
   Subheading,
-  Theme,
+  MD2Theme,
   useTheme,
-  Colors,
+  MD2Colors,
   List,
   Text
 } from "react-native-paper"
@@ -26,7 +26,7 @@ import EditGoogleDeviceModal from "src/components/EditGoogleDeviceModal/EditGoog
 import Loader from "src/components/Loader/Loader"
 
 function Googlehome() {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const { data: supportedDevices } = useQuery(
@@ -153,7 +153,7 @@ function Googlehome() {
 
 export default Googlehome
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     container: {
       backgroundColor: theme.colors.background,
@@ -164,7 +164,7 @@ const getStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "center",
       borderWidth: 1,
-      borderColor: Colors.grey800,
+      borderColor: MD2Colors.grey800,
       borderRadius: theme.roundness,
       margin: 8,
       marginBottom: 0

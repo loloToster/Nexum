@@ -9,13 +9,13 @@ import {
 
 import {
   Portal,
-  Theme,
+  MD2Theme,
   useTheme,
   TextInput,
   Switch,
   Text,
   Button,
-  Colors,
+  MD2Colors,
   Appbar,
   Avatar,
   Headline,
@@ -38,7 +38,7 @@ function Row({
   children: React.ReactNode
   extended?: boolean
 }) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   return (
@@ -172,7 +172,7 @@ export default function EditWidgetModal({
   onEdit = () => null,
   onDelete = () => null
 }: EditWidgetModalProps) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const newWidget = Boolean(newWidgetType)
@@ -245,7 +245,11 @@ export default function EditWidgetModal({
             Are you sure you want to delete this widget?
           </RUSure>
           <Appbar style={styles.bar}>
-            <Appbar.Action icon="close" onPress={handleClose} />
+            <Appbar.Action
+              icon="close"
+              containerColor="transparent"
+              onPress={handleClose}
+            />
           </Appbar>
           {widgetComponent ? (
             <ScrollView style={styles.container}>
@@ -311,7 +315,7 @@ export default function EditWidgetModal({
                     onPress={() => setDeleteModalOpen(true)}
                     mode="contained"
                     icon="delete"
-                    color={Colors.red500}
+                    buttonColor={MD2Colors.red900}
                   >
                     Remove Widget
                   </Button>
@@ -329,7 +333,7 @@ export default function EditWidgetModal({
     </Portal>
   )
 }
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     wrapper: {
       backgroundColor: theme.colors.background,

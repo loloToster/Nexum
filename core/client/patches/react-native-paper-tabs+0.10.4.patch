@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-paper-tabs/lib/module/TabsHeaderItem.js b/node_modules/react-native-paper-tabs/lib/module/TabsHeaderItem.js
-index 5eb30a4..200304f 100644
+index b72a24e..7e2c8b4 100644
 --- a/node_modules/react-native-paper-tabs/lib/module/TabsHeaderItem.js
 +++ b/node_modules/react-native-paper-tabs/lib/module/TabsHeaderItem.js
-@@ -62,7 +62,7 @@ export default function TabsHeaderItem({
+@@ -69,7 +69,7 @@ export default function TabsHeaderItem(_ref) {
    }, /*#__PURE__*/React.createElement(View, {
      style: [styles.touchableRippleInner, iconPosition === 'top' && styles.touchableRippleInnerTop]
    }, tab.props.icon ? /*#__PURE__*/React.createElement(View, {

@@ -1,10 +1,9 @@
-import { Colors } from "react-native-paper"
+import { MD2Colors } from "react-native-paper"
 import type { WidgetProperties } from "./types"
-import type { SupportedGooglehomeDevice } from "./types/ggl"
 
 export const SURFACE_COLOR = "#565656"
-export const PRIMARY_COLOR = Colors.teal300
-export const ACCENT_COLOR = Colors.cyan400
+export const PRIMARY_COLOR = MD2Colors.teal300
+export const ACCENT_COLOR = MD2Colors.cyan400
 
 export const DEF_WIDGET_PROPS: WidgetProperties = {
   title: "",

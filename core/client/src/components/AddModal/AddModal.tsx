@@ -6,7 +6,7 @@ import {
   Modal,
   Portal,
   Surface,
-  Theme,
+  MD2Theme,
   useTheme
 } from "react-native-paper"
 
@@ -23,7 +23,7 @@ export interface AddModalProps {
 }
 
 function AddModal({ title, items, open, onClose, onChoice }: AddModalProps) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   return (
@@ -57,7 +57,7 @@ function AddModal({ title, items, open, onClose, onChoice }: AddModalProps) {
 
 export default AddModal
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     modal: {
       alignItems: "center",

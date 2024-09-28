@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { StyleSheet, Dimensions } from "react-native"
 import {
-  Theme,
+  MD2Theme,
   useTheme,
   Portal,
   Modal,
@@ -28,7 +28,7 @@ const emptyDeviceData = {
 }
 
 function ErrorText({ error }: { error: string }) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   return (
@@ -44,7 +44,7 @@ function ErrorText({ error }: { error: string }) {
 function AddDeviceModal(
   props: { onAdd: () => void } & Omit<ModalProps, "children" | "theme">
 ) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const [deviceData, setDeviceData] = useObjectState<DeviceData>({
@@ -146,7 +146,7 @@ function AddDeviceModal(
 
 export default AddDeviceModal
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     modal: {
       alignItems: "center",

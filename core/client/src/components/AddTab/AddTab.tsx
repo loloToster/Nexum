@@ -4,7 +4,7 @@ import {
   Button,
   Headline,
   TextInput,
-  Theme,
+  MD2Theme,
   useTheme
 } from "react-native-paper"
 
@@ -17,7 +17,7 @@ export interface AddTabProps {
 
 // TODO: add error handling
 function AddTab({ onTabCreate = () => null }: AddTabProps) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const [name, setName] = useState("")
@@ -62,7 +62,7 @@ function AddTab({ onTabCreate = () => null }: AddTabProps) {
 
 export default AddTab
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     container: {
       flex: 1,

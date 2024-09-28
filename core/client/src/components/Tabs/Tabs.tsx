@@ -1,10 +1,11 @@
 import React, { useState } from "react"
 import { View, StyleSheet } from "react-native"
 
-import { List, Text, Theme, useTheme } from "react-native-paper"
+import { List, Text, useTheme, MD2Theme } from "react-native-paper"
 import {
   Tabs as PaperTabs,
-  TabScreen as PaperTabScreen
+  TabScreen as PaperTabScreen,
+  TabsProvider as PaperTabsProvider
 } from "react-native-paper-tabs"
 
 import { TabData } from "src/types"
@@ -22,7 +23,7 @@ export interface TabsProps {
 }
 
 function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const { user } = useUser()
@@ -91,9 +92,11 @@ function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
       {data.length === 1 && !user?.isAdmin ? (
         <Tab tabId={data[0].id} name={data[0].name} widgets={data[0].widgets} />
       ) : (
-        <PaperTabs defaultIndex={defaultIndex} mode="scrollable">
-          {renderTabs()}
-        </PaperTabs>
+        <PaperTabsProvider defaultIndex={defaultIndex}>
+          <PaperTabs mode="scrollable" showLeadingSpace>
+            {renderTabs()}
+          </PaperTabs>
+        </PaperTabsProvider>
       )}
     </View>
   )
@@ -101,7 +104,7 @@ function Tabs({ data, selectedTab, onTabCreate = () => null }: TabsProps) {
 
 export default Tabs
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     noTabsWrapper: {
       flex: 1,

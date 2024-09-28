@@ -1,13 +1,13 @@
 import React, { useState } from "react"
 import { View, StyleSheet, TextInput } from "react-native"
-import { Theme, useTheme } from "react-native-paper"
+import { MD2Theme, useTheme } from "react-native-paper"
 
 import { ChoosenWidgetProps, WidgetComponent } from "../Widget"
 
 function NumberInputWidgetComponent(props: ChoosenWidgetProps) {
   const { color, min, max } = props.properties
 
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(color, theme)
 
   const [width, setWidth] = useState(0)
@@ -60,7 +60,7 @@ const NumberInputWidget: WidgetComponent = {
 
 export default NumberInputWidget
 
-const getStyles = (color: string, theme: Theme) => {
+const getStyles = (color: string, theme: MD2Theme) => {
   return StyleSheet.create({
     container: {
       flex: 1,

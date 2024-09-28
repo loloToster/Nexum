@@ -13,13 +13,24 @@ function Header({ options, navigation, route }: DrawerHeaderProps) {
   return (
     <Appbar.Header style={{ elevation: 0 }}>
       {route.name !== "widgets" && (
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.BackAction
+          containerColor="transparent"
+          onPress={() => navigation.goBack()}
+        />
       )}
       <Appbar.Content title={getHeaderTitle(options, route.name)} />
       {moving || editing ? (
-        <Appbar.Action icon="check" onPress={save} />
+        <Appbar.Action
+          icon="check"
+          containerColor="transparent"
+          onPress={save}
+        />
       ) : (
-        <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
+        <Appbar.Action
+          icon="menu"
+          containerColor="transparent"
+          onPress={() => navigation.openDrawer()}
+        />
       )}
     </Appbar.Header>
   )

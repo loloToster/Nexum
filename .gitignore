@@ -2,20 +2,38 @@
 node_modules/
 dist/
 temp.*
+client-old/
 
-# client
+# client / Expo
 .expo/
-npm-debug.*
+dist/
+web-build/
+
+# client / Native
+*.orig.*
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
-*.orig.*
-web-build/
+
+# client / Metro
+.metro-health-check*
+
+# client / debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
 
 # client / macOS
 .DS_Store
+*.pem
+
+# client / local env files
+.env*.local
+
+# client / typescript
+*.tsbuildinfo
 
 # server
 .env

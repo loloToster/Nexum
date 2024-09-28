@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react"
-import { Colors, IconButton } from "react-native-paper"
-import Clipboard from "@react-native-clipboard/clipboard"
+import { MD2Colors, IconButton } from "react-native-paper"
+import * as Clipboard from "expo-clipboard"
 
 export interface CopyButtonProps {
   text: string
@@ -11,7 +11,7 @@ function CopyButton({ text }: CopyButtonProps) {
   const timeout = useRef<NodeJS.Timeout>()
 
   const handleClick = () => {
-    Clipboard.setString(text)
+    Clipboard.setStringAsync(text)
     setSuccess(true)
 
     clearTimeout(timeout.current)
@@ -23,7 +23,8 @@ function CopyButton({ text }: CopyButtonProps) {
   return (
     <IconButton
       icon={success ? "check" : "content-copy"}
-      color={success ? Colors.lightGreenA700 : undefined}
+      iconColor={success ? MD2Colors.lightGreenA700 : undefined}
+      containerColor="transparent"
       size={20}
       onPress={handleClick}
     />

@@ -1,7 +1,13 @@
 import React, { useRef, useState } from "react"
 import { View, StyleSheet, TextInput } from "react-native"
 import { useMutation } from "react-query"
-import { Button, Text, IconButton, Divider, Colors } from "react-native-paper"
+import {
+  Button,
+  Text,
+  IconButton,
+  Divider,
+  MD2Colors
+} from "react-native-paper"
 
 import api from "src/api"
 
@@ -97,6 +103,7 @@ function Device(props: {
         </View>
         <IconButton
           icon="pencil"
+          containerColor="transparent"
           size={20}
           onPress={() => nameInput.current?.focus()}
         />
@@ -104,7 +111,7 @@ function Device(props: {
       <Button
         style={styles.delete}
         icon="delete"
-        color={Colors.red500}
+        buttonColor={MD2Colors.red900}
         mode="contained"
         onPress={() => setDeleteActive(true)}
         loading={deleteMutation.isLoading}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { StyleSheet, Dimensions, View, Image } from "react-native"
 
 import {
-  Theme,
+  MD2Theme,
   useTheme,
   Portal,
   Modal,
@@ -12,19 +12,23 @@ import {
   Button
 } from "react-native-paper"
 
-import { Camera, BarCodeScanningResult, FlashMode } from "expo-camera"
+import {
+  CameraView,
+  BarcodeScanningResult,
+  useCameraPermissions
+} from "expo-camera"
 
 import qrFrame from "assets/qr-frame.png"
 
 function QrScanner(
   props: Omit<ModalProps, "children" | "theme"> & {
-    onScan?: (result: BarCodeScanningResult) => void
+    onScan?: (result: BarcodeScanningResult) => void
   }
 ) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
-  const requestPermission = Camera.useCameraPermissions()[1]
+  const requestPermission = useCameraPermissions()[1]
   const [flashlightOn, setFlashlightOn] = useState(false)
 
   // ask for permission when modal is opened
@@ -39,13 +43,13 @@ function QrScanner(
   return (
     <Portal>
       <Modal {...props}>
-        <Camera
+        <CameraView
           style={styles.camera}
-          barCodeScannerSettings={{
-            barCodeTypes: ["qr"]
+          barcodeScannerSettings={{
+            barcodeTypes: ["qr"]
           }}
-          onBarCodeScanned={props.onScan}
-          flashMode={flashlightOn ? FlashMode.torch : FlashMode.off}
+          onBarcodeScanned={props.onScan}
+          enableTorch={flashlightOn}
         >
           <View style={styles.cameraContent}>
             <IconButton
@@ -64,7 +68,7 @@ function QrScanner(
               Flashlight
             </Button>
           </View>
-        </Camera>
+        </CameraView>
       </Modal>
     </Portal>
   )
@@ -72,7 +76,7 @@ function QrScanner(
 
 export default QrScanner
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   const frameSize = Dimensions.get("window").width / 1.5
 
   return StyleSheet.create({

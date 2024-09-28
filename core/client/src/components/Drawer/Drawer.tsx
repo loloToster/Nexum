@@ -4,7 +4,7 @@ import { useQuery } from "react-query"
 
 import { DrawerContentComponentProps } from "@react-navigation/drawer"
 
-import { useTheme, Theme, Drawer, Avatar, Text } from "react-native-paper"
+import { useTheme, MD2Theme, Drawer, Avatar, Text } from "react-native-paper"
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon"
 
 import api from "src/api"
@@ -40,7 +40,7 @@ function DrawerContent({
   navigation,
   state
 }: DrawerContentComponentProps) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const { user, setUser } = useUser()
@@ -149,7 +149,7 @@ function DrawerContent({
 
 export default DrawerContent
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     profile: {
       paddingHorizontal: 10,

@@ -9,14 +9,14 @@ import {
 } from "react-native"
 import {
   useTheme,
-  Theme,
+  MD2Theme,
   Portal,
   Appbar,
   Headline,
   TextInput,
   Avatar,
   Subheading,
-  Colors,
+  MD2Colors,
   Button,
   Switch
 } from "react-native-paper"
@@ -56,7 +56,7 @@ function EditGoogleDeviceModal({
   if (!newDeviceType && !googleDevice)
     throw new Error("Invalid EditGoogleDeviceModal usage")
 
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const newDevice = Boolean(newDeviceType)
@@ -218,7 +218,11 @@ function EditGoogleDeviceModal({
           Are you sure you want to delete this device?
         </RUSure>
         <Appbar style={styles.bar}>
-          <Appbar.Action icon="close" onPress={handleClose} />
+          <Appbar.Action
+            icon="close"
+            containerColor="transparent"
+            onPress={handleClose}
+          />
         </Appbar>
         <ScrollView style={styles.container}>
           <View style={styles.row}>
@@ -309,7 +313,7 @@ function EditGoogleDeviceModal({
                 onPress={() => setDeleteModalOpen(true)}
                 mode="contained"
                 icon="delete"
-                color={Colors.red500}
+                buttonColor={MD2Colors.red900}
               >
                 Remove Device
               </Button>
@@ -324,7 +328,7 @@ function EditGoogleDeviceModal({
 
 export default EditGoogleDeviceModal
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     wrapper: {
       backgroundColor: theme.colors.background,
@@ -351,7 +355,7 @@ const getStyles = (theme: Theme) => {
     trait: {
       padding: 8,
       borderWidth: 1,
-      borderColor: Colors.grey800,
+      borderColor: MD2Colors.grey800,
       borderRadius: theme.roundness
     },
     traitHeader: {

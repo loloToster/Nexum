@@ -6,7 +6,7 @@ import {
   Animated,
   TouchableWithoutFeedback
 } from "react-native"
-import { Text, useTheme, Colors, Theme, List } from "react-native-paper"
+import { Text, useTheme, MD2Colors, MD2Theme, List } from "react-native-paper"
 
 import {
   WidgetProperties,
@@ -103,7 +103,7 @@ function Widget({
     dataRef.current = data
   }, [data])
 
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const ChoosenWidget =
@@ -354,7 +354,7 @@ function Widget({
       {editing && (
         <TouchableWithoutFeedback onPress={() => setEditWidgetModalOpen(true)}>
           <View style={[styles.changeCoverBase, styles.editCover]}>
-            <List.Icon icon="pencil" color={Colors.amber500} />
+            <List.Icon icon="pencil" color={MD2Colors.amber500} />
           </View>
         </TouchableWithoutFeedback>
       )}
@@ -382,7 +382,7 @@ function Widget({
 
 export default Widget
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   const resizeHandleSize = 30
 
   return StyleSheet.create({
@@ -395,7 +395,7 @@ const getStyles = (theme: Theme) => {
       fontSize: 9,
       padding: 5,
       paddingBottom: 0,
-      color: Colors.grey500
+      color: MD2Colors.grey500
     },
     changeCoverBase: {
       position: "absolute",
@@ -407,7 +407,7 @@ const getStyles = (theme: Theme) => {
       borderRadius: resizeHandleSize / 2
     },
     editCover: {
-      borderColor: Colors.amber400,
+      borderColor: MD2Colors.amber400,
       right: 0,
       bottom: 0,
       justifyContent: "center",

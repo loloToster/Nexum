@@ -6,14 +6,14 @@ import {
   ColorValue,
   GestureResponderEvent
 } from "react-native"
-import { Text, useTheme } from "react-native-paper"
+import { Text, useTheme, MD2Theme } from "react-native-paper"
 
 import { ChoosenWidgetProps, WidgetComponent } from "../Widget"
 
 function ButtonComponent(props: ChoosenWidgetProps) {
   const { color, text, onText, offText, isSwitch } = props.properties
 
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(color)
 
   const { useWidgetValue } = props

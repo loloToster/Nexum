@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { StyleSheet, Image, View } from "react-native"
-import { Colors, FAB, Text } from "react-native-paper"
+import { MD2Colors, FAB, Text } from "react-native-paper"
 import { useQuery } from "react-query"
 
 import api from "src/api"
@@ -47,8 +47,8 @@ function Devices() {
               styles.activityDot,
               {
                 backgroundColor: device.active
-                  ? Colors.lightGreenA700
-                  : Colors.grey800
+                  ? MD2Colors.lightGreenA700
+                  : MD2Colors.grey800
               }
             ]}
           ></View>
@@ -107,7 +107,7 @@ const getStyles = () => {
     },
     activityNumber: {
       marginRight: 3,
-      color: Colors.lightGreenA700,
+      color: MD2Colors.lightGreenA700,
       fontSize: 12,
       fontWeight: "800"
     },

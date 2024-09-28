@@ -1,3 +1,4 @@
+import "@expo/metro-runtime"
 import "react-native-gesture-handler"
 
 import React, { lazy, Suspense, useEffect } from "react"
@@ -14,7 +15,7 @@ import { io } from "socket.io-client"
 
 import {
   ActivityIndicator,
-  DarkTheme,
+  MD2DarkTheme,
   Modal,
   Portal,
   Provider as PaperProvider
@@ -43,10 +44,10 @@ const Users = lazy(() => import("./screens/Users"))
 const Devices = lazy(() => import("./screens/Devices"))
 const Googlehome = lazy(() => import("./screens/Googlehome"))
 
-DarkTheme.mode = "exact"
-DarkTheme.colors.surface = SURFACE_COLOR
-DarkTheme.colors.primary = PRIMARY_COLOR
-DarkTheme.colors.accent = ACCENT_COLOR
+MD2DarkTheme.mode = "exact"
+MD2DarkTheme.colors.surface = SURFACE_COLOR
+MD2DarkTheme.colors.primary = PRIMARY_COLOR
+MD2DarkTheme.colors.accent = ACCENT_COLOR
 
 const queryClient = new QueryClient()
 const Drawer = createDrawerNavigator()
@@ -78,7 +79,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PaperProvider theme={DarkTheme}>
+      <PaperProvider theme={MD2DarkTheme}>
         <Suspense fallback={<Loader />}>
           <UserProvider>
             <UserContextConsumer>
@@ -111,7 +112,8 @@ function App() {
                                   header: props => <Header {...props} />,
                                   drawerPosition: "right",
                                   drawerStyle: {
-                                    backgroundColor: DarkTheme.colors.background
+                                    backgroundColor:
+                                      MD2DarkTheme.colors.background
                                   },
                                   lazy: true
                                 }}
@@ -156,4 +158,4 @@ function App() {
   )
 }
 
-export default registerRootComponent(App)
+registerRootComponent(App)

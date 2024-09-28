@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { View, StyleSheet } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-import { ActivityIndicator, Theme, useTheme } from "react-native-paper"
+import { ActivityIndicator, MD2Theme, useTheme } from "react-native-paper"
 import { useQuery } from "react-query"
 
 import api from "src/api"
@@ -18,7 +18,7 @@ import Tabs from "src/components/Tabs/Tabs"
 import Error from "src/components/Error/Error"
 
 function Widgets() {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const { socket } = useSocket()
@@ -90,7 +90,7 @@ function Widgets() {
 
 export default Widgets
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     loading: {
       backgroundColor: theme.colors.background,

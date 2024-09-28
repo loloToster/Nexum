@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { View, StyleSheet, ColorValue } from "react-native"
-import { Text, useTheme, Theme } from "react-native-paper"
+import { Text, useTheme, MD2Theme } from "react-native-paper"
 import { AnimatedCircularProgress } from "react-native-circular-progress"
 
 import { map, roundBadFloat, roundByStep } from "src/utils"
@@ -10,7 +10,7 @@ import { ChoosenWidgetProps, WidgetComponent } from "../Widget"
 function GaugeComponent(props: ChoosenWidgetProps) {
   const { color, text, min, max, step } = props.properties
 
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme, color)
 
   const { useWidgetValue } = props
@@ -62,7 +62,7 @@ const Gauge: WidgetComponent = {
 
 export default Gauge
 
-const getStyles = (theme: Theme, color: ColorValue) => {
+const getStyles = (theme: MD2Theme, color: ColorValue) => {
   return StyleSheet.create({
     container: {
       flex: 1,

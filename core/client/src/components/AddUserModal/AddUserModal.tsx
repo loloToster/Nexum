@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { StyleSheet, Dimensions, View } from "react-native"
 import {
-  Theme,
+  MD2Theme,
   useTheme,
   Portal,
   Modal,
@@ -30,7 +30,7 @@ const emptyUserData = {
 }
 
 function ErrorText({ error }: { error: string }) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   return (
@@ -46,7 +46,7 @@ function ErrorText({ error }: { error: string }) {
 function AddUserModal(
   props: { onAdd: () => void } & Omit<ModalProps, "children" | "theme">
 ) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const [userData, setUserData] = useObjectState<UserData>({ ...emptyUserData })
@@ -157,7 +157,7 @@ function AddUserModal(
 
 export default AddUserModal
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     modal: {
       alignItems: "center",

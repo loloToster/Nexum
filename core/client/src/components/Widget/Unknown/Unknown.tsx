@@ -1,13 +1,13 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
-import { Text, List, useTheme, Theme } from "react-native-paper"
+import { Text, List, useTheme, MD2Theme } from "react-native-paper"
 
 import { ChoosenWidgetProps } from "../Widget"
 
 import Translatable from "src/components/Translatable/Translatable"
 
 function Unknown({ type }: ChoosenWidgetProps) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   return (
@@ -32,7 +32,7 @@ function Unknown({ type }: ChoosenWidgetProps) {
 
 export default Unknown
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     wrapper: {
       flex: 1,

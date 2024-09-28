@@ -4,7 +4,7 @@ import { AxiosError } from "axios"
 import { useMutation } from "react-query"
 
 import {
-  Theme,
+  MD2Theme,
   useTheme,
   Headline,
   TextInput,
@@ -24,7 +24,7 @@ import QrScanner from "src/components/QrScanner/QrScanner"
 import Translatable from "src/components/Translatable/Translatable"
 
 function Login() {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const { setUser } = useUser()
@@ -131,7 +131,7 @@ function Login() {
 
 export default Login
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     container: {
       backgroundColor: theme.colors.background,

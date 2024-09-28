@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-undef
-module.exports = api => {
+module.exports = function (api) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
   require("dotenv").config()
 

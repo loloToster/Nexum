@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { View, StyleSheet, FlatList } from "react-native"
 import {
   useTheme,
-  Theme,
+  MD2Theme,
   Searchbar,
   ActivityIndicator,
   List,
@@ -38,7 +38,7 @@ function SearchableList<T>({
   onSearch = () => null,
   onRefresh = () => null
 }: SearchableListProps<T>) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   const [searchValue, setSearchValue] = useState("")
@@ -94,7 +94,7 @@ function SearchableList<T>({
 
 export default SearchableList
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   const space = 10
 
   return StyleSheet.create({

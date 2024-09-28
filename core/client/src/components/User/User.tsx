@@ -10,10 +10,10 @@ import {
   Portal,
   Modal,
   Divider,
-  Colors,
+  MD2Colors,
   Headline,
   Surface,
-  Theme,
+  MD2Theme,
   useTheme
 } from "react-native-paper"
 import QRCode from "react-native-qrcode-svg"
@@ -40,7 +40,7 @@ export interface UserProps {
 }
 
 function User(props: UserProps) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
   const { user: loggedInUser } = useUser()
 
@@ -173,6 +173,7 @@ function User(props: UserProps) {
           <CopyButton text={user.id} />
           <IconButton
             icon="qrcode"
+            containerColor="transparent"
             size={20}
             onPress={() => setQrActive(true)}
           />
@@ -194,6 +195,7 @@ function User(props: UserProps) {
         </View>
         <IconButton
           icon="pencil"
+          containerColor="transparent"
           size={20}
           onPress={() => nameInput.current?.focus()}
         />
@@ -241,12 +243,13 @@ function User(props: UserProps) {
           onPress={() => setTabsModalActive(true)}
           style={[styles.tab, styles.addTab]}
           icon="plus"
+          containerColor="transparent"
         />
       </View>
       <Button
         style={styles.delete}
         icon="delete"
-        color={Colors.red500}
+        buttonColor={MD2Colors.red900}
         mode="contained"
         onPress={() => setDeleteActive(true)}
         loading={deleteMutation.isLoading}
@@ -260,7 +263,7 @@ function User(props: UserProps) {
 
 export default User
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     container: {
       paddingHorizontal: 15

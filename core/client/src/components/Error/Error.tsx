@@ -1,9 +1,9 @@
 import React from "react"
 import { View, StyleSheet } from "react-native"
-import { Text, useTheme, Theme, Avatar } from "react-native-paper"
+import { Text, useTheme, MD2Theme, Avatar } from "react-native-paper"
 
 function Error(props: { text?: string }) {
-  const theme = useTheme()
+  const theme = useTheme<MD2Theme>()
   const styles = getStyles(theme)
 
   return (
@@ -20,7 +20,7 @@ function Error(props: { text?: string }) {
 
 export default Error
 
-const getStyles = (theme: Theme) => {
+const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     container: {
       flex: 1,
