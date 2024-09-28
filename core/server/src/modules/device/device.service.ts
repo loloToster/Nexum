@@ -46,10 +46,16 @@ export class DeviceService {
         : undefined
     })
 
-    return devices.map(device => ({
-      ...device,
-      active: this.getNumberOfDeviceConnections(device.id)
-    }))
+    const mappedDevices: Array<Device & { active: number }> = []
+
+    for (const device of devices) {
+      mappedDevices.push({
+        ...device,
+        active: await this.getNumberOfDeviceConnections(device.id)
+      })
+    }
+
+    return mappedDevices
   }
 
   async getDeviceById(id: number) {
