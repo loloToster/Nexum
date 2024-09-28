@@ -25,10 +25,13 @@ import { CmdToVal, supportedTraits } from "./ggl-value-maps"
 const {
   GOOGLE_SMARTHOME_PROJECT_ID,
   GOOGLE_HOMEGRAPH_KEY_ID,
-  GOOGLE_HOMEGRAPH_KEY,
+  GOOGLE_HOMEGRAPH_KEY: unparsedHomegraphKey,
   GOOGLE_HOMEGRAPH_CLIENT_EMAIL,
   GOOGLE_HOMEGRAPH_CLIENT_ID
 } = process.env
+
+// neccessary because docker does not parse new lines
+const GOOGLE_HOMEGRAPH_KEY = unparsedHomegraphKey.replace(/\\n/g, "\n")
 
 const homegraphClient = google.homegraph({
   version: "v1",
