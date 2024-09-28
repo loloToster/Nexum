@@ -89,7 +89,8 @@ export class GoogleSmarthomeController {
 
     const code = await this.gglSmarthomeService.generateCodeForUser(user.id)
 
-    console.log("redirecting")
+    this.logger.log(`Creating ggl integration for user with id: '${user.id}'`)
+
     res.redirect(
       `${query.redirect_uri}?state=${encodeURIComponent(
         query.state
@@ -153,8 +154,6 @@ export class GoogleSmarthomeController {
     }
 
     const { intent, payload } = body.inputs[0]
-
-    this.logger.log(`got ${intent}`)
 
     const res = await this.gglSmarthomeService.handleIntent(
       intent,

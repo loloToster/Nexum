@@ -317,6 +317,10 @@ export class GoogleSmarthomeService {
       }
 
       case "action.devices.DISCONNECT": {
+        this.logger.log(
+          `Disconnecting ggl integration for user with id: '${user.id}'`
+        )
+
         await this.db.googleSmartHomeIntegration.update({
           where: { userId: user.id },
           data: { connected: false }
