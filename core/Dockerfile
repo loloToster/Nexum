@@ -1,4 +1,4 @@
-FROM node:16 AS builder
+FROM node:20 AS builder
 
 WORKDIR /tmp/app
 
@@ -19,7 +19,7 @@ COPY . .
 RUN npm run build:raw
 
 
-FROM node:16-alpine3.16 AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 

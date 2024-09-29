@@ -437,12 +437,16 @@ export class GoogleSmarthomeService {
         states[device.id.toString()] = await this.getDeviceState(device)
       }
 
-      await homegraphClient.devices.reportStateAndNotification({
-        requestBody: {
-          agentUserId: user.userId,
-          payload: { devices: { states } }
-        }
-      })
+      try {
+        await homegraphClient.devices.reportStateAndNotification({
+          requestBody: {
+            agentUserId: user.userId,
+            payload: { devices: { states } }
+          }
+        })
+      } catch (err) {
+        this.logger.error(err)
+      }
     }
   }
 }
