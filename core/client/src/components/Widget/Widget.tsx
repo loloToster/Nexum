@@ -33,6 +33,7 @@ import Unknown from "./Unknown/Unknown"
 
 import Button from "./Button/Button"
 import SliderWidget from "./Slider/Slider"
+import ColorPicker from "./ColorPicker/ColorPicker"
 import Gauge from "./Gauge/Gauge"
 import Label from "./Label/Label"
 import NumberInput from "./NumberInput/NumberInput"
@@ -69,6 +70,7 @@ export interface WidgetComponent {
 export const widgetComponents: WidgetComponent[] = [
   Button,
   SliderWidget,
+  ColorPicker,
   Gauge,
   Label,
   NumberInput
