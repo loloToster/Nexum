@@ -22,6 +22,12 @@ import {
   Subheading
 } from "react-native-paper"
 
+import ColorPicker, {
+  BrightnessSlider,
+  Preview,
+  Swatches
+} from "reanimated-color-picker"
+
 import { DEF_WIDGET_PROPS } from "src/consts"
 import { fillWithValues } from "src/utils"
 import type { WidgetData, WidgetProperties, WidgetProperty } from "src/types"
@@ -30,6 +36,8 @@ import { WidgetComponent, widgetComponents } from "src/components/Widget/Widget"
 import Error from "src/components/Error/Error"
 import RUSure from "src/components/RUSure/RUSure"
 import DeviceChoiceBtn from "../DeviceChoiceBtn/DeviceChoiceBtn"
+
+import { SWATCHES_COLORS } from "./swatch-colors"
 
 function Row({
   children,
@@ -57,9 +65,24 @@ type Inputs = {
 
 const inputs: Inputs = {
   color: function ({ value, onChange }) {
+    const theme = useTheme<MD2Theme>()
+    const styles = getStyles(theme)
+
     return (
       <Row>
-        <TextInput label="Color" value={value} onChangeText={onChange} />
+        <View style={styles.colorPickerWrapper}>
+          <ColorPicker
+            value={value}
+            onChange={clr => onChange(clr.hex)}
+            onComplete={clr => onChange(clr.hex)}
+            style={styles.colorPicker}
+          >
+            <Text>Color</Text>
+            <Preview hideInitialColor />
+            <Swatches colors={SWATCHES_COLORS}></Swatches>
+            <BrightnessSlider boundedThumb style={{ borderRadius: 1000 }} />
+          </ColorPicker>
+        </View>
       </Row>
     )
   },
@@ -355,6 +378,16 @@ const getStyles = (theme: MD2Theme) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center"
+    },
+    colorPickerWrapper: {
+      padding: 8,
+      borderWidth: 2,
+      borderColor: MD2Colors.grey800,
+      borderRadius: 4
+    },
+    colorPicker: {
+      width: "100%",
+      gap: 6
     }
   })
 }

@@ -143,7 +143,7 @@ export default ColorPickerWidget
 const getStyles = (theme: MD2Theme) => {
   return StyleSheet.create({
     wrapper: {
-      height: "100%"
+      flex: 1
     },
     btn: {
       flex: 1,
@@ -151,7 +151,6 @@ const getStyles = (theme: MD2Theme) => {
       alignItems: "center",
       borderRadius: 10000,
       margin: 5,
-      height: "100%",
       backgroundColor: "black",
       borderWidth: 1,
       borderStyle: "solid",
