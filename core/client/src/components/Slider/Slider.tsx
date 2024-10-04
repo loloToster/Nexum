@@ -48,41 +48,43 @@ function Slider({
   const sliderPercentage = ((value - min) / (max - min)) * 100
 
   // fix for web slider not updating when initial value is changed
-  if (Platform.OS === "web")
-    useEffect(() => {
-      setValue(initialValue)
-    }, [initialValue])
+  useEffect(() => {
+    if (Platform.OS === "web") setValue(initialValue)
+  }, [initialValue])
 
   // fix for web slider not responding on touchmove
   const input = useRef<HTMLInputElement>(null)
   const inputId = uid()
-  if (Platform.OS === "web" && vertical) {
-    useEffect(() => {
-      const moveHandler = (e: TouchEvent) => {
-        if (!inputing || !input.current) return
+  useEffect(() => {
+    if (Platform.OS !== "web" || !vertical) return
 
-        const { clientY } = e.touches[0]
-        const { y, height } = input.current.getBoundingClientRect()
-        const start = y + height
-        const end = y
+    const moveHandler = (e: TouchEvent) => {
+      if (!inputing || !input.current) return
 
-        const prevVal = value
-        let newVal = map(clientY, start, end, min, max)
+      const { clientY } = e.touches[0]
+      const { y, height } = input.current.getBoundingClientRect()
+      const start = y + height
+      const end = y
 
-        // value needs to be within min & max
-        newVal = newVal > max ? max : newVal
-        newVal = newVal < min ? min : newVal
+      const prevVal = value
+      let newVal = map(clientY, start, end, min, max)
 
-        newVal = roundBadFloat(roundByStep(newVal, step))
+      // value needs to be within min & max
+      newVal = newVal > max ? max : newVal
+      newVal = newVal < min ? min : newVal
 
-        if (prevVal !== newVal) onChange(newVal)
-        setValue(newVal)
-      }
+      newVal = roundBadFloat(roundByStep(newVal, step))
 
-      window.addEventListener("touchmove", moveHandler)
-      return () => window.removeEventListener("touchmove", moveHandler)
-    }, [inputing, value])
-  }
+      if (prevVal !== newVal) onChange(newVal)
+      setValue(newVal)
+    }
+
+    window.addEventListener("touchmove", moveHandler)
+    return () => {
+      if (Platform.OS !== "web" || !vertical) return
+      window.removeEventListener("touchmove", moveHandler)
+    }
+  }, [inputing, value])
 
   return (
     <View
