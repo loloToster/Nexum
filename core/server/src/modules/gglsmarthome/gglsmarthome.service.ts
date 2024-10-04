@@ -178,6 +178,7 @@ export class GoogleSmarthomeService {
         traits: {
           create: device.traits.map(trait => ({
             name: trait.name,
+            mode: trait.mode,
             targets: { create: trait.targets }
           }))
         }
@@ -217,6 +218,7 @@ export class GoogleSmarthomeService {
           traits: {
             create: editedDevice.traits.map(trait => ({
               name: trait.name,
+              mode: trait.mode,
               targets: { create: trait.targets }
             }))
           }
@@ -242,22 +244,28 @@ export class GoogleSmarthomeService {
               let attributes = {}
 
               device.traits.forEach(trait => {
+                const traitMode =
+                  supportedTraits[trait.name]?.find(m => m.id === trait.mode) ??
+                  supportedTraits[trait.name][0]
+
                 attributes = {
-                  attributes,
-                  ...supportedTraits[trait.name]?.attributes
+                  ...attributes,
+                  ...traitMode?.attributes
                 }
               })
 
-              return {
+              const deviceInfo = {
                 id: device.id.toString(),
                 type: `action.devices.types.${device.type}`,
                 traits: device.traits.map(
                   trait => `action.devices.traits.${trait.name}`
                 ),
                 name: { name: device.name },
-                willReportState: true,
+                willReportState: false,
                 attributes
               }
+
+              return deviceInfo
             })
           }
         }
@@ -342,7 +350,13 @@ export class GoogleSmarthomeService {
     let state: Record<string, any> = {}
 
     for (const trait of device.traits) {
-      const stateGetter = supportedTraits[trait.name].valueToGglState
+      const stateGetter = (
+        supportedTraits[trait.name].find(m => m.id === trait.mode) ??
+        supportedTraits[trait.name][0]
+      ).valueToGglState
+
+      if (!stateGetter) continue
+
       const partialState = await stateGetter(
         trait,
         async (deviceId, customId) => {
@@ -363,25 +377,30 @@ export class GoogleSmarthomeService {
   ) {
     const commandName = command.split(".")[3]
 
-    let targetTrait: string
-    let commandToValue: CmdToVal
+    let targetTrait: string | undefined = undefined
+    let commandToValue: CmdToVal | undefined = undefined
 
-    for (const traitName in supportedTraits) {
-      const trait = supportedTraits[traitName]
+    const gglDevice = gglDevices.find(gd => gd.id.toString() === device.id)
 
-      for (const cmd in trait.commands) {
+    for (const trait of gglDevice.traits) {
+      const traitMode =
+        supportedTraits[trait.name].find(m => m.id === trait.mode) ??
+        supportedTraits[trait.name][0]
+
+      for (const cmd in traitMode.commands) {
         if (cmd !== commandName) continue
 
-        targetTrait = traitName
-        commandToValue = trait.commands[cmd].commandToValue
+        targetTrait = trait.name
+        commandToValue = traitMode.commands[cmd].commandToValue
+        break
       }
     }
 
+    if (!targetTrait || !commandToValue) return
+
     await commandToValue(
       params,
-      gglDevices
-        .find(gd => gd.id.toString() === device.id)
-        .traits.find(t => t.name === targetTrait),
+      gglDevice.traits.find(t => t.name === targetTrait),
       async (deviceId, customId, val) => {
         await this.valueService.updateValue(
           "googlehome",
@@ -389,6 +408,9 @@ export class GoogleSmarthomeService {
           deviceId,
           val
         )
+
+        const target = this.valueService.createTarget(deviceId, customId)
+        this.logger.log(`google changed value of '${target}' to '${val}'`)
       }
     )
   }

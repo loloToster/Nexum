@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { useMutation } from "react-query"
+
 import {
   Dimensions,
   ScrollView,
@@ -7,6 +8,7 @@ import {
   StyleSheet,
   View
 } from "react-native"
+
 import {
   useTheme,
   MD2Theme,
@@ -20,6 +22,8 @@ import {
   Button,
   Switch
 } from "react-native-paper"
+
+import { Dropdown } from "react-native-paper-dropdown"
 
 import api from "src/api"
 import { capitalizeFirstLetter } from "src/utils"
@@ -81,6 +85,19 @@ function EditGoogleDeviceModal({
 
     for (const trait of googleDevice.traits) {
       initialState[trait.name] = true
+    }
+
+    return initialState
+  })
+
+  type TraitsModes = Record<string, string | undefined>
+  const [traitsModes, setTraitsModes] = useState<TraitsModes>(() => {
+    const initialState: TraitsModes = {}
+
+    for (const trait of respectiveSupDevice.traits) {
+      initialState[trait.name] =
+        googleDevice?.traits.find(t => t.name === trait.name)?.mode ??
+        trait.modes[0].id
     }
 
     return initialState
@@ -177,7 +194,11 @@ function EditGoogleDeviceModal({
         .filter(trait => traitsEnabled[trait.name] || trait.required)
         .map(trait => ({
           name: trait.name,
-          targets: trait.targets.map(target => ({
+          mode: traitsModes[trait.name] ?? trait.modes[0].id,
+          targets: (
+            trait.modes.find(m => m.id === traitsModes[trait.name]) ??
+            trait.modes[0]
+          ).targets.map(target => ({
             name: target,
             deviceId: getTraitsDataField(trait.name, target, "deviceId") ?? -1,
             customId: getTraitsDataField(trait.name, target, "customId") ?? ""
@@ -251,34 +272,60 @@ function EditGoogleDeviceModal({
                     }}
                   />
                 </View>
-                {(trait.required || traitsEnabled[trait.name]) &&
-                  trait.targets.map(tar => (
-                    <View key={tar}>
-                      {/* todo: support adding by widgets  */}
-                      <DeviceChoiceBtn
-                        style={styles.traitTargetInp}
-                        deviceId={getTraitsDataField(
-                          trait.name,
-                          tar,
-                          "deviceId"
-                        )}
-                        onChangeDevice={dId =>
-                          setTraitsDataField(trait.name, tar, "deviceId", dId)
-                        }
-                      />
-                      <TextInput
+                {(trait.required || traitsEnabled[trait.name]) && (
+                  <>
+                    {trait.modes.length > 1 && (
+                      <Dropdown
+                        label="Mode"
+                        placeholder="Select Mode"
+                        value={traitsModes[trait.name]}
+                        hideMenuHeader
                         mode="outlined"
-                        style={styles.traitTargetInp}
-                        label={`Custom Id (${tar})`}
-                        value={
-                          getTraitsDataField(trait.name, tar, "customId") ?? ""
-                        }
-                        onChangeText={cId =>
-                          setTraitsDataField(trait.name, tar, "customId", cId)
+                        options={trait.modes.map(m => ({
+                          label: m.label,
+                          value: m.id
+                        }))}
+                        onSelect={val =>
+                          setTraitsModes(prev => ({
+                            ...prev,
+                            [trait.name]: val
+                          }))
                         }
                       />
-                    </View>
-                  ))}
+                    )}
+                    {(
+                      trait.modes.find(m => m.id === traitsModes[trait.name]) ??
+                      trait.modes[0]
+                    ).targets.map(tar => (
+                      <View key={tar}>
+                        {/* todo: support adding by widgets  */}
+                        <DeviceChoiceBtn
+                          style={styles.traitTargetInp}
+                          deviceId={getTraitsDataField(
+                            trait.name,
+                            tar,
+                            "deviceId"
+                          )}
+                          onChangeDevice={dId =>
+                            setTraitsDataField(trait.name, tar, "deviceId", dId)
+                          }
+                        />
+                        <TextInput
+                          mode="outlined"
+                          style={styles.traitTargetInp}
+                          label={`Custom Id (${tar})`}
+                          value={
+                            getTraitsDataField(trait.name, tar, "customId") ??
+                            ""
+                          }
+                          onChangeText={cId =>
+                            setTraitsDataField(trait.name, tar, "customId", cId)
+                          }
+                        />
+                      </View>
+                    ))}
+                  </>
+                )}
               </View>
             </View>
           ))}

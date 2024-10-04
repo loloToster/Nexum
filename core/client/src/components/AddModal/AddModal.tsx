@@ -68,7 +68,7 @@ const getStyles = (theme: MD2Theme) => {
       padding: 20,
       borderRadius: theme.roundness,
       backgroundColor: theme.colors.background,
-      maxHeight: Dimensions.get("window").height / 1.2
+      maxHeight: Dimensions.get("window").height / 1.65
     }
   })
 }

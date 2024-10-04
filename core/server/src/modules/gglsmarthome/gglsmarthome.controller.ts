@@ -175,7 +175,11 @@ export class GoogleSmarthomeController {
       traits: Object.keys(sd.traits).map(traitName => ({
         name: traitName,
         required: sd.traits[traitName],
-        targets: supportedTraits[traitName].targets
+        modes: supportedTraits[traitName].map(m => ({
+          id: m.id,
+          label: m.label,
+          targets: m.targets
+        }))
       }))
     }))
   }

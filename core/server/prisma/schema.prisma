@@ -116,6 +116,7 @@ model GooglehomeDeviceTrait {
   googleDeviceId Int                     @map("google_device_id")
   googleDevice   GooglehomeDevice        @relation(fields: [googleDeviceId], references: [id], onDelete: Cascade)
   name           String
+  mode           String?
   targets        GooglehomeTraitTarget[]
 
   @@map("ggl_smarthome_device_trait")

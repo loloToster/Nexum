@@ -4,7 +4,11 @@ export interface SupportedGooglehomeDevice {
   traits: Array<{
     name: string
     required: boolean
-    targets: string[]
+    modes: Array<{
+      id: string
+      label: string
+      targets: string[]
+    }>
   }>
 }
 
@@ -20,6 +24,7 @@ export interface GooglehomeDevice {
   name: string
   traits: Array<{
     name: string
+    mode: string
     targets: GooglehomeDeviceTarget[]
   }>
 }

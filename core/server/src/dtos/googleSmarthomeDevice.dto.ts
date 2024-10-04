@@ -26,6 +26,9 @@ export class GoogleSmarthomeDeviceTraitDto {
   @IsNotEmpty()
   name: string
 
+  @IsString()
+  mode: string
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => GoogleSmarthomeTraitTargetDto)
