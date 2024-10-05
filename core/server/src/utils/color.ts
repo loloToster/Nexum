@@ -1,22 +1,25 @@
+import * as tinycolor from "tinycolor2"
 import { keepBetween } from "./numeric"
 
-export function rgbToInteger(red: number, green: number, blue: number) {
-  red = Math.max(0, Math.min(255, red))
-  green = Math.max(0, Math.min(255, green))
-  blue = Math.max(0, Math.min(255, blue))
+export function tinycolorToInteger(clr: tinycolor.Instance) {
+  let { r, g, b } = clr.toRgb()
 
-  return (red << 16) | (green << 8) | blue
+  r = Math.max(0, Math.min(255, r))
+  g = Math.max(0, Math.min(255, g))
+  b = Math.max(0, Math.min(255, b))
+
+  return (r << 16) | (g << 8) | b
 }
 
-export function integerToRGB(colorInteger: number) {
-  const red = (colorInteger >> 16) & 0xff
-  const green = (colorInteger >> 8) & 0xff
-  const blue = colorInteger & 0xff
+export function integerToTinycolor(rgbInteger: number) {
+  const r = (rgbInteger >> 16) & 0xff
+  const g = (rgbInteger >> 8) & 0xff
+  const b = rgbInteger & 0xff
 
-  return { red, green, blue }
+  return tinycolor({ r, g, b })
 }
 
-const tempsToHex = {
+const TEMPS_TO_HEX = {
   1000: "ff3800",
   1100: "ff4700",
   1200: "ff5300",
@@ -130,57 +133,12 @@ const tempsToHex = {
   12000: "c3d1ff"
 }
 
-export function hexToRGB(hex: string) {
-  const red = parseInt(hex.substring(0, 2), 16)
-  const green = parseInt(hex.substring(2, 4), 16)
-  const blue = parseInt(hex.substring(4, 6), 16)
-
-  return { red, green, blue }
-}
-
-export function temperatureToRGB(temp: number) {
+export function temperatureToTinycolor(temp: number) {
   temp = keepBetween(
     Math.round(temp / 100) * 100,
-    parseInt(Object.keys(tempsToHex).at(0)),
-    parseInt(Object.keys(tempsToHex).at(-1))
+    parseInt(Object.keys(TEMPS_TO_HEX).at(0)),
+    parseInt(Object.keys(TEMPS_TO_HEX).at(-1))
   )
 
-  return hexToRGB(tempsToHex[temp] ?? "000000")
-}
-
-export function hsvToRGB(h: number, s: number, v: number) {
-  let r: number, g: number, b: number
-
-  const i = Math.floor(h / 60) % 6
-  const f = h / 60 - Math.floor(h / 60)
-  const p = v * (1 - s)
-  const q = v * (1 - f * s)
-  const t = v * (1 - (1 - f) * s)
-
-  switch (i) {
-    case 0:
-      ;(r = v), (g = t), (b = p)
-      break
-    case 1:
-      ;(r = q), (g = v), (b = p)
-      break
-    case 2:
-      ;(r = p), (g = v), (b = t)
-      break
-    case 3:
-      ;(r = p), (g = q), (b = v)
-      break
-    case 4:
-      ;(r = t), (g = p), (b = v)
-      break
-    case 5:
-      ;(r = v), (g = p), (b = q)
-      break
-  }
-
-  return {
-    red: Math.round(r * 255),
-    green: Math.round(g * 255),
-    blue: Math.round(b * 255)
-  }
+  return tinycolor(TEMPS_TO_HEX[temp] ?? "000000")
 }

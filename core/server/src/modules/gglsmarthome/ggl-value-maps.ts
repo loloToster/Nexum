@@ -1,10 +1,11 @@
+import * as tinycolor from "tinycolor2"
+
 import { FullGglDeviceTrait, WidgetValue } from "src/types/types"
 import { keepBetween } from "src/utils/numeric"
 import {
-  hsvToRGB,
-  integerToRGB,
-  rgbToInteger,
-  temperatureToRGB
+  tinycolorToInteger,
+  integerToTinycolor,
+  temperatureToTinycolor
 } from "src/utils/color"
 
 type ValueGetter = (deviceId: number, customId: string) => Promise<WidgetValue>
@@ -33,11 +34,9 @@ async function setValueOfTargetWithName(
   setValue: ValueSetter,
   trait: FullGglDeviceTrait,
   value: WidgetValue,
-  name?: string
+  name: string
 ) {
-  const { customId, deviceId } = trait.targets.find(
-    t => t.name === (name ?? trait.name)
-  )
+  const { customId, deviceId } = trait.targets.find(t => t.name === name)
 
   await setValue(deviceId, customId, value)
 }
@@ -267,16 +266,18 @@ export const supportedTraits: SupportedTraits = {
       attributes: { colorModel: "rgb" },
       targets: ["r", "g", "b"],
       async valueToGglState(trait, getValue) {
-        const rValue = await getValueOfTargetWithName(getValue, trait, "r")
-        const gValue = await getValueOfTargetWithName(getValue, trait, "g")
-        const bValue = await getValueOfTargetWithName(getValue, trait, "b")
+        const r = await getValueOfTargetWithName(getValue, trait, "r")
+        const g = await getValueOfTargetWithName(getValue, trait, "g")
+        const b = await getValueOfTargetWithName(getValue, trait, "b")
 
         return {
           color: {
-            spectrumRgb: rgbToInteger(
-              parseInt(rValue.toString()),
-              parseInt(gValue.toString()),
-              parseInt(bValue.toString())
+            spectrumRgb: tinycolorToInteger(
+              tinycolor({
+                r: parseInt(r.toString()),
+                g: parseInt(g.toString()),
+                b: parseInt(b.toString())
+              })
             )
           }
         }
@@ -284,33 +285,25 @@ export const supportedTraits: SupportedTraits = {
       commands: {
         ColorAbsolute: {
           async commandToValue(params, trait, _, setValue) {
-            let [r, g, b] = [0, 0, 0]
+            let color: tinycolor.Instance
 
             if (params.color.temperature) {
-              const colors = temperatureToRGB(params.color.temperature)
-              r = colors.red
-              g = colors.green
-              b = colors.blue
+              color = temperatureToTinycolor(params.color.temperature)
             } else if (params.color.spectrumRGB) {
-              const colors = integerToRGB(params.color.spectrumRGB)
-              r = colors.red
-              g = colors.green
-              b = colors.blue
+              color = integerToTinycolor(params.color.spectrumRGB)
             } else if (params.color.spectrumHSV) {
-              const colors = hsvToRGB(
-                params.color.spectrumHSV.hue,
-                params.color.spectrumHSV.saturation,
-                params.color.spectrumHSV.value
-              )
-
-              r = colors.red
-              g = colors.green
-              b = colors.blue
+              color = tinycolor({
+                h: params.color.spectrumHSV.hue,
+                s: params.color.spectrumHSV.saturation,
+                v: params.color.spectrumHSV.value
+              })
             }
 
-            await setValueOfTargetWithName(setValue, trait, r, "r")
-            await setValueOfTargetWithName(setValue, trait, g, "g")
-            await setValueOfTargetWithName(setValue, trait, b, "b")
+            const rgb = color.toRgb()
+
+            await setValueOfTargetWithName(setValue, trait, rgb.r, "r")
+            await setValueOfTargetWithName(setValue, trait, rgb.g, "g")
+            await setValueOfTargetWithName(setValue, trait, rgb.b, "b")
           }
         }
       }
@@ -332,27 +325,76 @@ export const supportedTraits: SupportedTraits = {
       commands: {
         ColorAbsolute: {
           async commandToValue(params, trait, _, setValue) {
-            let color: number
+            let color: tinycolor.Instance
 
             if (params.color.temperature) {
-              const { red, green, blue } = temperatureToRGB(
-                params.color.temperature
-              )
-
-              color = rgbToInteger(red, green, blue)
+              color = temperatureToTinycolor(params.color.temperature)
             } else if (params.color.spectrumRGB) {
-              color = params.color.spectrumRGB
+              color = integerToTinycolor(params.color.spectrumRGB)
             } else if (params.color.spectrumHSV) {
-              const { red, green, blue } = hsvToRGB(
-                params.color.spectrumHSV.hue,
-                params.color.spectrumHSV.saturation,
-                params.color.spectrumHSV.value
-              )
-
-              color = rgbToInteger(red, green, blue)
+              color = tinycolor({
+                h: params.color.spectrumHSV.hue,
+                s: params.color.spectrumHSV.saturation,
+                v: params.color.spectrumHSV.value
+              })
             }
 
-            await setValueOfTargetWithName(setValue, trait, color)
+            await setValueOfTargetWithName(
+              setValue,
+              trait,
+              tinycolorToInteger(color),
+              "ColorSetting"
+            )
+          }
+        }
+      }
+    },
+    {
+      id: "gradient",
+      label: "Gradient",
+      attributes: { colorModel: "rgb" },
+      targets: ["start", "end"],
+      async valueToGglState(trait, getValue) {
+        const colorValue = await getValueOfTargetWithName(
+          getValue,
+          trait,
+          "start"
+        )
+
+        return { color: { spectrumRgb: colorValue } }
+      },
+      commands: {
+        ColorAbsolute: {
+          async commandToValue(params, trait, _, setValue) {
+            let color: tinycolor.Instance
+
+            if (params.color.temperature) {
+              color = temperatureToTinycolor(params.color.temperature)
+            } else if (params.color.spectrumRGB) {
+              color = integerToTinycolor(params.color.spectrumRGB)
+            } else if (params.color.spectrumHSV) {
+              color = tinycolor({
+                h: params.color.spectrumHSV.hue,
+                s: params.color.spectrumHSV.saturation,
+                v: params.color.spectrumHSV.value
+              })
+            }
+
+            await setValueOfTargetWithName(
+              setValue,
+              trait,
+              tinycolorToInteger(color),
+              "start"
+            )
+
+            color.spin(120)
+
+            await setValueOfTargetWithName(
+              setValue,
+              trait,
+              tinycolorToInteger(color),
+              "end"
+            )
           }
         }
       }
