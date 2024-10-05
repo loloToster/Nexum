@@ -401,6 +401,9 @@ export class GoogleSmarthomeService {
     await commandToValue(
       params,
       gglDevice.traits.find(t => t.name === targetTrait),
+      async (deviceId, customId) => {
+        return await this.valueService.getValue(deviceId, customId)
+      },
       async (deviceId, customId, val) => {
         await this.valueService.updateValue(
           "googlehome",

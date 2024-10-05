@@ -1,3 +1,5 @@
+import { keepBetween } from "./numeric"
+
 export function rgbToInteger(red: number, green: number, blue: number) {
   red = Math.max(0, Math.min(255, red))
   green = Math.max(0, Math.min(255, green))
@@ -137,6 +139,12 @@ export function hexToRGB(hex: string) {
 }
 
 export function temperatureToRGB(temp: number) {
+  temp = keepBetween(
+    Math.round(temp / 100) * 100,
+    parseInt(Object.keys(tempsToHex).at(0)),
+    parseInt(Object.keys(tempsToHex).at(-1))
+  )
+
   return hexToRGB(tempsToHex[temp] ?? "000000")
 }
 

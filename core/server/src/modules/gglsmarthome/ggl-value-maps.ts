@@ -12,10 +12,10 @@ type ValueGetter = (deviceId: number, customId: string) => Promise<WidgetValue>
 async function getValueOfTargetWithName(
   getValue: ValueGetter,
   trait: FullGglDeviceTrait,
-  name?: string
+  traitTargetName: string
 ) {
   const { customId, deviceId } = trait.targets.find(
-    t => t.name === (name ?? trait.name)
+    t => t.name === traitTargetName
   )
 
   const value = await getValue(deviceId, customId)
@@ -45,6 +45,7 @@ async function setValueOfTargetWithName(
 export type CmdToVal = (
   params: Record<string, any>,
   trait: FullGglDeviceTrait,
+  getValue: ValueGetter,
   setValue: ValueSetter
 ) => Promise<void>
 
@@ -75,7 +76,7 @@ export const supportedTraits: SupportedTraits = {
       label: "Switch",
       targets: ["OnOff"],
       async valueToGglState(trait, getValue) {
-        const value = await getValueOfTargetWithName(getValue, trait)
+        const value = await getValueOfTargetWithName(getValue, trait, "OnOff")
 
         return {
           on: typeof value === "boolean" ? value : true
@@ -83,7 +84,7 @@ export const supportedTraits: SupportedTraits = {
       },
       commands: {
         OnOff: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             await setValueOfTargetWithName(setValue, trait, params.on, "OnOff")
           }
         }
@@ -96,7 +97,7 @@ export const supportedTraits: SupportedTraits = {
       targets: ["OnOff"],
       commands: {
         OnOff: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             if (params.on) {
               await setValueOfTargetWithName(setValue, trait, true, "OnOff")
               await new Promise(r => setTimeout(r, 1000))
@@ -116,7 +117,11 @@ export const supportedTraits: SupportedTraits = {
       attributes: { discreteOnlyOpenClose: true },
       targets: ["OpenClose"],
       async valueToGglState(trait, getValue) {
-        const value = (await getValueOfTargetWithName(getValue, trait))
+        const value = (await getValueOfTargetWithName(
+          getValue,
+          trait,
+          "OpenClose"
+        ))
           ? 100
           : 0
 
@@ -126,7 +131,7 @@ export const supportedTraits: SupportedTraits = {
       },
       commands: {
         OpenClose: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             await setValueOfTargetWithName(
               setValue,
               trait,
@@ -144,7 +149,7 @@ export const supportedTraits: SupportedTraits = {
       targets: ["OpenClose"],
       commands: {
         OpenClose: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             if (params.openPercent) {
               await setValueOfTargetWithName(setValue, trait, true, "OpenClose")
               await new Promise(r => setTimeout(r, 1000))
@@ -171,7 +176,11 @@ export const supportedTraits: SupportedTraits = {
       label: "Progressive",
       targets: ["OpenClose"],
       async valueToGglState(trait, getValue) {
-        const value = await getValueOfTargetWithName(getValue, trait)
+        const value = await getValueOfTargetWithName(
+          getValue,
+          trait,
+          "OpenClose"
+        )
 
         return {
           openPercent: keepBetween(value, 0, 100)
@@ -179,13 +188,26 @@ export const supportedTraits: SupportedTraits = {
       },
       commands: {
         OpenClose: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             await setValueOfTargetWithName(
               setValue,
               trait,
               params.openPercent,
               "OpenClose"
             )
+          }
+        },
+        OpenCloseRelative: {
+          async commandToValue(params, trait, getValue, setValue) {
+            let value = await getValueOfTargetWithName(
+              getValue,
+              trait,
+              "OpenClose"
+            )
+
+            value = keepBetween(value + params.openRelativePercent, 0, 100)
+
+            await setValueOfTargetWithName(setValue, trait, value, "OpenClose")
           }
         }
       }
@@ -197,7 +219,11 @@ export const supportedTraits: SupportedTraits = {
       label: "",
       targets: ["Brightness"],
       async valueToGglState(trait, getValue) {
-        const value = await getValueOfTargetWithName(getValue, trait)
+        const value = await getValueOfTargetWithName(
+          getValue,
+          trait,
+          "Brightness"
+        )
 
         return {
           brightness: keepBetween(value, 0, 100)
@@ -205,13 +231,30 @@ export const supportedTraits: SupportedTraits = {
       },
       commands: {
         BrightnessAbsolute: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             await setValueOfTargetWithName(
               setValue,
               trait,
               params.brightness,
               "Brightness"
             )
+          }
+        },
+        BrightnessRelative: {
+          async commandToValue(params, trait, getValue, setValue) {
+            let value = await getValueOfTargetWithName(
+              getValue,
+              trait,
+              "Brightness"
+            )
+
+            value = keepBetween(
+              value + params.brightnessRelativePercent,
+              0,
+              100
+            )
+
+            await setValueOfTargetWithName(setValue, trait, value, "Brightness")
           }
         }
       }
@@ -240,7 +283,7 @@ export const supportedTraits: SupportedTraits = {
       },
       commands: {
         ColorAbsolute: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             let [r, g, b] = [0, 0, 0]
 
             if (params.color.temperature) {
@@ -278,13 +321,17 @@ export const supportedTraits: SupportedTraits = {
       attributes: { colorModel: "rgb" },
       targets: ["ColorSetting"],
       async valueToGglState(trait, getValue) {
-        const colorValue = await getValueOfTargetWithName(getValue, trait)
+        const colorValue = await getValueOfTargetWithName(
+          getValue,
+          trait,
+          "ColorSetting"
+        )
 
         return { color: { spectrumRgb: colorValue } }
       },
       commands: {
         ColorAbsolute: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             let color: number
 
             if (params.color.temperature) {
@@ -346,13 +393,28 @@ export const supportedTraits: SupportedTraits = {
       },
       commands: {
         ThermostatTemperatureSetpoint: {
-          async commandToValue(params, trait, setValue) {
+          async commandToValue(params, trait, _, setValue) {
             await setValueOfTargetWithName(
               setValue,
               trait,
               params.thermostatTemperatureSetpoint,
               "setpoint"
             )
+          }
+        },
+        TemperatureRelative: {
+          async commandToValue(params, trait, getValue, setValue) {
+            let value = await getValueOfTargetWithName(
+              getValue,
+              trait,
+              "setpoint"
+            )
+
+            value =
+              parseFloat(value.toString()) +
+              params.thermostatTemperatureRelativeDegree
+
+            await setValueOfTargetWithName(setValue, trait, value, "setpoint")
           }
         }
       }
