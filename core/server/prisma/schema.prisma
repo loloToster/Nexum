@@ -59,6 +59,7 @@ model WidgetProperties {
   step       Float?
   min        Float?
   max        Float?
+  readOnly   Boolean? @map("read_only")
 
   @@unique([widgetId])
   @@map("widget_properties")

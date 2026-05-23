@@ -51,11 +51,13 @@ NexumClass::NexumClass()
       _onReceive(NULL),
       _connected(false) {}
 
-void NexumClass::begin(const char *token, const char *ssid, const char *pass,
-                       const char *host, uint16_t port, boolean useSSL) {
+void NexumClass::begin(const char* token, const char* ssid, const char* pass,
+                       const char* host, uint16_t port, boolean useSSL) {
   if (WiFi.getMode() & WIFI_AP) {
     WiFi.softAPdisconnect(true);
   }
+
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
 
   WiFiMulti.addAP(ssid, pass);
   WiFiMulti.run();
@@ -71,8 +73,8 @@ void NexumClass::begin(const char *token, const char *ssid, const char *pass,
   attachCb();
 }
 
-void NexumClass::begin(const char *token, const char *ssid, const char *pass,
-                       const char *url) {
+void NexumClass::begin(const char* token, const char* ssid, const char* pass,
+                       const char* url) {
   URL parsedUrl = parseUrl(url);
 
   boolean useSSL = parsedUrl.protocol == "https" || parsedUrl.protocol == "wss";
@@ -86,7 +88,7 @@ void NexumClass::begin(const char *token, const char *ssid, const char *pass,
 
 void NexumClass::attachCb() {
   socketIO.onEvent(
-      [this](socketIOmessageType_t type, uint8_t *payload, size_t length) {
+      [this](socketIOmessageType_t type, uint8_t* payload, size_t length) {
         switch (type) {
           case sIOtype_DISCONNECT: {
             if (!_connected) break;
@@ -168,7 +170,7 @@ void NexumClass::update(String customId, String value) {
   rawUpdate(customId, "\"" + value + "\"");
 }
 
-void NexumClass::update(String customId, const char *value) {
+void NexumClass::update(String customId, const char* value) {
   update(customId, (String)value);
 }
 
@@ -188,6 +190,9 @@ boolean NexumClass::isConnected() { return _connected; }
 
 boolean NexumClass::isWifiConnected() { return WiFi.status() == WL_CONNECTED; }
 
-void NexumClass::loop() { socketIO.loop(); }
+void NexumClass::loop() {
+  WiFiMulti.run();
+  socketIO.loop();
+}
 
 NexumClass Nexum;

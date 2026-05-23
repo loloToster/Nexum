@@ -4,7 +4,8 @@ import {
   Param,
   Query,
   BadRequestException,
-  NotFoundException
+  NotFoundException,
+  Logger
 } from "@nestjs/common"
 
 import { ValueService } from "./value.service"
@@ -13,6 +14,8 @@ import { DeviceService } from "../device/device.service"
 
 @Controller("/api/value")
 export class ValueController {
+  private readonly logger = new Logger(ValueController.name)
+
   constructor(
     private valueService: ValueService,
     private valueGateway: ValueGateway,
@@ -38,6 +41,13 @@ export class ValueController {
       return await this.valueService.getValue(device.id, customId)
     } else {
       const parsedValue = JSON.parse(value)
+
+      this.logger.log(
+        `REST API changed value of '${this.valueService.createTarget(
+          device.id,
+          customId
+        )}' to '${value}'`
+      )
 
       await this.valueService.updateValue(
         this.valueGateway.server,

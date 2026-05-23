@@ -205,6 +205,9 @@ export default function EditWidgetModal({
   const [deviceId, setDeviceId] = useState(widget?.deviceId ?? -1)
   const [customId, setCustomId] = useState(widget?.customId || "")
   const [title, setTitle] = useState(widget?.properties?.title || "")
+  const [readOnly, setReadOnly] = useState(
+    widget?.properties?.readOnly || false
+  )
   const [widgetProperties, setWidgetProperties] = useState<WidgetProperties>(
     fillWithValues(widget?.properties, DEF_WIDGET_PROPS)
   )
@@ -242,7 +245,8 @@ export default function EditWidgetModal({
       component: widgetComponent,
       properties: {
         ...widgetProperties,
-        title
+        title,
+        readOnly
       }
     }
 
@@ -308,6 +312,10 @@ export default function EditWidgetModal({
                   value={title}
                   onChangeText={setTitle}
                 />
+              </Row>
+              <Row extended>
+                <Text>Read Only</Text>
+                <Switch value={readOnly} onValueChange={setReadOnly} />
               </Row>
               {widgetComponent.editableProperties
                 .filter(prop => Boolean(inputs[prop]))

@@ -31,6 +31,7 @@ export interface WidgetProperties {
   min: number
   max: number
   step: number
+  readOnly: boolean
 }
 
 export type WidgetProperty = keyof WidgetProperties

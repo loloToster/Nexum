@@ -353,6 +353,9 @@ function Widget({
         )}
         <ChoosenWidget {...choosenWidgetProps} />
       </View>
+      {widgetProperties.readOnly && (
+        <View style={[styles.readOnlyCover]}></View>
+      )}
       {editing && (
         <TouchableWithoutFeedback onPress={() => setEditWidgetModalOpen(true)}>
           <View style={[styles.changeCoverBase, styles.editCover]}>
@@ -398,6 +401,14 @@ const getStyles = (theme: MD2Theme) => {
       padding: 5,
       paddingBottom: 0,
       color: MD2Colors.grey500
+    },
+    readOnlyCover: {
+      position: "absolute",
+      backgroundColor: "transparent",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
     },
     changeCoverBase: {
       position: "absolute",
