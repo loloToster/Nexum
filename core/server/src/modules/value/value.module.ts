@@ -9,7 +9,11 @@ import { ValueService } from "./value.service"
 
 @Module({
   controllers: [ValueController],
-  imports: [DeviceModule, forwardRef(() => UserModule), GoogleSmarthomeModule],
+  imports: [
+    forwardRef(() => DeviceModule),
+    forwardRef(() => UserModule),
+    GoogleSmarthomeModule
+  ],
   providers: [ValueGateway, ValueService],
   exports: [ValueGateway, ValueService]
 })

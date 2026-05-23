@@ -31,7 +31,8 @@ const {
 } = process.env
 
 // neccessary because docker does not parse new lines
-const GOOGLE_HOMEGRAPH_KEY = unparsedHomegraphKey.replace(/\\n/g, "\n")
+const GOOGLE_HOMEGRAPH_KEY =
+  unparsedHomegraphKey?.replace(/\\n/g, "\n") ?? undefined
 
 const homegraphClient = google.homegraph({
   version: "v1",

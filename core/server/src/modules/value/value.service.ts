@@ -1,21 +1,61 @@
-import { forwardRef, Inject, Injectable } from "@nestjs/common"
+import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common"
 import { Socket, Server } from "socket.io"
+import { io, Socket as ClientSocket } from "socket.io-client"
 
 import { RedisService } from "src/modules/redis/redis.service"
 import { GoogleSmarthomeService } from "../gglsmarthome/gglsmarthome.service"
 import { ValueGateway } from "./value.gateway"
 
 import { UserWithTabsAndWidgets, WidgetValue } from "src/types/types"
+import { DeviceService } from "../device/device.service"
 
 @Injectable()
 export class ValueService {
+  readonly slaveSocket: ClientSocket
+  private readonly logger = new Logger(ValueService.name)
+
   constructor(
     private redis: RedisService,
     @Inject(forwardRef(() => ValueGateway))
     private valueGateway: ValueGateway,
+    @Inject(forwardRef(() => DeviceService))
+    private deviceService: DeviceService,
     @Inject(forwardRef(() => GoogleSmarthomeService))
     private gglSmarthomeService: GoogleSmarthomeService
-  ) {}
+  ) {
+    if (process.env.MASTER_SERVER && process.env.MASTER_SERVER_TOKEN)
+      this.slaveSocket = this.connectToMaster()
+  }
+
+  connectToMaster() {
+    this.logger.log(`connecting to master at '${process.env.MASTER_SERVER}'`)
+
+    const slaveSocket = io(process.env.MASTER_SERVER, {
+      autoConnect: false,
+      reconnection: true,
+      auth: { as: "slave", token: process.env.MASTER_SERVER_TOKEN }
+    })
+
+    slaveSocket.on("connect", () => this.logger.log("connected to master"))
+    slaveSocket.on("disconnect", () =>
+      this.logger.log("disconnected from master")
+    )
+
+    slaveSocket.on("devices", async ({ devices }) => {
+      this.logger.log("Syncing devices with master...")
+      await this.deviceService.overrideDevices(devices)
+      this.logger.log("Devices synced with master")
+    })
+
+    slaveSocket.on("update-value", ({ target, value }) => {
+      this.logger.log(`master changed value of '${target}' to '${value}'`)
+      this.updateValue("master", target, value)
+    })
+
+    slaveSocket.connect()
+
+    return slaveSocket
+  }
 
   createTarget(deviceId: number | string, customId: string) {
     return `${deviceId}-${customId}`
@@ -31,24 +71,24 @@ export class ValueService {
   }
 
   async updateValue(
-    origin: Socket | Server | "googlehome",
+    origin: Socket | Server | "googlehome" | "master",
     target: string,
     value: WidgetValue
   )
   async updateValue(
-    origin: Socket | Server | "googlehome",
+    origin: Socket | Server | "googlehome" | "master",
     customId: string,
     deviceId: number,
     value: WidgetValue
   )
   async updateValue(
-    origin: Socket | Server | "googlehome",
+    origin: Socket | Server | "googlehome" | "master",
     targetOrCustomId: string,
     deviceIdOrValue: WidgetValue | number,
     valueOrUndefined?: WidgetValue
   ) {
     const updater =
-      origin === "googlehome"
+      origin === "googlehome" || origin === "master"
         ? this.valueGateway.server
         : origin instanceof Server
           ? origin
@@ -71,6 +111,13 @@ export class ValueService {
       target = this.createTarget(deviceId, customId)
     }
 
+    // send update to every slave except the one that updated
+    const isSlave = origin instanceof Socket && origin.in("slaves")
+    updater
+      .to("slaves")
+      .except(isSlave ? `slave-${origin.data.id}` : [])
+      .emit("update-value", { target, value })
+
     // send update to every user that can read current target
     updater.to(target).emit("update-value", { target, value })
 
@@ -84,6 +131,9 @@ export class ValueService {
 
     if (origin !== "googlehome")
       this.gglSmarthomeService.reportStateToHomegraph(deviceId, customId)
+
+    if (origin !== "master")
+      this.slaveSocket?.emit("update-value", { target, value })
   }
 
   async getValue(deviceId: number, customId: string): Promise<WidgetValue> {

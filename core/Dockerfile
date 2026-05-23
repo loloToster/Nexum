@@ -26,6 +26,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
+RUN apk add --no-cache openssl
+
 COPY --from=builder /tmp/app/package*.json ./
 COPY --from=builder /tmp/app/server/package*.json ./server/
 

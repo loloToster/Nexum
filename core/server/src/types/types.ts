@@ -1,4 +1,5 @@
 import {
+  Device,
   GooglehomeDevice,
   GooglehomeDeviceTrait,
   GooglehomeTraitTarget,
@@ -40,4 +41,9 @@ export type FullGglDeviceTrait = GooglehomeDeviceTrait & {
 
 export type FullGglDevice = GooglehomeDevice & {
   traits: FullGglDeviceTrait[]
+}
+
+export type DeviceWithValues = Omit<Device, "lastTimeConnected"> & {
+  lastTimeConnected: Date | number
+  values: Array<{ customId: string; value: WidgetValue }>
 }

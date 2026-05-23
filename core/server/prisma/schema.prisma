@@ -68,6 +68,7 @@ model Device {
   id                     Int                     @id @default(autoincrement())
   token                  String                  @default(uuid())
   name                   String
+  lastTimeConnected      DateTime?               @map("last_time_connected")
   widgets                Widget[]
   googlehomeTraitTargets GooglehomeTraitTarget[]
 

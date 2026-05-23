@@ -6,6 +6,8 @@
   "scripts": {
     "start:client": "cd ./core/client && npm start",
     "start:server": "cd ./core/server && npm run start:dev",
+    "prisma-studio": "cd ./core/server && npx prisma studio",
+    "build-core": "cd ./core && docker build -t nexum .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ignore-path ./.gitignore"
   },

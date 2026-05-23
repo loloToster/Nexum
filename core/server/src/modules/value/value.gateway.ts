@@ -25,10 +25,12 @@ export class ValueGateway {
   server: Server
 
   private readonly logger = new Logger(ValueGateway.name)
+  private nextSlaveId = 0
 
   constructor(
     @Inject(forwardRef(() => ValueService))
     private valueService: ValueService,
+    @Inject(forwardRef(() => DeviceService))
     private deviceService: DeviceService,
     @Inject(forwardRef(() => UserService))
     private userService: UserService
@@ -50,9 +52,11 @@ export class ValueGateway {
     } else if (socket.rooms.has("devices")) {
       const deviceId = socket.data.id
       target = this.valueService.createTarget(deviceId, customId)
+    } else if (socket.rooms.has("slaves")) {
+      // do nothing
     } else {
       this.logger.warn(
-        "Someone was connected without being in a 'users' or 'devices' room"
+        "Someone was connected without being in a 'users', 'devices' or 'slaves' room"
       )
 
       socket.disconnect()
@@ -133,9 +137,43 @@ export class ValueGateway {
 
         socket.data = device
 
+        await this.deviceService.editDevice(
+          device.id,
+          "lastTimeConnected",
+          new Date()
+        )
+
         this.logger.log(`device named: '${device.name}' successfully connected`)
 
         this.handleDisconnection(socket, "device")
+
+        break
+      }
+
+      case "slave": {
+        if (
+          !process.env.SLAVE_TOKEN ||
+          authorization.token !== process.env.SLAVE_TOKEN
+        ) {
+          socket.disconnect()
+          break
+        }
+
+        const slaveId = this.nextSlaveId++
+
+        socket.join(["slaves", `slave-${slaveId}`])
+        socket.data = {
+          id: slaveId,
+          name: "slave",
+          token: authorization.token,
+          lastTimeConnected: new Date()
+        }
+
+        this.logger.log("new slave successfully connected")
+
+        this.deviceService.syncDevicesInSlaves(slaveId)
+
+        this.handleDisconnection(socket, "slave")
 
         break
       }
